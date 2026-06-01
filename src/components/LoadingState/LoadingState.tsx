@@ -1,6 +1,6 @@
 "use client";
 
-import { Skeleton } from "@lumen-ui/react";
+import { Skeleton } from "@khamudom/lumen-ui-react";
 import styles from "./LoadingState.module.css";
 
 interface LoadingStateProps {

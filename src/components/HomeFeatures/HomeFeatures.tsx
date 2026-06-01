@@ -9,7 +9,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@lumen-ui/react";
+} from "@khamudom/lumen-ui-react";
 import styles from "./HomeFeatures.module.css";
 
 const features = [

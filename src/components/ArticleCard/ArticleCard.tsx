@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@lumen-ui/react";
+import { Badge, Card, CardContent, CardHeader, CardTitle } from "@khamudom/lumen-ui-react";
 import type { Article } from "@/types";
 import styles from "./ArticleCard.module.css";
 

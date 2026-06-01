@@ -9,7 +9,7 @@ import {
   Label,
   Select,
   Button,
-} from "@lumen-ui/react";
+} from "@khamudom/lumen-ui-react";
 import {
   championOptions,
   goldenBootOptions,

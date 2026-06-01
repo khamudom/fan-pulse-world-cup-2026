@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, Progress } from "@lumen-ui/react";
+import { Card, CardContent, CardHeader, CardTitle, Progress } from "@khamudom/lumen-ui-react";
 import styles from "./FanConfidenceMeter.module.css";
 
 interface ConfidenceItem {

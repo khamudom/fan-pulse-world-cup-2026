@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
   Button,
-} from "@lumen-ui/react";
+} from "@khamudom/lumen-ui-react";
 import { mockAiPrompts, mockAiResponses } from "@/data/mockInsights";
 import styles from "./AiInsightCard.module.css";
 

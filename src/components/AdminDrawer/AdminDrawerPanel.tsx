@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Button, Drawer } from "@lumen-ui/react";
+import { Button, Drawer } from "@khamudom/lumen-ui-react";
 import type { Stadium } from "@/types";
 import { FeaturedStadiumPicker } from "./FeaturedStadiumPicker";
 import styles from "./AdminDrawer.module.css";
@@ -37,7 +37,7 @@ export function AdminDrawerPanel({
       <Drawer
         open={open}
         onOpenChange={setOpen}
-        side="right"
+        right
         heading="Admin controls"
         description="Development-only editorial settings."
         returnFocusRef={triggerRef}

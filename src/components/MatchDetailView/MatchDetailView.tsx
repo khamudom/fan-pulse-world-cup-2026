@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@lumen-ui/react";
+import { Badge, Card, CardContent, CardHeader, CardTitle } from "@khamudom/lumen-ui-react";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
 import { Hero } from "@/components/Hero";
 import { SectionHeader } from "@/components/SectionHeader";

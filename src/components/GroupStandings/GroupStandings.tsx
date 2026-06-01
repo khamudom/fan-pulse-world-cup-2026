@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@lumen-ui/react";
+} from "@khamudom/lumen-ui-react";
 import type { Group } from "@/types";
 import styles from "./GroupStandings.module.css";
 

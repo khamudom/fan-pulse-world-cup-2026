@@ -7,7 +7,7 @@ import { SectionHeader } from "@/components/SectionHeader";
 import { MetricCard } from "@/components/MetricCard";
 import { FanConfidenceMeter } from "@/components/FanConfidenceMeter";
 import { Timeline } from "@/components/Timeline";
-import { Card, CardContent, CardHeader, CardTitle, Badge } from "@lumen-ui/react";
+import { Card, CardContent, CardHeader, CardTitle, Badge } from "@khamudom/lumen-ui-react";
 import {
   mockDashboardMetrics,
   mockFanSentiment,

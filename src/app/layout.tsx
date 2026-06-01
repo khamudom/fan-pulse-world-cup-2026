@@ -4,7 +4,7 @@ import { AdminDrawer } from "@/components/AdminDrawer";
 import { ApiPreviewBanner } from "@/components/ApiPreviewBanner";
 import { Header } from "@/components/Header/Header";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import "@lumen-ui/react/styles.css";
+import "@khamudom/lumen-ui-react/styles.css";
 import "./globals.css";
 
 const geistSans = Geist({

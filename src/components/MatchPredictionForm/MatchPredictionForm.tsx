@@ -9,7 +9,7 @@ import {
   Select,
   Input,
   Button,
-} from "@lumen-ui/react";
+} from "@khamudom/lumen-ui-react";
 import type { Match } from "@/types";
 import styles from "./MatchPredictionForm.module.css";
 

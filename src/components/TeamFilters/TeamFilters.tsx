@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Input, Select } from "@lumen-ui/react";
+import { Input, Select } from "@khamudom/lumen-ui-react";
 import { TeamCard } from "@/components/TeamCard";
 import { EmptyState } from "@/components/EmptyState";
 import type { Team } from "@/types";

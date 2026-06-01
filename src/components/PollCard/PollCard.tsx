@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
   Progress,
-} from "@lumen-ui/react";
+} from "@khamudom/lumen-ui-react";
 import type { Poll } from "@/types";
 import styles from "./PollCard.module.css";
 

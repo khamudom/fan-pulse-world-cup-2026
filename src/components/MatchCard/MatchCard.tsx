@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image, { type ImageLoaderProps } from "next/image";
-import { Badge, Button, Card, CardContent, CardFooter, CardHeader } from "@lumen-ui/react";
+import { Badge, Button, Card, CardContent, CardFooter, CardHeader } from "@khamudom/lumen-ui-react";
 import type { Match } from "@/types";
 import { getStatusLabel, getStatusBadgeVariant } from "@/services/worldCupApi";
 import styles from "./MatchCard.module.css";

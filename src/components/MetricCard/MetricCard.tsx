@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent } from "@lumen-ui/react";
+import { Card, CardContent } from "@khamudom/lumen-ui-react";
 import type { AnalyticsMetric } from "@/types";
 import styles from "./MetricCard.module.css";
 

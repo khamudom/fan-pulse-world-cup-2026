@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@lumen-ui/react";
+import { Badge, Card, CardContent, CardHeader, CardTitle } from "@khamudom/lumen-ui-react";
 import type { Team } from "@/types";
 import styles from "./TeamCard.module.css";
 

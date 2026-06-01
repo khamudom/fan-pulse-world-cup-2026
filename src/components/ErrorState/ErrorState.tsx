@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, AlertDescription, AlertTitle } from "@lumen-ui/react";
+import { Alert, AlertDescription, AlertTitle } from "@khamudom/lumen-ui-react";
 import styles from "./ErrorState.module.css";
 
 interface ErrorStateProps {

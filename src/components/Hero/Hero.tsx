@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@lumen-ui/react";
+import { Button } from "@khamudom/lumen-ui-react";
 import styles from "./Hero.module.css";
 
 interface HeroAction {

@@ -5,7 +5,7 @@ import {
   Banner,
   BannerDescription,
   BannerTitle,
-} from "@lumen-ui/react";
+} from "@khamudom/lumen-ui-react";
 import {
   isApiPreviewMode,
   USE_MOCK_FALLBACKS,

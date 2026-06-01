@@ -37,36 +37,18 @@ Monetization areas (e.g. “Presented by Global Connect”) are subtle and integ
 - **React**
 - **CSS Modules** + global design tokens
 - **npm**
-- **[@lumen-ui/react](https://github.com/khamudom/lumen-react)** — local component library
+- **[@khamudom/lumen-ui-react](https://www.npmjs.com/package/@khamudom/lumen-ui-react)** — published component library
 
 Not used: Tailwind, Material UI, Chakra, Bootstrap.
 
 ## Lumen UI Integration
 
-FanPulse composes UI from `@lumen-ui/react` (Button, Card, Badge, Input, Select, Tabs, Table, Progress, Alert, etc.). Custom components wrap Lumen primitives rather than reimplementing them.
+FanPulse composes UI from `@khamudom/lumen-ui-react` (Button, Card, Badge, Input, Select, Tabs, Table, Progress, Alert, etc.). Custom components wrap Lumen primitives rather than reimplementing them.
 
-### Install / link the library
-
-From the Lumen library directory:
+### Install the library
 
 ```bash
-cd /path/to/ComponentLibrary/lumen-react
-npm run build
-npm link
-```
-
-From this project:
-
-```bash
-cd /path/to/world-cup
-npm link @lumen-ui/react
-npm install
-```
-
-Alternatively, `package.json` uses a file dependency:
-
-```json
-"@lumen-ui/react": "file:../../ComponentLibrary/lumen-react"
+npm install @khamudom/lumen-ui-react
 ```
 
 ### Global styles
@@ -74,14 +56,14 @@ Alternatively, `package.json` uses a file dependency:
 In `src/app/layout.tsx`:
 
 ```ts
-import '@lumen-ui/react/styles.css';
+import '@khamudom/lumen-ui-react/styles.css';
 ```
 
 The package export `./styles.css` maps to `dist/lumen-react.css`. Next.js resolves the export path reliably; a direct `dist/` subpath import may fail depending on package `exports` configuration.
 
 ### Next.js config
 
-`next.config.ts` includes `transpilePackages: ['@lumen-ui/react']` so linked/source packages compile correctly.
+`next.config.ts` includes `transpilePackages: ['@khamudom/lumen-ui-react']` so the library compiles correctly with Next.js.
 
 ## World Cup API Integration
 

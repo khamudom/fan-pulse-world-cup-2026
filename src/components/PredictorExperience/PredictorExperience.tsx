@@ -9,7 +9,7 @@ import {
   Button,
   Select,
   Badge,
-} from "@lumen-ui/react";
+} from "@khamudom/lumen-ui-react";
 import { championOptions, mockMostPickedChampion } from "@/data/mockPredictions";
 import styles from "./PredictorExperience.module.css";
 

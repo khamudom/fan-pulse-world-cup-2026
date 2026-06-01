@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@lumen-ui/react";
+import { Button } from "@khamudom/lumen-ui-react";
 import Link from "next/link";
 import styles from "./EmptyState.module.css";
 

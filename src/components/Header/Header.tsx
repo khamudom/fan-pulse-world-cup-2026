@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@lumen-ui/react";
+import { Button } from "@khamudom/lumen-ui-react";
 import styles from "./Header.module.css";
 
 const navItems = [

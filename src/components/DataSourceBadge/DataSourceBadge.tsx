@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge } from "@lumen-ui/react";
+import { Badge } from "@khamudom/lumen-ui-react";
 import styles from "./DataSourceBadge.module.css";
 
 type DataSourceBadgeProps = {

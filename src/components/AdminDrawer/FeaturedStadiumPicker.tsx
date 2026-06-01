@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { Select } from "@lumen-ui/react";
+import { Select } from "@khamudom/lumen-ui-react";
 import { setFeaturedStadium } from "@/actions/featuredStadium";
 import type { Stadium } from "@/types";
 import styles from "./AdminDrawer.module.css";
