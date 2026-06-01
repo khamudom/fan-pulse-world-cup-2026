@@ -1,0 +1,76 @@
+import { Hero } from "@/components/Hero";
+import { SectionHeader } from "@/components/SectionHeader";
+import { StadiumCard } from "@/components/StadiumCard";
+import { DataSourceBadge } from "@/components/DataSourceBadge";
+import { EmptyState } from "@/components/EmptyState";
+import {
+  getFeaturedStadiumIdFromCookies,
+  resolveFeaturedStadium,
+} from "@/lib/featuredStadium";
+import { getStadiums } from "@/services/worldCupApi";
+import styles from "./page.module.css";
+
+export const metadata = {
+  title: "Stadiums",
+};
+
+export default async function StadiumsPage() {
+  const [{ data: stadiums, source }, preferredId] = await Promise.all([
+    getStadiums(),
+    getFeaturedStadiumIdFromCookies(),
+  ]);
+  const featured = resolveFeaturedStadium(stadiums, preferredId);
+  const rest = stadiums.filter((s) => s.id !== featured?.id);
+
+  return (
+    <div className="page">
+      <Hero
+        title="Host Stadiums"
+        subtitle="Explore World Cup 2026 venues across USA, Mexico, and Canada."
+        compact
+      />
+
+      {stadiums.length > 0 ? (
+        <>
+          <section className="section">
+            <div className="container">
+              <SectionHeader
+                title="Featured Venue"
+                action={<DataSourceBadge source={source === "mock" ? "mock" : "api"} />}
+              />
+              {featured && <StadiumCard stadium={featured} featured />}
+            </div>
+          </section>
+
+          <section className="section sectionAlt">
+            <div className="container">
+              <SectionHeader
+                title="All Stadiums"
+                subtitle={`${stadiums.length} venues${source === "mock" ? " (fallback data)" : ""}`}
+                action={<DataSourceBadge source={source === "mock" ? "mock" : "api"} />}
+              />
+              <div className={styles.grid}>
+                {rest.map((stadium) => (
+                  <StadiumCard key={stadium.id} stadium={stadium} />
+                ))}
+              </div>
+            </div>
+          </section>
+        </>
+      ) : (
+        <section className="section">
+          <div className="container">
+            <SectionHeader
+              title="All Stadiums"
+              action={<DataSourceBadge source="unavailable" />}
+            />
+            <EmptyState
+              title="No stadiums available"
+              message="The World Cup API returned no stadium data."
+            />
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}

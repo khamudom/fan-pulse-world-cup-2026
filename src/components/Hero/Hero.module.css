@@ -1,0 +1,92 @@
+.hero {
+  background: var(--color-hero-bg);
+  color: var(--color-text-inverse);
+  padding: var(--space-16) 0 var(--space-12);
+}
+
+.compact {
+  padding: var(--space-10) 0 var(--space-8);
+}
+
+.inner {
+  max-width: var(--layout-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.withAside {
+  display: grid;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .withAside {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+.content {
+  min-width: 0;
+}
+
+.aside {
+  min-width: 0;
+}
+
+.sponsor {
+  font-size: var(--text-sm);
+  opacity: 0.85;
+  margin-bottom: var(--space-4);
+}
+
+.sponsor strong {
+  color: var(--color-accent-muted);
+}
+
+.title {
+  font-size: clamp(var(--text-3xl), 5vw, var(--text-5xl));
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-4);
+  max-width: 16ch;
+}
+
+.subtitle {
+  font-size: clamp(var(--text-lg), 2.5vw, var(--text-xl));
+  opacity: 0.9;
+  max-width: 42ch;
+  margin-bottom: var(--space-8);
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.actions a {
+  text-decoration: none;
+}
+
+.actions :global(.lumen-button--primary) {
+  --lumen-button-bg: var(--color-cyan);
+  --lumen-button-color: var(--color-navy);
+  --lumen-button-hover-bg: #00b8e6;
+}
+
+.actions :global(.lumen-button--outline) {
+  --lumen-button-bg: transparent;
+  --lumen-button-color: var(--color-text-inverse);
+  --lumen-button-border: rgba(255, 255, 255, 0.85);
+  --lumen-button-hover-bg: rgba(255, 255, 255, 0.1);
+  --lumen-button-hover-color: var(--color-text-inverse);
+  --lumen-button-hover-border: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding: 0 var(--space-6);
+  }
+}
