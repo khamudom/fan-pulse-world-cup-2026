@@ -15,7 +15,9 @@ import {
 export function ApiPreviewBanner() {
   const [dismissed, setDismissed] = useState(false);
 
-  if (!isApiPreviewMode || dismissed) return null;
+  if (process.env.NODE_ENV !== "development" || !isApiPreviewMode || dismissed) {
+    return null;
+  }
 
   const notes = [
     !USE_MOCK_FALLBACKS && "API mock fallbacks disabled",
