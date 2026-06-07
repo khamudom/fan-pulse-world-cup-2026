@@ -31,8 +31,8 @@ export function ApiPreviewBanner() {
         <BannerDescription>{notes.join(" · ")}</BannerDescription>
       )}
       <BannerDescription>
-        Green &quot;Live API&quot; badges mark real World Cup API data. Toggle
-        flags in <code>src/config/dataSource.ts</code>.
+        Badges on each section show where data comes from — see the legend
+        below. Toggle preview flags in <code>src/config/dataSource.ts</code>.
       </BannerDescription>
     </Banner>
   );

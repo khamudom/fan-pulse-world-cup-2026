@@ -10,24 +10,14 @@ import {
   Select,
   Badge,
 } from "@khamudom/lumen-ui-react";
-import { championOptions, mockMostPickedChampion } from "@/data/mockPredictions";
+import { DataSourceBadge } from "@/components/DataSourceBadge";
+import { mockMostPickedChampion } from "@/data/mockPredictions";
+import { contentData } from "@/services/contentApi";
 import styles from "./PredictorExperience.module.css";
 
-const mockGroups = ["A", "B", "C", "D", "E", "F", "G", "H"];
-const mockAdvanceTeams: Record<string, string[]> = {
-  A: ["Mexico", "South Korea"],
-  B: ["England", "Senegal"],
-  C: ["Brazil", "Morocco"],
-  D: ["France", "Turkey"],
-};
-
-const knockoutRounds = [
-  { round: "Round of 32", matchups: ["1A vs 3C", "2B vs 2D"] },
-  { round: "Round of 16", matchups: ["Winner R32-1 vs Winner R32-2"] },
-  { round: "Quarterfinals", matchups: ["QF1", "QF2"] },
-  { round: "Semifinals", matchups: ["SF1", "SF2"] },
-  { round: "Final", matchups: ["Champion"] },
-];
+const championOptions = contentData.predictionOptions.championOptions;
+const { groups: mockGroups, advanceTeams: mockAdvanceTeams, knockoutRounds } =
+  contentData.predictor;
 
 export function PredictorExperience() {
   const [champion, setChampion] = useState("");
@@ -41,11 +31,14 @@ export function PredictorExperience() {
   return (
     <div className={styles.wrapper}>
       <section aria-labelledby="group-predictions">
-        <h2 id="group-predictions" className={styles.sectionTitle}>
-          Group Stage Predictions
-        </h2>
+        <div className={styles.sectionHeader}>
+          <h2 id="group-predictions" className={styles.sectionTitle}>
+            Group Stage Predictions
+          </h2>
+          <DataSourceBadge source="local" />
+        </div>
         <p className={styles.sectionDesc}>
-          Pick two teams to advance from each group (prototype).
+          Pick two teams to advance from each group.
         </p>
         <div className={styles.groupGrid}>
           {mockGroups.slice(0, 4).map((group) => (

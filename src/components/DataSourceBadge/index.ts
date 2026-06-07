@@ -1,1 +1,1 @@
-export { DataSourceBadge } from "./DataSourceBadge";
+export { DataSourceBadge, type DataSourceBadgeSource } from "./DataSourceBadge";

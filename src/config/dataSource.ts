@@ -9,7 +9,7 @@
  *
  * Flip these back to true when you want the full demo experience again.
  */
-export const USE_MOCK_FALLBACKS = false;
-export const USE_PROTOTYPE_DATA = false;
+export const USE_MOCK_FALLBACKS = true;
+export const USE_PROTOTYPE_DATA = true;
 
 export const isApiPreviewMode = !USE_MOCK_FALLBACKS || !USE_PROTOTYPE_DATA;

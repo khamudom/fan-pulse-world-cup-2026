@@ -4,26 +4,43 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@khamudom/lumen-ui-react";
+import { AuthNav } from "@/components/AuthNav";
+import { ThemeToggle } from "@/components/Theme";
+import type { ResolvedTheme } from "@/lib/theme";
 import styles from "./Header.module.css";
 
 const navItems = [
   { href: "/", label: "Home" },
-  { href: "/fanpulse", label: "FanPulse" },
+  { href: "/my-world-cup", label: "My World Cup" },
+  { href: "/challenges", label: "Challenges" },
   { href: "/matches", label: "Matches" },
   { href: "/predictor", label: "Predictor" },
-  { href: "/insights", label: "Insights" },
   { href: "/teams", label: "Teams" },
   { href: "/stadiums", label: "Stadiums" },
 ];
 
-export function Header() {
+interface HeaderProps {
+  signedIn?: boolean;
+  displayName?: string | null;
+  resolvedTheme: ResolvedTheme;
+}
+
+export function Header({
+  signedIn = false,
+  displayName,
+  resolvedTheme,
+}: HeaderProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <Link href="/" className={styles.logo} aria-label="World Cup FanPulse home">
+        <Link
+          href="/"
+          className={styles.logo}
+          aria-label="World Cup FanPulse home"
+        >
           <span className={styles.logoMark} aria-hidden="true">
             ⚽
           </span>
@@ -42,7 +59,9 @@ export function Header() {
                 <Link
                   href={item.href}
                   className={
-                    pathname === item.href ? styles.navLinkActive : styles.navLink
+                    pathname === item.href
+                      ? styles.navLinkActive
+                      : styles.navLink
                   }
                   onClick={() => setMenuOpen(false)}
                   aria-current={pathname === item.href ? "page" : undefined}
@@ -53,6 +72,11 @@ export function Header() {
             ))}
           </ul>
         </nav>
+
+        <div className={styles.right}>
+          <ThemeToggle resolvedTheme={resolvedTheme} />
+          <AuthNav signedIn={signedIn} displayName={displayName} />
+        </div>
 
         <Button
           type="button"

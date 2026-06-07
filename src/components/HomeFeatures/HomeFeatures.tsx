@@ -26,22 +26,12 @@ const features = [
   {
     title: "Fan Polls",
     description: "Vote on the biggest questions and see how fans are leaning.",
-    href: "/fanpulse",
-  },
-  {
-    title: "AI Match Insights",
-    description: "Explore AI-style observations on teams, matches, and storylines.",
-    href: "/fanpulse",
+    href: "/predictor",
   },
   {
     title: "Group Standings",
     description: "Track every group from A through L with live standings.",
-    href: "/fanpulse",
-  },
-  {
-    title: "World Cup Insights",
-    description: "Dive into trends, sentiment, and tournament analytics.",
-    href: "/insights",
+    href: "/matches",
   },
 ];
 

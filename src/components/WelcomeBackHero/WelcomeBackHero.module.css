@@ -1,0 +1,90 @@
+.hero {
+  background: var(--color-hero-bg);
+  color: var(--color-text-inverse);
+  padding: var(--space-12) 0;
+}
+
+.inner {
+  max-width: var(--layout-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.eyebrow {
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+  margin-bottom: var(--space-2);
+}
+
+.title {
+  font-size: clamp(var(--text-3xl), 5vw, var(--text-4xl));
+  font-weight: 800;
+  margin-bottom: var(--space-4);
+}
+
+.greeting {
+  font-size: var(--text-lg);
+  opacity: 0.9;
+  max-width: 52ch;
+  line-height: 1.5;
+  margin-bottom: var(--space-6);
+}
+
+.stats {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .stats {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.statLabel {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+
+.statValue {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.actions a {
+  text-decoration: none;
+}
+
+.actions :global(.lumen-button--primary) {
+  --lumen-button-bg: var(--color-cyan);
+  --lumen-button-color: var(--color-navy);
+}
+
+.actions :global(.lumen-button--outline) {
+  --lumen-button-bg: transparent;
+  --lumen-button-color: var(--color-text-inverse);
+  --lumen-button-border: rgba(255, 255, 255, 0.85);
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding: 0 var(--space-6);
+  }
+}

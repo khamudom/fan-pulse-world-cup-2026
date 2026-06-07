@@ -1,4 +1,7 @@
-:root {
+:root,
+[data-lumen-theme="light"] {
+  color-scheme: light;
+
   /* FIFA official palette */
   --color-navy: #001021;
   --color-blue: #00509d;
@@ -24,10 +27,57 @@
 
   /* Lumen UI — align buttons and controls with FIFA palette */
   --lumen-color-primary: #00509d;
+  --lumen-color-on-primary: #ffffff;
   --lumen-color-ring: #00ccff;
+  --lumen-color-background: var(--color-bg);
+  --lumen-color-surface: var(--color-surface);
+  --lumen-color-border: var(--color-border);
+  --lumen-color-text: var(--color-text);
+  --lumen-color-text-secondary: var(--color-text-muted);
+  --lumen-color-muted: #e8eef4;
   /* Above sticky header (100) so drawers/dialogs are not covered */
   --lumen-z-modal: 200;
+}
 
+:root.lumen-dark,
+.lumen-dark,
+[data-lumen-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg: #0a1420;
+  --color-surface: #132337;
+  --color-surface-elevated: #1a2d45;
+  --color-text: #e8f0f7;
+  --color-text-muted: #8ba3b8;
+  --color-text-inverse: #ffffff;
+  --color-primary: #3d9ae8;
+  --color-primary-hover: #66b3f0;
+  --color-accent: #00ccff;
+  --color-accent-muted: #66e5ff;
+  --color-border: #243a52;
+  --color-border-strong: #3a5570;
+  --color-header-bg: #001021;
+  --color-footer-bg: #003d78;
+  --color-hero-bg: #000a14;
+  --color-live: #f87171;
+  --color-success: #4ade80;
+
+  --lumen-color-primary: #00509d;
+  --lumen-color-on-primary: #ffffff;
+  --lumen-color-ring: #00ccff;
+  --lumen-color-background: var(--color-bg);
+  --lumen-color-surface: var(--color-surface);
+  --lumen-color-border: var(--color-border);
+  --lumen-color-text: var(--color-text);
+  --lumen-color-text-secondary: var(--color-text-muted);
+  --lumen-color-muted: #1a2d45;
+  --lumen-input-bg: var(--color-surface-elevated);
+  --lumen-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --lumen-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --lumen-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+:root {
   --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
@@ -109,7 +159,10 @@ img {
   height: auto;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   line-height: 1.2;
   font-weight: 700;
   margin: 0;

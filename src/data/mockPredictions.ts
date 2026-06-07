@@ -1,40 +1,8 @@
-export const championOptions = [
-  "Brazil",
-  "Argentina",
-  "France",
-  "England",
-  "USA",
-  "Germany",
-  "Spain",
-  "Portugal",
-];
+import { contentData } from "@/services/contentApi";
 
-export const goldenBootOptions = [
-  "Kylian Mbappé",
-  "Erling Haaland",
-  "Vinícius Júnior",
-  "Lionel Messi",
-  "Harry Kane",
-  "Lamine Yamal",
-];
-
-export const surpriseTeamOptions = [
-  "Morocco",
-  "Japan",
-  "USA",
-  "Colombia",
-  "Croatia",
-  "South Korea",
-];
-
-export const mockMostPickedChampion = {
-  team: "Brazil",
-  percentage: 34,
-};
-
-export const mockPredictionTrends = {
-  mostPickedChampion: "Brazil (34%)",
-  mostPickedGoldenBoot: "Kylian Mbappé (28%)",
-  biggestSurpriseTeam: "Morocco (19%)",
-  mostPredictedUpset: "USA over England in Round of 16",
-};
+export const championOptions = contentData.predictionOptions.championOptions;
+export const goldenBootOptions = contentData.predictionOptions.goldenBootOptions;
+export const surpriseTeamOptions =
+  contentData.predictionOptions.surpriseTeamOptions;
+export const mockMostPickedChampion = contentData.predictionTrends.mostPickedChampion;
+export const mockPredictionTrends = contentData.predictionTrends.trends;

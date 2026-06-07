@@ -9,19 +9,31 @@
   }
 }
 
-.featuredWrap {
-  max-width: 480px;
-}
-
-.dataNote {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  margin-top: var(--space-2);
-}
-
 .sectionActions {
   display: flex;
   align-items: center;
   gap: var(--space-4);
   flex-wrap: wrap;
+}
+
+.personalGrid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 900px) {
+  .personalGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.cta {
+  margin-top: var(--space-6);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.cta a {
+  color: var(--color-primary);
+  font-weight: 700;
 }

@@ -11,6 +11,7 @@ import {
   Button,
 } from "@khamudom/lumen-ui-react";
 import type { Match } from "@/types";
+import { savePrediction } from "@/actions/points";
 import styles from "./MatchPredictionForm.module.css";
 
 interface MatchPredictionFormProps {
@@ -22,12 +23,32 @@ export function MatchPredictionForm({ match }: MatchPredictionFormProps) {
   const [homeScore, setHomeScore] = useState("");
   const [awayScore, setAwayScore] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const teams = [match.homeTeam.name, match.awayTeam.name, "Draw"];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (winner) setSubmitted(true);
+    if (!winner) return;
+
+    const home = homeScore !== "" ? parseInt(homeScore, 10) : 0;
+    const away = awayScore !== "" ? parseInt(awayScore, 10) : 0;
+
+    setLoading(true);
+    setMessage(null);
+    const result = await savePrediction(match.id, home, away);
+    setLoading(false);
+
+    if ("error" in result && result.error) {
+      setMessage(result.error);
+      return;
+    }
+
+    setSubmitted(true);
+    setMessage(
+      result.isNew ? "Prediction saved · +25 points!" : "Prediction updated."
+    );
   };
 
   return (
@@ -67,15 +88,15 @@ export function MatchPredictionForm({ match }: MatchPredictionFormProps) {
               onChange={(e) => setAwayScore(e.target.value)}
             />
           </div>
-          <Button type="submit">Submit Prediction</Button>
-          {submitted && (
+          <Button type="submit" disabled={loading}>
+            {loading ? "Saving…" : "Submit Prediction"}
+          </Button>
+          {submitted && message ? (
             <p className={styles.success} role="status">
-              Prediction saved: {winner}
-              {homeScore && awayScore
-                ? ` (${homeScore}-${awayScore})`
-                : ""}
+              {message}: {winner}
+              {homeScore && awayScore ? ` (${homeScore}-${awayScore})` : ""}
             </p>
-          )}
+          ) : null}
         </form>
       </CardContent>
     </Card>

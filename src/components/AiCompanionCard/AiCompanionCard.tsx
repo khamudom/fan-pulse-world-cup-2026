@@ -1,0 +1,130 @@
+"use client";
+
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+} from "@khamudom/lumen-ui-react";
+import { DataSourceBadge } from "@/components/DataSourceBadge";
+import styles from "./AiCompanionCard.module.css";
+
+const defaultPrompts = [
+  "What should I know before my team's next match?",
+  "Who are the favorites today?",
+  "Summarize yesterday's biggest upset.",
+];
+
+interface AiCompanionCardProps {
+  title?: string;
+  prompts?: string[];
+}
+
+export function AiCompanionCard({
+  title = "AI World Cup Companion",
+  prompts = defaultPrompts,
+}: AiCompanionCardProps) {
+  const [message, setMessage] = useState("");
+  const [response, setResponse] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const ask = async (text: string) => {
+    const query = text.trim();
+    if (!query) return;
+
+    setLoading(true);
+    setError(null);
+    setResponse(null);
+
+    try {
+      const res = await fetch("/api/companion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: query }),
+      });
+
+      if (res.status === 401) {
+        setError("Sign in to use the AI companion.");
+        setLoading(false);
+        return;
+      }
+
+      if (!res.ok) {
+        setError("Could not reach the companion. Try again.");
+        setLoading(false);
+        return;
+      }
+
+      const answer = await res.text();
+      setResponse(answer);
+    } catch {
+      setError("Network error. Try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader className={styles.cardHeader}>
+        <CardTitle as="h3">{title}</CardTitle>
+        <DataSourceBadge source="local" />
+      </CardHeader>
+      <CardContent>
+        <div className={styles.prompts} role="group" aria-label="Companion prompts">
+          {prompts.map((prompt) => (
+            <Button
+              key={prompt}
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setMessage(prompt);
+                void ask(prompt);
+              }}
+              disabled={loading}
+            >
+              {prompt}
+            </Button>
+          ))}
+        </div>
+
+        <form
+          className={styles.form}
+          onSubmit={(e) => {
+            e.preventDefault();
+            void ask(message);
+          }}
+        >
+          <Input
+            label="Ask FanPulse"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Ask about your team, today's matches…"
+          />
+          <Button type="submit" disabled={loading || !message.trim()}>
+            {loading ? "Thinking…" : "Ask"}
+          </Button>
+        </form>
+
+        {error ? <p className={styles.error}>{error}</p> : null}
+        {response ? (
+          <div className={styles.response} role="region" aria-live="polite">
+            <p className={styles.responseLabel}>FanPulse AI</p>
+            <p className={styles.responseText}>{response}</p>
+          </div>
+        ) : (
+          !loading &&
+          !error && (
+            <p className={styles.hint}>
+              Your proactive World Cup companion — grounded in live match data.
+            </p>
+          )
+        )}
+      </CardContent>
+    </Card>
+  );
+}

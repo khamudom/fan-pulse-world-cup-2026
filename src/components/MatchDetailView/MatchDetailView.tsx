@@ -7,18 +7,13 @@ import { SectionHeader } from "@/components/SectionHeader";
 import { MatchPredictionForm } from "@/components/MatchPredictionForm";
 import { AiInsightCard } from "@/components/AiInsightCard";
 import { ArticleCard } from "@/components/ArticleCard";
-import { mockMatchInsights } from "@/data/mockInsights";
-import { mockArticles } from "@/data/mockArticles";
+import { contentData, getMatchComparison } from "@/services/contentApi";
 import { getStatusLabel, getStatusBadgeVariant } from "@/services/worldCupApi";
 import type { Match } from "@/types";
 import styles from "./MatchDetailView.module.css";
 
-const mockComparison = {
-  form: ["W", "W", "D", "W", "L"],
-  goalsScored: 8,
-  fanConfidence: 72,
-  keyPlayer: "Star Forward",
-};
+const mockMatchInsights = contentData.matchInsights;
+const mockArticles = contentData.articles;
 
 interface MatchDetailViewProps {
   match: Match;
@@ -35,6 +30,12 @@ export function MatchDetailView({
     match.status === "live" ||
     match.status === "finished" ||
     match.status === "halftime";
+
+  const comparisons = getMatchComparison(
+    match.id,
+    match.homeTeam.name,
+    match.awayTeam.name,
+  ).data;
 
   return (
     <>
@@ -63,13 +64,13 @@ export function MatchDetailView({
             <div className="container">
               <SectionHeader
                 title="Team Comparison"
-                action={<DataSourceBadge source="prototype" />}
+                action={<DataSourceBadge source="local" />}
               />
               <div className={styles.comparisonGrid}>
-                {[match.homeTeam, match.awayTeam].map((team, i) => (
-                  <Card key={team.id}>
+                {comparisons.map((stats) => (
+                  <Card key={stats.teamId}>
                     <CardHeader>
-                      <CardTitle as="h3">{team.name}</CardTitle>
+                      <CardTitle as="h3">{stats.teamName}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <dl className={styles.stats}>
@@ -77,7 +78,7 @@ export function MatchDetailView({
                           <dt>Recent form</dt>
                           <dd>
                             <span className={styles.form}>
-                              {mockComparison.form.map((r, idx) => (
+                              {stats.form.map((r, idx) => (
                                 <span key={idx} className={styles[`form_${r}`]}>
                                   {r}
                                 </span>
@@ -87,15 +88,15 @@ export function MatchDetailView({
                         </div>
                         <div>
                           <dt>Goals scored (tournament)</dt>
-                          <dd>{mockComparison.goalsScored - i}</dd>
+                          <dd>{stats.goalsScored}</dd>
                         </div>
                         <div>
                           <dt>Fan confidence</dt>
-                          <dd>{mockComparison.fanConfidence - i * 5}%</dd>
+                          <dd>{stats.fanConfidence}%</dd>
                         </div>
                         <div>
                           <dt>Key player</dt>
-                          <dd>{mockComparison.keyPlayer}</dd>
+                          <dd>{stats.keyPlayer}</dd>
                         </div>
                       </dl>
                     </CardContent>
@@ -109,14 +110,13 @@ export function MatchDetailView({
             <div className="container">
               <SectionHeader
                 title="Predictions & AI"
-                action={<DataSourceBadge source="prototype" />}
+                action={<DataSourceBadge source="local" />}
               />
               <div className={styles.twoCol}>
                 <MatchPredictionForm match={match} />
                 <AiInsightCard
                   title="AI Match Explainer"
                   prompts={Object.keys(mockMatchInsights)}
-                  responses={mockMatchInsights}
                 />
               </div>
             </div>
@@ -126,7 +126,7 @@ export function MatchDetailView({
             <div className="container">
               <SectionHeader
                 title="Related Stories"
-                action={<DataSourceBadge source="prototype" />}
+                action={<DataSourceBadge source="local" />}
               />
               <div className={styles.storyGrid}>
                 {mockArticles.slice(0, 3).map((article) => (

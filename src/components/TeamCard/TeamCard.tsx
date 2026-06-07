@@ -1,6 +1,14 @@
 "use client";
 
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@khamudom/lumen-ui-react";
+import {
+  Badge,
+  Button,
+  Card,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@khamudom/lumen-ui-react";
+import { getTeamFifaNewsUrl } from "@/lib/fifa";
 import type { Team } from "@/types";
 import styles from "./TeamCard.module.css";
 
@@ -9,8 +17,15 @@ interface TeamCardProps {
 }
 
 export function TeamCard({ team }: TeamCardProps) {
+  const fifaUrl = getTeamFifaNewsUrl(team);
+
   return (
     <Card className={styles.card}>
+      {team.group && (
+        <Badge variant="outline" className={styles.groupBadge}>
+          Group {team.group}
+        </Badge>
+      )}
       <CardHeader className={styles.header}>
         {team.flag ? (
           <img
@@ -23,18 +38,27 @@ export function TeamCard({ team }: TeamCardProps) {
         ) : (
           <span className={styles.flagPlaceholder} aria-hidden="true" />
         )}
-        <div>
+        <div className={styles.identity}>
           <CardTitle as="h3">{team.name}</CardTitle>
           {team.fifaCode && (
             <span className={styles.code}>{team.fifaCode}</span>
           )}
         </div>
       </CardHeader>
-      <CardContent>
-        {team.group && (
-          <Badge variant="outline">Group {team.group}</Badge>
-        )}
-      </CardContent>
+      <CardFooter className={styles.footer}>
+        <Button
+          type="button"
+          variant="outline"
+          fullWidth
+          className={styles.ctaButton}
+          aria-label={`View ${team.name} on FIFA.com (opens in new tab)`}
+          onClick={() => {
+            window.open(fifaUrl, "_blank", "noopener,noreferrer");
+          }}
+        >
+          View Team
+        </Button>
+      </CardFooter>
     </Card>
   );
 }

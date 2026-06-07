@@ -22,11 +22,9 @@ Monetization areas (e.g. “Presented by Global Connect”) are subtle and integ
 | Route | Description |
 |-------|-------------|
 | `/` | Home — hero, featured match, today’s matches, feature cards |
-| `/fanpulse` | Fan dashboard — matches, polls, predictions, AI insights, standings, stories |
-| `/matches` | Searchable/filterable full match schedule |
+| `/matches` | Searchable/filterable full match schedule with group standings |
 | `/matches/[id]` | Match center — comparison, prediction, AI explainer, stories |
 | `/predictor` | Tournament predictor — group picks, bracket preview, champion |
-| `/insights` | Fan insights dashboard — KPIs, sentiment, trends, timeline |
 | `/teams` | All 48 teams with search and group filter |
 | `/stadiums` | Host stadiums and cities |
 

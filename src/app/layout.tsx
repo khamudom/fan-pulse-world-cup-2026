@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AdminDrawer } from "@/components/AdminDrawer";
 import { ApiPreviewBanner } from "@/components/ApiPreviewBanner";
-import { Header } from "@/components/Header/Header";
+import { DataSourceLegend } from "@/components/DataSourceLegend";
+import { HeaderContainer } from "@/components/Header/HeaderContainer";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { ThemeProvider } from "@/components/Theme";
+import { getThemeState } from "@/lib/theme-request";
 import "@khamudom/lumen-ui-react/styles.css";
 import "./globals.css";
 
@@ -26,23 +29,36 @@ export const metadata: Metadata = {
     "Your companion experience for the FIFA World Cup 2026 — matches, predictions, insights, and fan engagement.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { preference, resolvedTheme } = await getThemeState();
+  const htmlClass = [
+    geistSans.variable,
+    geistMono.variable,
+    resolvedTheme === "dark" ? "lumen-dark" : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={htmlClass}
+      data-lumen-theme={resolvedTheme}
       data-scroll-behavior="smooth"
     >
       <body suppressHydrationWarning>
-        <ScrollToTop />
-        <ApiPreviewBanner />
-        <AdminDrawer />
-        <Header />
-        <main id="main-content">{children}</main>
+        <ThemeProvider preference={preference}>
+          <ScrollToTop />
+          <ApiPreviewBanner />
+          <DataSourceLegend />
+          <AdminDrawer />
+          <HeaderContainer />
+          <main id="main-content">{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   );

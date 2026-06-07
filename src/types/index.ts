@@ -12,6 +12,7 @@ export interface Team {
   nameFa?: string;
   flag?: string;
   fifaCode?: string;
+  fifaSlug?: string;
   iso2?: string;
   group?: string;
 }
