@@ -1,31 +1,150 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Button,
-  Select,
-  Badge,
-} from "@khamudom/lumen-ui-react";
+import Link from "next/link";
+import { useMemo, useState, useTransition } from "react";
+import { Button, Alert, Card, CardContent } from "@khamudom/lumen-ui-react";
+import { saveMyBracketPrediction } from "@/actions/bracketPredictions";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
+import {
+  BracketModeToggle,
+  WorldCupBracket,
+  type BracketMode,
+} from "@/components/WorldCupBracket";
+import { GroupStagePredictor } from "./GroupStagePredictor";
 import { mockMostPickedChampion } from "@/data/mockPredictions";
-import { contentData } from "@/services/contentApi";
+import {
+  cascadeBracketPicks,
+  getChampionFromPicks,
+  getThirdPlaceCandidates,
+  MAX_THIRD_PLACE_QUALIFIERS,
+} from "@/lib/bracket";
+import type {
+  BracketPredictionPayload,
+  BracketWinnerPicks,
+  GroupRankings,
+} from "@/types/bracket";
+import type { Group, Match, Team } from "@/types";
 import styles from "./PredictorExperience.module.css";
 
-const championOptions = contentData.predictionOptions.championOptions;
-const { groups: mockGroups, advanceTeams: mockAdvanceTeams, knockoutRounds } =
-  contentData.predictor;
+interface PredictorExperienceProps {
+  matches: Match[];
+  groups: Group[];
+  teams: Team[];
+  matchSource: "api" | "mock";
+  isSignedIn: boolean;
+  savedBracket?: BracketPredictionPayload | null;
+}
 
-export function PredictorExperience() {
-  const [champion, setChampion] = useState("");
+export function PredictorExperience({
+  matches,
+  groups,
+  teams,
+  matchSource,
+  isSignedIn,
+  savedBracket,
+}: PredictorExperienceProps) {
   const [submitted, setSubmitted] = useState(false);
-  const [groupPicks, setGroupPicks] = useState<Record<string, string>>({});
+  const [bracketMode, setBracketMode] = useState<BracketMode>("picks");
+  const [picks, setPicks] = useState<BracketWinnerPicks>(
+    savedBracket?.winners ?? {},
+  );
+  const [groupRankings, setGroupRankings] = useState<GroupRankings>(
+    savedBracket?.groupRankings ?? {},
+  );
+  const [thirdPlaceQualifiers, setThirdPlaceQualifiers] = useState<string[]>(
+    savedBracket?.thirdPlaceQualifiers ?? [],
+  );
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaving, startSaving] = useTransition();
 
-  const handleSubmit = () => {
-    if (champion) setSubmitted(true);
+  const championFromBracket = useMemo(
+    () => getChampionFromPicks(picks, teams),
+    [picks, teams],
+  );
+
+  const clearSaveState = () => {
+    setSaveMessage(null);
+    setSaveError(null);
+  };
+
+  const pruneThirdQualifiers = (nextRankings: GroupRankings) => {
+    const validIds = new Set(
+      getThirdPlaceCandidates(nextRankings, teams, groups).map((c) => c.team.id),
+    );
+    setThirdPlaceQualifiers((prev) => prev.filter((id) => validIds.has(id)));
+  };
+
+  const handleRankTeam = (groupName: string, teamId: string) => {
+    clearSaveState();
+    const order = groupRankings[groupName] ?? [];
+    const exists = order.includes(teamId);
+    const nextOrder = exists
+      ? order.filter((id) => id !== teamId)
+      : order.length < 4
+        ? [...order, teamId]
+        : order;
+    const next = { ...groupRankings, [groupName]: nextOrder };
+    setGroupRankings(next);
+    pruneThirdQualifiers(next);
+  };
+
+  const handleResetGroup = (groupName: string) => {
+    clearSaveState();
+    const next = { ...groupRankings };
+    delete next[groupName];
+    setGroupRankings(next);
+    pruneThirdQualifiers(next);
+  };
+
+  const handleToggleThird = (teamId: string) => {
+    clearSaveState();
+    setThirdPlaceQualifiers((prev) => {
+      if (prev.includes(teamId)) return prev.filter((id) => id !== teamId);
+      if (prev.length >= MAX_THIRD_PLACE_QUALIFIERS) return prev;
+      return [...prev, teamId];
+    });
+  };
+
+  const handlePickWinner = (matchId: string, team: Team) => {
+    clearSaveState();
+    setPicks((current) => cascadeBracketPicks(matchId, team.id, current));
+  };
+
+  const handleResetBracket = () => {
+    clearSaveState();
+    setPicks({});
+  };
+
+  const handleSaveBracket = () => {
+    clearSaveState();
+
+    if (!isSignedIn) {
+      setSaveError("Sign in to save your bracket picks.");
+      return;
+    }
+
+    startSaving(async () => {
+      const result = await saveMyBracketPrediction({
+        winners: picks,
+        groupRankings,
+        thirdPlaceQualifiers,
+        championTeamId: championFromBracket?.id,
+        championTeamName: championFromBracket?.name,
+      });
+
+      if (result.error) {
+        setSaveError(result.error);
+        return;
+      }
+
+      setSubmitted(true);
+      setSaveMessage(
+        result.isNew
+          ? "Your bracket is saved and you earned prediction points."
+          : "Your bracket picks were updated.",
+      );
+    });
   };
 
   return (
@@ -35,94 +154,89 @@ export function PredictorExperience() {
           <h2 id="group-predictions" className={styles.sectionTitle}>
             Group Stage Predictions
           </h2>
-          <DataSourceBadge source="local" />
+          <DataSourceBadge source={matchSource} />
         </div>
         <p className={styles.sectionDesc}>
-          Pick two teams to advance from each group.
+          Group advancement is decided by final standings, not knockout games.
+          Predict where each team finishes, then build your knockout bracket below.
         </p>
-        <div className={styles.groupGrid}>
-          {mockGroups.slice(0, 4).map((group) => (
-            <Card key={group}>
-              <CardHeader>
-                <CardTitle as="h3">Group {group}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Select
-                  label={`Advancing team 1`}
-                  value={groupPicks[`${group}-1`] ?? ""}
-                  onChange={(e) =>
-                    setGroupPicks((p) => ({ ...p, [`${group}-1`]: e.target.value }))
-                  }
-                  options={[
-                    { value: "", label: "Select team" },
-                    ...(mockAdvanceTeams[group] ?? ["Team 1", "Team 2"]).map(
-                      (t) => ({ value: t, label: t })
-                    ),
-                  ]}
-                />
-                <div className={styles.secondSelect}>
-                  <Select
-                    label="Advancing team 2"
-                    value={groupPicks[`${group}-2`] ?? ""}
-                    onChange={(e) =>
-                      setGroupPicks((p) => ({ ...p, [`${group}-2`]: e.target.value }))
-                    }
-                    options={[
-                      { value: "", label: "Select team" },
-                      ...(mockAdvanceTeams[group] ?? ["Team 1", "Team 2"]).map(
-                        (t) => ({ value: t, label: t })
-                      ),
-                    ]}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <GroupStagePredictor
+          groups={groups}
+          teams={teams}
+          rankings={groupRankings}
+          thirdPlaceQualifiers={thirdPlaceQualifiers}
+          maxThirds={MAX_THIRD_PLACE_QUALIFIERS}
+          onRankTeam={handleRankTeam}
+          onResetGroup={handleResetGroup}
+          onToggleThird={handleToggleThird}
+        />
       </section>
 
-      <section className={styles.bracketSection} aria-labelledby="bracket-preview">
-        <h2 id="bracket-preview" className={styles.sectionTitle}>
-          Knockout Bracket Preview
-        </h2>
-        <div className={styles.bracket}>
-          {knockoutRounds.map((round) => (
-            <div key={round.round} className={styles.bracketRound}>
-              <h3>{round.round}</h3>
-              <ul>
-                {round.matchups.map((m) => (
-                  <li key={m}>
-                    <Badge variant="outline">{m}</Badge>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+      <section className={styles.bracketSection} aria-labelledby="knockout-bracket">
+        <div className={styles.bracketHeader}>
+          <div>
+            <h2 id="knockout-bracket" className={styles.sectionTitle}>
+              Knockout Bracket
+            </h2>
+            <p className={styles.sectionDesc}>
+              Seeded from your group predictions. Tap teams to advance them through
+              each round — March Madness style. Switch to Live Bracket to follow
+              real results.
+            </p>
+          </div>
+          <div className={styles.bracketActions}>
+            <DataSourceBadge source={matchSource} />
+            <BracketModeToggle mode={bracketMode} onChange={setBracketMode} />
+          </div>
         </div>
-      </section>
 
-      <section aria-labelledby="champion-select">
-        <Card>
-          <CardHeader>
-            <CardTitle as="h2" id="champion-select">
-              Champion Selection
-            </CardTitle>
-          </CardHeader>
-          <CardContent className={styles.championSection}>
-            <Select
-              label="Your World Cup champion"
-              value={champion}
-              onChange={(e) => setChampion(e.target.value)}
-              options={[
-                { value: "", label: "Select champion" },
-                ...championOptions.map((c) => ({ value: c, label: c })),
-              ]}
-            />
-            <Button onClick={handleSubmit} disabled={!champion}>
-              Submit Prediction
+        {!isSignedIn && bracketMode === "picks" && (
+          <Alert className={styles.signInAlert}>
+            You can preview picks here.{" "}
+            <Link href="/login">Sign in</Link> to save your bracket.
+          </Alert>
+        )}
+
+        <WorldCupBracket
+          mode={bracketMode}
+          matches={matches}
+          groups={groups}
+          teams={teams}
+          picks={picks}
+          groupRankings={groupRankings}
+          thirdPlaceQualifiers={thirdPlaceQualifiers}
+          onPickWinner={bracketMode === "picks" ? handlePickWinner : undefined}
+        />
+
+        {bracketMode === "picks" && (
+          <div className={styles.saveRow}>
+            <Button onClick={handleSaveBracket} disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save Bracket Picks"}
             </Button>
-          </CardContent>
-        </Card>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={handleResetBracket}
+              disabled={isSaving || Object.keys(picks).length === 0}
+            >
+              Reset Bracket
+            </Button>
+            {championFromBracket && (
+              <p className={styles.stat}>
+                Your champion: <strong>{championFromBracket.name}</strong>
+              </p>
+            )}
+          </div>
+        )}
+
+        {saveError && (
+          <Alert variant="destructive" className={styles.saveAlert}>
+            {saveError}
+          </Alert>
+        )}
+        {saveMessage && (
+          <Alert className={styles.saveAlert}>{saveMessage}</Alert>
+        )}
       </section>
 
       {submitted && (
@@ -130,7 +244,8 @@ export function PredictorExperience() {
           <CardContent>
             <h2 className={styles.confirmTitle}>Your prediction is saved</h2>
             <p>
-              Champion selected: <strong>{champion}</strong>
+              Champion selected:{" "}
+              <strong>{championFromBracket?.name ?? "Not set"}</strong>
             </p>
             <div className={styles.confirmActions}>
               <Button variant="outline" type="button">

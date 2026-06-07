@@ -14,3 +14,9 @@ export { mockTeamsApiResponse } from "./worldcup/teams";
 export { mockGamesApiResponse } from "./worldcup/games";
 export { mockGroupsApiResponse } from "./worldcup/groups";
 export { mockStadiumsApiResponse } from "./worldcup/stadiums";
+export { worldCupSquadsApiResponse } from "./worldcup/squads";
+export type {
+  WorldCupSquad,
+  WorldCupSquadPlayer,
+  WorldCupSquadPosition,
+} from "./worldcup/squads";
