@@ -20,8 +20,10 @@ interface HeroProps {
   sponsor?: string;
   compact?: boolean;
   aside?: React.ReactNode;
+  asideWide?: boolean;
   children?: React.ReactNode;
   backgroundImage?: string;
+  backgroundImageFit?: "default" | "photo";
 }
 
 export function Hero({
@@ -33,8 +35,10 @@ export function Hero({
   sponsor,
   compact = false,
   aside,
+  asideWide = false,
   children,
   backgroundImage,
+  backgroundImageFit = "default",
 }: HeroProps) {
   return (
     <section
@@ -49,12 +53,18 @@ export function Hero({
             fill
             priority
             sizes="100vw"
-            className={styles.backgroundImage}
+            className={`${styles.backgroundImage} ${
+              backgroundImageFit === "photo" ? styles.backgroundImagePhoto : ""
+            }`}
           />
           <div className={styles.backgroundOverlay} />
         </div>
       ) : null}
-      <div className={`${styles.inner} ${aside ? styles.withAside : ""}`}>
+      <div
+        className={`${styles.inner} ${backgroundImage ? styles.withBackground : ""} ${
+          aside ? styles.withAside : ""
+        } ${asideWide ? styles.withWideAside : ""}`}
+      >
         <div className={styles.content}>
           {sponsor && (
             <p className={styles.sponsor} aria-label={`Presented by ${sponsor}`}>

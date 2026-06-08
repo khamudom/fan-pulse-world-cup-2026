@@ -37,6 +37,11 @@
   );
 }
 
+.backgroundImagePhoto {
+  object-fit: cover;
+  object-position: center right;
+}
+
 .backgroundOverlay {
   position: absolute;
   inset: 0;
@@ -69,8 +74,33 @@
   align-items: center;
 }
 
+.withBackground {
+  display: grid;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .withBackground {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .withBackground .content {
+    grid-column: 1;
+  }
+}
+
 @media (min-width: 768px) {
   .withAside {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .withWideAside {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    align-items: center;
+  }
+
+  .withBackground.withAside {
     grid-template-columns: minmax(0, 1fr) auto;
   }
 }
