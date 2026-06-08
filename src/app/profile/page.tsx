@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { Hero } from "@/components/Hero";
+import { EditableDisplayName } from "@/components/EditableDisplayName";
 import { ProfileDashboard } from "@/components/ProfileDashboard";
 import { getAuthContext } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -21,7 +22,9 @@ export default async function ProfilePage() {
   return (
     <div className="page">
       <Hero
-        title={profile?.display_name ?? "Fan Profile"}
+        title={
+          <EditableDisplayName displayName={profile?.display_name ?? "Fan"} />
+        }
         subtitle="Your FanPulse reputation — points, streaks, and prediction accuracy."
         compact
       />

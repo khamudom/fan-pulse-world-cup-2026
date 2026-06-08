@@ -12,7 +12,7 @@ interface HeroAction {
 }
 
 interface HeroProps {
-  title: string;
+  title: React.ReactNode;
   subtitle: string;
   tagline?: string;
   stats?: string[];

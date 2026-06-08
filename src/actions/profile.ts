@@ -72,20 +72,27 @@ export async function saveMyWorldCup(
 
   revalidatePath("/", "layout");
   revalidatePath("/my-world-cup");
-  return { success: "Your World Cup profile is saved!" };
+  redirect("/my-world-cup");
 }
 
 export async function updateDisplayName(displayName: string) {
   const user = await getSessionUser();
   if (!user) return { error: "Not signed in." };
 
+  const trimmed = displayName.trim();
+  if (!trimmed) return { error: "Display name can't be empty." };
+  if (trimmed.length > 50) {
+    return { error: "Display name must be 50 characters or fewer." };
+  }
+
   const supabase = await createClient();
   const { error } = await supabase
     .from("profiles")
-    .update({ display_name: displayName, updated_at: new Date().toISOString() })
+    .update({ display_name: trimmed, updated_at: new Date().toISOString() })
     .eq("id", user.id);
 
   if (error) return { error: error.message };
+  revalidatePath("/", "layout");
   revalidatePath("/profile");
   return { success: true };
 }
