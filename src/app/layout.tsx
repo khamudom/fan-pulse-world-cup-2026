@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AdminDrawer } from "@/components/AdminDrawer";
 import { ApiPreviewBanner } from "@/components/ApiPreviewBanner";
+import { AuthModalProvider } from "@/components/AuthModal";
 import { DataSourceLegend } from "@/components/DataSourceLegend";
 import { HeaderContainer } from "@/components/Header/HeaderContainer";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -52,12 +53,14 @@ export default async function RootLayout({
     >
       <body suppressHydrationWarning>
         <ThemeProvider preference={preference}>
-          <ScrollToTop />
-          <ApiPreviewBanner />
-          <DataSourceLegend />
-          <AdminDrawer />
-          <HeaderContainer />
-          <main id="main-content">{children}</main>
+          <AuthModalProvider>
+            <ScrollToTop />
+            <ApiPreviewBanner />
+            <DataSourceLegend />
+            <AdminDrawer />
+            <HeaderContainer />
+            <main id="main-content">{children}</main>
+          </AuthModalProvider>
         </ThemeProvider>
       </body>
     </html>

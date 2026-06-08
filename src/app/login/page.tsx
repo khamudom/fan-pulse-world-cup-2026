@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { LoginForm } from "@/components/LoginForm";
+import { LoginPageOpener } from "@/components/AuthModal";
 import { getSessionUser, isSupabaseConfigured } from "@/lib/auth";
 import styles from "./page.module.css";
 
@@ -16,6 +16,7 @@ export default async function LoginPage({
   if (user) redirect("/");
 
   const { country } = await searchParams;
+  const pendingCountry = country?.trim() || undefined;
 
   return (
     <div className={`page ${styles.page}`}>
@@ -28,8 +29,9 @@ export default async function LoginPage({
               project URL and anon key.
             </p>
           </div>
-        ) : null}
-        <LoginForm pendingCountry={country?.trim() || undefined} />
+        ) : (
+          <LoginPageOpener country={pendingCountry} />
+        )}
       </div>
     </div>
   );

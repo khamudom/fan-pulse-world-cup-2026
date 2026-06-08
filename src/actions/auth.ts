@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -88,4 +89,66 @@ export async function signOut() {
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect("/login");
+}
+
+async function getRequestOrigin(): Promise<string> {
+  const headerStore = await headers();
+  const host =
+    headerStore.get("x-forwarded-host") ?? headerStore.get("host");
+  if (!host) return "http://localhost:3000";
+  const protocol =
+    headerStore.get("x-forwarded-proto") ??
+    (host.includes("localhost") ? "http" : "https");
+  return `${protocol}://${host}`;
+}
+
+export async function requestPasswordReset(
+  _prevState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const email = String(formData.get("email") ?? "").trim();
+
+  if (!email) {
+    return { error: "Email is required." };
+  }
+
+  const origin = await getRequestOrigin();
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/login/reset-password`,
+  });
+
+  if (error) return { error: error.message };
+
+  return {
+    success: "Check your email for a link to reset your password.",
+  };
+}
+
+export async function updatePassword(
+  _prevState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+  if (!password) {
+    return { error: "Password is required." };
+  }
+
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters." };
+  }
+
+  if (password !== confirmPassword) {
+    return { error: "Passwords do not match." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/", "layout");
+  return { success: "Your password has been updated." };
 }

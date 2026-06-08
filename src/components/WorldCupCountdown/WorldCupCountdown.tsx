@@ -20,6 +20,14 @@ const countdownUnits: { key: keyof CountdownParts; label: string }[] = [
   { key: "seconds", label: "secs" },
 ];
 
+const emptyCountdown: CountdownParts = {
+  days: 0,
+  hours: 0,
+  minutes: 0,
+  seconds: 0,
+  totalMs: 0,
+};
+
 export function WorldCupCountdown() {
   const [now, setNow] = useState<Date | null>(null);
 
@@ -30,18 +38,24 @@ export function WorldCupCountdown() {
   }, []);
 
   const phase = now ? getCountdownPhase(now) : "countdown";
-  const countdown = now ? getCountdownParts(WORLD_CUP_2026.kickoff, now) : null;
+  const countdown = now
+    ? getCountdownParts(WORLD_CUP_2026.kickoff, now)
+    : emptyCountdown;
 
   return (
     <div className={styles.wrap} aria-label="FIFA World Cup 2026 countdown">
       <p className={styles.eyebrow}>{WORLD_CUP_2026.dateRangeLabel}</p>
 
-      {phase === "countdown" && countdown ? (
+      {phase === "countdown" ? (
         <div
           className={styles.countdown}
           role="timer"
           aria-live="polite"
-          aria-label={`${countdown.days} days, ${countdown.hours} hours, ${countdown.minutes} minutes, ${countdown.seconds} seconds until kickoff`}
+          aria-label={
+            now
+              ? `${countdown.days} days, ${countdown.hours} hours, ${countdown.minutes} minutes, ${countdown.seconds} seconds until kickoff`
+              : "Countdown to kickoff"
+          }
         >
           {countdownUnits.map(({ key, label }) => (
             <div key={key} className={styles.unit}>

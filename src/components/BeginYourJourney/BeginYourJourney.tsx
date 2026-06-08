@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useMemo, useState, useSyncExternalStore } from "react";
 import { Button, Input } from "@khamudom/lumen-ui-react";
 import {
   beginJourneyWithNation,
@@ -13,6 +13,18 @@ import styles from "./BeginYourJourney.module.css";
 
 const initialState: ProfileActionState = {};
 
+function subscribeToMount() {
+  return () => {};
+}
+
+function getClientMounted() {
+  return true;
+}
+
+function getServerMounted() {
+  return false;
+}
+
 interface BeginYourJourneyProps {
   teams: Team[];
   teamsSource?: ApiDataSource;
@@ -24,6 +36,11 @@ export function BeginYourJourney({
 }: BeginYourJourneyProps) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
+  const mounted = useSyncExternalStore(
+    subscribeToMount,
+    getClientMounted,
+    getServerMounted
+  );
   const [state, formAction, pending] = useActionState(
     beginJourneyWithNation,
     initialState
@@ -77,6 +94,7 @@ export function BeginYourJourney({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Find your nation"
+            autoComplete="off"
           />
 
           {filtered.length === 0 ? (
@@ -89,30 +107,21 @@ export function BeginYourJourney({
                 const isSelected = selected === team.name;
                 return (
                   <li key={team.id} role="presentation">
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={isSelected}
-                      className={`${styles.nation} ${isSelected ? styles.nationSelected : ""}`}
-                      onClick={() => setSelected(team.name)}
-                    >
-                      <span className={styles.nationGlow} aria-hidden="true" />
-                      {team.flag ? (
-                        <img
-                          src={team.flag}
-                          alt=""
-                          className={styles.flag}
-                          width={80}
-                          height={60}
-                        />
-                      ) : (
-                        <span className={styles.flagPlaceholder} aria-hidden="true" />
-                      )}
-                      <span className={styles.nationName}>{team.name}</span>
-                      {team.group ? (
-                        <span className={styles.group}>Group {team.group}</span>
-                      ) : null}
-                    </button>
+                    {mounted ? (
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        className={`${styles.nation} ${isSelected ? styles.nationSelected : ""}`}
+                        onClick={() => setSelected(team.name)}
+                      >
+                        <NationCardContent team={team} />
+                      </button>
+                    ) : (
+                      <div className={styles.nation} aria-hidden="true">
+                        <NationCardContent team={team} />
+                      </div>
+                    )}
                   </li>
                 );
               })}
@@ -141,5 +150,26 @@ export function BeginYourJourney({
         </form>
       </div>
     </section>
+  );
+}
+
+function NationCardContent({ team }: { team: Team }) {
+  return (
+    <>
+      <span className={styles.nationGlow} aria-hidden="true" />
+      {team.flag ? (
+        <img
+          src={team.flag}
+          alt=""
+          className={styles.flag}
+          width={80}
+          height={60}
+        />
+      ) : (
+        <span className={styles.flagPlaceholder} aria-hidden="true" />
+      )}
+      <span className={styles.nationName}>{team.name}</span>
+      {team.group ? <span className={styles.group}>Group {team.group}</span> : null}
+    </>
   );
 }

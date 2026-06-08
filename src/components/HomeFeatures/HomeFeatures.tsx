@@ -46,7 +46,9 @@ export function HomeFeatures() {
         >
           <Card className={styles.featureCard} interactive>
             <CardHeader>
-              <Badge variant="secondary">Feature</Badge>
+              <Badge variant="secondary" className={styles.featureBadge}>
+                Feature
+              </Badge>
               <CardTitle as="h3">{feature.title}</CardTitle>
             </CardHeader>
             <CardContent>

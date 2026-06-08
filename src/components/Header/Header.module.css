@@ -74,8 +74,12 @@
   background: rgba(0, 204, 255, 0.12);
 }
 
-.menuToggle {
+.menuToggleWrap {
   display: flex;
+  align-items: center;
+}
+
+.menuToggle {
   --lumen-button-color: var(--color-text-inverse);
   --lumen-button-hover-bg: rgba(255, 255, 255, 0.08);
   --lumen-button-hover-color: var(--color-text-inverse);
@@ -86,7 +90,7 @@
 }
 
 @media (min-width: 900px) {
-  .menuToggle {
+  .menuToggleWrap {
     display: none;
   }
 

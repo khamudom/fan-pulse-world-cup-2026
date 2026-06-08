@@ -9,11 +9,9 @@ import {
   Button,
   Input,
   Select,
-  Checkbox,
 } from "@khamudom/lumen-ui-react";
 import { saveMyWorldCup, type ProfileActionState } from "@/actions/profile";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
-import { followablePlayers } from "@/data/followablePlayers";
 import { toDataSourceBadge, type ApiDataSource } from "@/lib/dataSourceBadge";
 import type { Team } from "@/types";
 import type { Profile } from "@/types/database";
@@ -41,12 +39,6 @@ export function MyWorldCupForm({
     ...teams.map((t) => ({ value: t.name, label: t.name })),
   ];
 
-  const favoriteCountry =
-    profile?.favorite_country ?? initialCountry ?? "";
-  const filteredPlayers = favoriteCountry
-    ? followablePlayers.filter((p) => p.team === favoriteCountry)
-    : followablePlayers;
-
   return (
     <Card>
       <CardHeader>
@@ -70,7 +62,9 @@ export function MyWorldCupForm({
             <Select
               label="Favorite country"
               name="favoriteCountry"
-              defaultValue={profile?.favorite_country ?? ""}
+              defaultValue={
+                profile?.favorite_country ?? initialCountry ?? ""
+              }
               options={teamOptions}
               required
             />
@@ -81,24 +75,6 @@ export function MyWorldCupForm({
               options={teamOptions}
             />
           </div>
-
-          <fieldset className={styles.players}>
-            <legend className={styles.legend}>
-              <span>Favorite players</span>
-              <DataSourceBadge source="local" />
-            </legend>
-            <div className={styles.playerGrid}>
-              {filteredPlayers.map((player) => (
-                <Checkbox
-                  key={player.id}
-                  name="favoritePlayers"
-                  value={player.id}
-                  label={`${player.name} (${player.team})`}
-                  defaultChecked={profile?.favorite_player_ids?.includes(player.id)}
-                />
-              ))}
-            </div>
-          </fieldset>
 
           {state.error ? <p className={styles.error}>{state.error}</p> : null}
           {state.success ? <p className={styles.success}>{state.success}</p> : null}

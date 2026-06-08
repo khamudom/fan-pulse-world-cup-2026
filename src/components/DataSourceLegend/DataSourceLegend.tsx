@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
 import styles from "./DataSourceLegend.module.css";
 
@@ -18,9 +21,25 @@ const items = [
 ];
 
 export function DataSourceLegend() {
+  const [dismissed, setDismissed] = useState(false);
+
+  if (process.env.NODE_ENV !== "development" || dismissed) {
+    return null;
+  }
+
   return (
     <div className={styles.legend} aria-label="Data source legend">
-      <p className={styles.title}>Data sources</p>
+      <div className={styles.header}>
+        <p className={styles.title}>Data sources</p>
+        <button
+          type="button"
+          className={styles.dismiss}
+          onClick={() => setDismissed(true)}
+          aria-label="Dismiss data source legend"
+        >
+          ×
+        </button>
+      </div>
       <ul className={styles.list}>
         {items.map((item) => (
           <li key={item.source}>
