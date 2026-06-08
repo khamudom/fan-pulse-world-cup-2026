@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Input, Select } from "@khamudom/lumen-ui-react";
+import { Select } from "@khamudom/lumen-ui-react";
 import { MatchCard } from "@/components/MatchCard";
 import { EmptyState } from "@/components/EmptyState";
 import { isMatchOnDate } from "@/lib/matchDate";
@@ -23,20 +23,12 @@ export function MatchFilters({
   stadiums,
   selectedDate,
 }: MatchFiltersProps) {
-  const [search, setSearch] = useState("");
   const [group, setGroup] = useState("");
   const [team, setTeam] = useState("");
   const [stadium, setStadium] = useState("");
 
   const filtered = useMemo(() => {
     return matches.filter((m) => {
-      const searchLower = search.toLowerCase();
-      const matchesSearch =
-        !search ||
-        m.homeTeam.name.toLowerCase().includes(searchLower) ||
-        m.awayTeam.name.toLowerCase().includes(searchLower) ||
-        m.stadiumName?.toLowerCase().includes(searchLower);
-
       const matchesGroup = !group || m.group === group;
       const matchesTeam =
         !team ||
@@ -46,20 +38,13 @@ export function MatchFilters({
       const matchesDate =
         !selectedDate || isMatchOnDate(m.date, selectedDate);
 
-      return matchesSearch && matchesGroup && matchesTeam && matchesStadium && matchesDate;
+      return matchesGroup && matchesTeam && matchesStadium && matchesDate;
     });
-  }, [matches, search, group, team, stadium, selectedDate]);
+  }, [matches, group, team, stadium, selectedDate]);
 
   return (
     <div>
-      <div className={styles.filters} role="search">
-        <Input
-          label="Search matches"
-          placeholder="Team or stadium…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          type="search"
-        />
+      <div className={styles.filters}>
         <Select
           label="Group"
           value={group}
@@ -92,7 +77,7 @@ export function MatchFilters({
       {filtered.length === 0 ? (
         <EmptyState
           title="No matches found"
-          message="Try adjusting your filters or search term."
+          message="Try adjusting your filters or selecting another date."
           actionLabel="Clear filters"
           actionHref="/matches"
         />

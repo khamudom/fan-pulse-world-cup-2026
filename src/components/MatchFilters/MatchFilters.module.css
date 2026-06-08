@@ -12,7 +12,7 @@
 
 @media (min-width: 1024px) {
   .filters {
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
