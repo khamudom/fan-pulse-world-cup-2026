@@ -1,22 +1,39 @@
+.card {
+  height: 100%;
+  min-width: 0;
+}
+
 .cardHeader {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-2);
+  padding-right: var(--space-8);
+}
+
+.content {
+  padding-right: var(--space-8);
 }
 
 .prompts {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--space-2);
   margin-bottom: var(--space-4);
+}
+
+.prompts button {
+  white-space: normal;
+  text-align: left;
+  height: auto;
 }
 
 .form {
   display: grid;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
+  min-width: 0;
 }
 
 @media (min-width: 640px) {

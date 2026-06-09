@@ -4,6 +4,7 @@ import { AdminDrawer } from "@/components/AdminDrawer";
 import { ApiPreviewBanner } from "@/components/ApiPreviewBanner";
 import { AuthModalProvider } from "@/components/AuthModal";
 import { DataSourceLegend } from "@/components/DataSourceLegend";
+import { CheckInCelebrationContainer } from "@/components/CheckInCelebration";
 import { HeaderContainer } from "@/components/Header/HeaderContainer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ThemeProvider } from "@/components/Theme";
@@ -59,6 +60,7 @@ export default async function RootLayout({
             <DataSourceLegend />
             <AdminDrawer />
             <HeaderContainer />
+            <CheckInCelebrationContainer />
             <main id="main-content">{children}</main>
           </AuthModalProvider>
         </ThemeProvider>

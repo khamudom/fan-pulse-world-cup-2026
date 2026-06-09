@@ -4,6 +4,10 @@
   margin-bottom: var(--space-6);
 }
 
+.accolades {
+  margin-bottom: var(--space-6);
+}
+
 @media (min-width: 768px) {
   .grid {
     grid-template-columns: 1fr 1fr;

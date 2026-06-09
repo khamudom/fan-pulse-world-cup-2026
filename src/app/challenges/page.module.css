@@ -1,5 +1,5 @@
 .topGrid {
-  max-width: 480px;
+  max-width: var(--layout-max);
 }
 
 .grid {

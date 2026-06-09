@@ -73,8 +73,9 @@
 }
 
 .actions :global(.lumen-button--primary) {
-  --lumen-button-bg: var(--color-cyan);
+  --lumen-button-bg: var(--color-primary);
   --lumen-button-color: var(--color-navy);
+  --lumen-button-hover-bg: var(--color-primary-hover);
 }
 
 .actions :global(.lumen-button--outline) {

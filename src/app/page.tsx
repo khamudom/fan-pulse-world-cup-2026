@@ -11,7 +11,7 @@ import { BeginYourJourney } from "@/components/BeginYourJourney";
 import { StoryToday } from "@/components/StoryToday";
 import { WelcomeBackHero } from "@/components/WelcomeBackHero";
 import { FanJourneyCard } from "@/components/FanJourneyCard";
-import { DailyCheckIn } from "@/components/DailyCheckIn";
+import { FanAccoladesBoard } from "@/components/FanAccoladesBoard";
 import { AiCompanionCard } from "@/components/AiCompanionCard";
 import { BriefingSection } from "@/components/BriefingContent";
 import { getAuthContext } from "@/lib/auth";
@@ -99,10 +99,7 @@ export default async function HomePage() {
                 favoriteCountry={profile.favorite_country}
                 matchesSource={matchesResult.source}
               />
-              <DailyCheckIn
-                lastCheckIn={stats?.last_check_in ?? null}
-                currentStreak={stats?.current_streak ?? 0}
-              />
+              <FanAccoladesBoard stats={stats} variant="compact" />
               <AiCompanionCard />
             </div>
           </div>

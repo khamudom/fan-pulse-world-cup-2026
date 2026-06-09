@@ -13,8 +13,8 @@
   --color-text: #001021;
   --color-text-muted: #4a667a;
   --color-text-inverse: #ffffff;
-  --color-primary: #00509d;
-  --color-primary-hover: #003d78;
+  --color-primary: #3d9ae8;
+  --color-primary-hover: #2c84cf;
   --color-accent: #00ccff;
   --color-accent-muted: #66e5ff;
   --color-border: #d4e0eb;
@@ -26,8 +26,8 @@
   --color-success: #16a34a;
 
   /* Lumen UI — align buttons and controls with FIFA palette */
-  --lumen-color-primary: #00509d;
-  --lumen-color-on-primary: #ffffff;
+  --lumen-color-primary: #3d9ae8;
+  --lumen-color-on-primary: var(--color-navy);
   --lumen-color-ring: #00ccff;
   --lumen-color-background: var(--color-bg);
   --lumen-color-surface: var(--color-surface);
@@ -62,8 +62,8 @@
   --color-live: #f87171;
   --color-success: #4ade80;
 
-  --lumen-color-primary: #00509d;
-  --lumen-color-on-primary: #ffffff;
+  --lumen-color-primary: #3d9ae8;
+  --lumen-color-on-primary: var(--color-navy);
   --lumen-color-ring: #00ccff;
   --lumen-color-background: var(--color-bg);
   --lumen-color-surface: var(--color-surface);

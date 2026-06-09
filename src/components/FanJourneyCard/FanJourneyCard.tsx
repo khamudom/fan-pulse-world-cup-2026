@@ -87,7 +87,7 @@ export function FanJourneyCard({
           {journey.nextMatch.stadiumName ? ` · ${journey.nextMatch.stadiumName}` : ""}
         </p>
         <Link href={`/matches/${journey.nextMatch.id}`}>
-          <Button variant="outline">View match</Button>
+          <Button variant="primary">View match</Button>
         </Link>
       </CardContent>
     </Card>

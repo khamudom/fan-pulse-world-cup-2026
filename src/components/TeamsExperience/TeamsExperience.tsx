@@ -60,7 +60,7 @@ const teamsHeroProps = {
   title: "Meet the Nations",
   tagline: "World Cup 2026",
   backgroundImage: "/images/wc-flags.webp",
-  backgroundImageFit: "photo" as const,
+  backgroundImageFit: "fullWidth" as const,
 };
 
 function subscribeToMount() {

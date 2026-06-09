@@ -128,7 +128,7 @@ export function MatchCard({ match, featured = false }: MatchCardProps) {
       </CardContent>
       <CardFooter>
         <Link href={`/matches/${match.id}`} className={styles.link}>
-          <Button variant="outline">
+          <Button variant="primary">
             View Match
           </Button>
         </Link>

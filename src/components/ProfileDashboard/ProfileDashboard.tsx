@@ -8,7 +8,7 @@ import {
   CardTitle,
   Badge,
 } from "@khamudom/lumen-ui-react";
-import { DailyCheckIn } from "@/components/DailyCheckIn";
+import { FanAccoladesBoard } from "@/components/FanAccoladesBoard";
 import { getLevelTitle } from "@/lib/points";
 import type { Profile, UserStats } from "@/types/database";
 import styles from "./ProfileDashboard.module.css";
@@ -61,10 +61,10 @@ export function ProfileDashboard({
           </CardContent>
         </Card>
 
-        <DailyCheckIn
-          lastCheckIn={stats?.last_check_in ?? null}
-          currentStreak={stats?.current_streak ?? 0}
-        />
+      </div>
+
+      <div className={styles.accolades}>
+        <FanAccoladesBoard stats={stats} variant="full" />
       </div>
 
       <div className={styles.links}>

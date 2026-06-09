@@ -4,78 +4,34 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth";
 import { awardPoints } from "@/actions/points";
-import { POINT_VALUES } from "@/lib/points";
+import { ensureDailyCheckIn } from "@/lib/checkin";
+
+export type { DailyCheckInStatus } from "@/lib/checkin";
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+function revalidateCheckInPaths() {
+  revalidatePath("/", "layout");
+  revalidatePath("/profile");
+  revalidatePath("/challenges");
 }
 
 export async function performDailyCheckIn() {
   const user = await getSessionUser();
   if (!user) return { error: "Not signed in." };
 
-  const supabase = await createClient();
-  const { data: stats } = await supabase
-    .from("user_stats")
-    .select("*")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  const today = todayIso();
-  if (stats?.last_check_in === today) {
-    return {
-      success: true,
-      alreadyCheckedIn: true,
-      streak: stats.current_streak,
-    };
+  const result = await ensureDailyCheckIn(user.id);
+  if (result.justCheckedIn) {
+    revalidateCheckInPaths();
   }
 
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayIso = yesterday.toISOString().slice(0, 10);
-
-  let newStreak = 1;
-  if (stats?.last_check_in === yesterdayIso) {
-    newStreak = (stats.current_streak ?? 0) + 1;
-  }
-
-  await supabase.from("user_stats").upsert(
-    {
-      user_id: user.id,
-      points: stats?.points ?? 0,
-      level: stats?.level ?? 1,
-      current_streak: newStreak,
-      last_check_in: today,
-      prediction_accuracy: stats?.prediction_accuracy ?? 0,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" }
-  );
-
-  await awardPoints("daily_check_in", POINT_VALUES.daily_check_in);
-
-  const { data: checkInChallenge } = await supabase
-    .from("challenges")
-    .select("id")
-    .eq("slug", "daily-check-in")
-    .maybeSingle();
-
-  if (checkInChallenge) {
-    await supabase.from("challenge_completions").upsert(
-      {
-        user_id: user.id,
-        challenge_id: checkInChallenge.id,
-        completed_date: today,
-      },
-      { onConflict: "user_id,challenge_id,completed_date" }
-    );
-  }
-
-  revalidatePath("/", "layout");
-  revalidatePath("/profile");
-  revalidatePath("/challenges");
-
-  return { success: true, alreadyCheckedIn: false, streak: newStreak };
+  return {
+    success: true as const,
+    alreadyCheckedIn: result.alreadyCheckedIn,
+    streak: result.streak,
+  };
 }
 
 export async function completeChallenge(slug: string) {

@@ -1,7 +1,7 @@
 .experience {
   position: relative;
   overflow: hidden;
-  padding: var(--space-16) 0 calc(var(--space-16) + var(--space-8));
+  padding: var(--space-10) 0 calc(var(--space-16) + var(--space-8));
   background: var(--color-navy);
   color: var(--color-text-inverse);
 }
@@ -12,19 +12,19 @@
   pointer-events: none;
   background:
     radial-gradient(
-      ellipse 70% 45% at 50% 0%,
-      rgba(255, 200, 120, 0.14),
-      transparent 55%
+      ellipse 42% 24% at 50% 18%,
+      rgba(255, 200, 120, 0.11),
+      transparent 72%
     ),
     radial-gradient(
-      ellipse 55% 40% at 8% 90%,
-      rgba(0, 80, 157, 0.5),
-      transparent 55%
+      ellipse 34% 26% at 18% 86%,
+      rgba(0, 80, 157, 0.36),
+      transparent 72%
     ),
     radial-gradient(
-      ellipse 50% 35% at 92% 75%,
-      rgba(0, 204, 255, 0.14),
-      transparent 50%
+      ellipse 32% 24% at 82% 78%,
+      rgba(0, 204, 255, 0.1),
+      transparent 74%
     ),
     linear-gradient(180deg, #000a14 0%, var(--color-navy) 35%, #001428 100%);
 }

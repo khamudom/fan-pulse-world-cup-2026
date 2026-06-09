@@ -52,7 +52,11 @@ export function DailyChallengeCard({ challenge, completed }: DailyChallengeCardP
       <CardContent>
         <p className={styles.description}>{challenge.description}</p>
         {challenge.slug === "daily-check-in" ? (
-          <p className={styles.note}>Use the check-in button on your home or profile page.</p>
+          <p className={styles.note}>
+            {done
+              ? "Welcome back reward claimed — see you tomorrow!"
+              : "Completes automatically when you visit FanPulse each day."}
+          </p>
         ) : challenge.slug === "read-briefing" ? (
           <p className={styles.note}>Read today&apos;s briefing to complete this challenge.</p>
         ) : (

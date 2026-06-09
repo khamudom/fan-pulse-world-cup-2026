@@ -48,7 +48,7 @@ export function TeamCard({ team }: TeamCardProps) {
       <CardFooter className={styles.footer}>
         <Button
           type="button"
-          variant="outline"
+          variant="primary"
           fullWidth
           className={styles.ctaButton}
           aria-label={`View ${team.name} on FIFA.com (opens in new tab)`}

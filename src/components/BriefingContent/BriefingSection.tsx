@@ -43,7 +43,7 @@ export function BriefingSection({ initialContent }: BriefingSectionProps) {
         to get yesterday&apos;s results, today&apos;s storylines, and what
         matters for your team.
       </p>
-      <Button type="button" onClick={() => void generate()} disabled={loading}>
+      <Button type="button" variant="primary" onClick={() => void generate()} disabled={loading}>
         {loading ? "Generating…" : "Generate today's briefing"}
       </Button>
       {error ? <p className={styles.error}>{error}</p> : null}

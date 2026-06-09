@@ -69,12 +69,12 @@ export function AiCompanionCard({
   };
 
   return (
-    <Card>
+    <Card className={styles.card}>
       <CardHeader className={styles.cardHeader}>
         <CardTitle as="h3">{title}</CardTitle>
         <DataSourceBadge source="local" />
       </CardHeader>
-      <CardContent>
+      <CardContent className={styles.content}>
         <div className={styles.prompts} role="group" aria-label="Companion prompts">
           {prompts.map((prompt) => (
             <Button
@@ -105,7 +105,7 @@ export function AiCompanionCard({
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Ask about your team, today's matches…"
           />
-          <Button type="submit" disabled={loading || !message.trim()}>
+          <Button type="submit" variant="primary" disabled={loading || !message.trim()}>
             {loading ? "Thinking…" : "Ask"}
           </Button>
         </form>

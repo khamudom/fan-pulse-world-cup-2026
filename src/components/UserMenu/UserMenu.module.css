@@ -8,29 +8,32 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   padding: 0;
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: box-shadow 0.15s;
+  border-radius: var(--radius-full) !important;
+  --lumen-button-bg: transparent;
+  --lumen-button-border: rgba(255, 255, 255, 0.45);
+  --lumen-button-hover-bg: rgba(255, 255, 255, 0.08);
+  --lumen-button-hover-border: var(--color-accent);
+}
+
+.trigger:focus-visible {
+  --lumen-button-border: var(--color-accent);
 }
 
 .trigger:hover .avatar,
 .trigger:focus-visible .avatar {
-  box-shadow: 0 0 0 2px var(--color-header-bg), 0 0 0 4px var(--color-accent);
-}
-
-.trigger:focus-visible {
-  outline: none;
+  box-shadow: none;
 }
 
 .avatar {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-full);
-  background: var(--color-cyan);
-  color: var(--color-navy);
+  background: transparent;
+  color: var(--color-text-inverse);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,7 +42,6 @@
 }
 
 .avatarGuest {
-  background: rgba(255, 255, 255, 0.12);
   color: var(--color-text-inverse);
 }
 

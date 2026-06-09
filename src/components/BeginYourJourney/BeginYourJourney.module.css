@@ -247,9 +247,9 @@
 }
 
 .commit :global(.lumen-button--primary) {
-  --lumen-button-bg: var(--color-cyan);
+  --lumen-button-bg: var(--color-primary);
   --lumen-button-color: var(--color-navy);
-  --lumen-button-hover-bg: #00b8e6;
+  --lumen-button-hover-bg: var(--color-primary-hover);
   min-width: min(100%, 18rem);
   font-weight: 700;
 }

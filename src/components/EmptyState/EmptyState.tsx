@@ -23,7 +23,7 @@ export function EmptyState({
       <p className={styles.message}>{message}</p>
       {actionLabel && actionHref && (
         <Link href={actionHref}>
-          <Button variant="outline">{actionLabel}</Button>
+          <Button variant="primary">{actionLabel}</Button>
         </Link>
       )}
     </div>

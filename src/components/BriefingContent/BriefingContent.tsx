@@ -22,7 +22,7 @@ export function BriefingContent({ content }: BriefingContentProps) {
       <div className={styles.body}>{content}</div>
       <Button
         type="button"
-        variant="outline"
+        variant="primary"
         onClick={() => void markBriefingRead()}
       >
         Mark briefing read (+15 pts)

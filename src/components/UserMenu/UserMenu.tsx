@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
+import { Button } from "@khamudom/lumen-ui-react";
 import { signOut } from "@/actions/auth";
 import { useAuthModal } from "@/components/AuthModal";
 import { setThemePreference } from "@/actions/theme";
@@ -66,9 +67,10 @@ export function UserMenu({
 
   return (
     <div className={styles.root} ref={rootRef}>
-      <button
+      <Button
         ref={triggerRef}
         type="button"
+        variant="outline"
         className={styles.trigger}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -92,7 +94,7 @@ export function UserMenu({
             </svg>
           </span>
         )}
-      </button>
+      </Button>
 
       {open ? (
         <div className={styles.menu} role="menu">

@@ -23,7 +23,7 @@ interface HeroProps {
   asideWide?: boolean;
   children?: React.ReactNode;
   backgroundImage?: string;
-  backgroundImageFit?: "default" | "photo";
+  backgroundImageFit?: "default" | "photo" | "fullWidth";
 }
 
 export function Hero({
@@ -55,9 +55,19 @@ export function Hero({
             sizes="100vw"
             className={`${styles.backgroundImage} ${
               backgroundImageFit === "photo" ? styles.backgroundImagePhoto : ""
+            } ${
+              backgroundImageFit === "fullWidth"
+                ? styles.backgroundImageFullWidth
+                : ""
             }`}
           />
-          <div className={styles.backgroundOverlay} />
+          <div
+            className={
+              backgroundImageFit === "fullWidth"
+                ? styles.backgroundOverlayFullWidth
+                : styles.backgroundOverlay
+            }
+          />
         </div>
       ) : null}
       <div
