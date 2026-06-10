@@ -14,8 +14,6 @@ import styles from "./AiCompanionCard.module.css";
 
 const defaultPrompts = [
   "What should I know before my team's next match?",
-  "Who are the favorites today?",
-  "Summarize yesterday's biggest upset.",
 ];
 
 interface AiCompanionCardProps {

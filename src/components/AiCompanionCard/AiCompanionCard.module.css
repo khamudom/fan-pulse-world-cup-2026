@@ -1,5 +1,7 @@
 .card {
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 34rem;
   min-width: 0;
 }
 
@@ -13,6 +15,10 @@
 }
 
 .content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
   padding-right: var(--space-8);
 }
 
@@ -54,7 +60,10 @@
 }
 
 .response {
+  flex: 1;
+  min-height: 0;
   margin-top: var(--space-4);
+  overflow-y: auto;
   padding: var(--space-4);
   background: var(--color-bg);
   border-radius: var(--radius-md);
