@@ -1,6 +1,8 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import Link from "next/link";
+import { Button } from "@khamudom/lumen-ui-react";
 import { WORLD_CUP_2026 } from "@/config/tournament";
 import { getCountdownParts, type CountdownParts } from "@/lib/countdown";
 import styles from "./WorldCupCountdown.module.css";
@@ -86,9 +88,18 @@ export function WorldCupCountdown() {
           ))}
         </div>
       ) : (
-        <p className={styles.status}>
-          {phase === "live" ? "Tournament underway" : "Tournament complete"}
-        </p>
+        <div className={styles.statusGroup}>
+          <p className={styles.status}>
+            {phase === "live" ? "Tournament underway" : "Tournament complete"}
+          </p>
+          <div className={styles.statusAction}>
+            <Link href="/matches" style={{ textDecoration: "none" }}>
+              <Button variant="primary">
+                {phase === "live" ? "Check out the matches" : "View results"}
+              </Button>
+            </Link>
+          </div>
+        </div>
       )}
     </div>
   );

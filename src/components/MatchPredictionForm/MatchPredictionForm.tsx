@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -16,17 +17,52 @@ import styles from "./MatchPredictionForm.module.css";
 
 interface MatchPredictionFormProps {
   match: Match;
+  isSignedIn?: boolean;
+  initialPrediction?: { home: number; away: number } | null;
 }
 
-export function MatchPredictionForm({ match }: MatchPredictionFormProps) {
-  const [winner, setWinner] = useState("");
-  const [homeScore, setHomeScore] = useState("");
-  const [awayScore, setAwayScore] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+type Outcome = "home" | "away" | "draw";
+
+function getOutcome(home: number, away: number): Outcome {
+  if (home > away) return "home";
+  if (away > home) return "away";
+  return "draw";
+}
+
+function deriveWinnerLabel(home: number, away: number, match: Match): string {
+  const outcome = getOutcome(home, away);
+  if (outcome === "home") return match.homeTeam.name;
+  if (outcome === "away") return match.awayTeam.name;
+  return "Draw";
+}
+
+export function MatchPredictionForm({
+  match,
+  isSignedIn = false,
+  initialPrediction = null,
+}: MatchPredictionFormProps) {
+  const [saved, setSaved] = useState(initialPrediction);
+  const [winner, setWinner] = useState(
+    initialPrediction
+      ? deriveWinnerLabel(initialPrediction.home, initialPrediction.away, match)
+      : "",
+  );
+  const [homeScore, setHomeScore] = useState(
+    initialPrediction ? String(initialPrediction.home) : "",
+  );
+  const [awayScore, setAwayScore] = useState(
+    initialPrediction ? String(initialPrediction.away) : "",
+  );
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const teams = [match.homeTeam.name, match.awayTeam.name, "Draw"];
+
+  const hasResult =
+    match.status === "live" ||
+    match.status === "halftime" ||
+    match.status === "finished";
+  const isFinal = match.status === "finished";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,11 +81,27 @@ export function MatchPredictionForm({ match }: MatchPredictionFormProps) {
       return;
     }
 
-    setSubmitted(true);
+    setSaved({ home, away });
     setMessage(
       result.isNew ? "Prediction saved · +25 points!" : "Prediction updated.",
     );
   };
+
+  if (!isSignedIn) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle as="h2">Match Prediction</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className={styles.signInPrompt}>
+            <Link href="/login">Sign in</Link> to predict the score, track your
+            accuracy, and earn points.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -57,6 +109,10 @@ export function MatchPredictionForm({ match }: MatchPredictionFormProps) {
         <CardTitle as="h2">Match Prediction</CardTitle>
       </CardHeader>
       <CardContent>
+        {saved ? (
+          <PredictionSummary saved={saved} match={match} hasResult={hasResult} isFinal={isFinal} />
+        ) : null}
+
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
             <Select
@@ -89,16 +145,85 @@ export function MatchPredictionForm({ match }: MatchPredictionFormProps) {
             />
           </div>
           <Button type="submit" disabled={loading}>
-            {loading ? "Saving…" : "Submit Prediction"}
+            {loading
+              ? "Saving…"
+              : saved
+                ? "Update Prediction"
+                : "Submit Prediction"}
           </Button>
-          {submitted && message ? (
+          {message ? (
             <p className={styles.success} role="status">
-              {message}: {winner}
-              {homeScore && awayScore ? ` (${homeScore}-${awayScore})` : ""}
+              {message}
             </p>
           ) : null}
         </form>
       </CardContent>
     </Card>
   );
+}
+
+function PredictionSummary({
+  saved,
+  match,
+  hasResult,
+  isFinal,
+}: {
+  saved: { home: number; away: number };
+  match: Match;
+  hasResult: boolean;
+  isFinal: boolean;
+}) {
+  const verdict = hasResult ? getVerdict(saved, match) : null;
+
+  return (
+    <div className={styles.summary}>
+      <div className={styles.summaryRow}>
+        <span className={styles.summaryLabel}>Your prediction</span>
+        <span className={styles.summaryScore}>
+          {match.homeTeam.name} {saved.home} – {saved.away}{" "}
+          {match.awayTeam.name}
+        </span>
+      </div>
+      {verdict ? (
+        <p
+          className={`${styles.verdict} ${styles[`verdict_${verdict.tone}`]}`}
+          role="status"
+        >
+          {isFinal ? verdict.finalLabel : verdict.liveLabel}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function getVerdict(
+  saved: { home: number; away: number },
+  match: Match,
+): { tone: "exact" | "result" | "miss"; finalLabel: string; liveLabel: string } {
+  const exact =
+    saved.home === match.homeScore && saved.away === match.awayScore;
+  if (exact) {
+    return {
+      tone: "exact",
+      finalLabel: "Spot on — exact score!",
+      liveLabel: "Exact score so far",
+    };
+  }
+
+  const sameOutcome =
+    getOutcome(saved.home, saved.away) ===
+    getOutcome(match.homeScore, match.awayScore);
+  if (sameOutcome) {
+    return {
+      tone: "result",
+      finalLabel: "Right result, wrong score",
+      liveLabel: "Right result so far",
+    };
+  }
+
+  return {
+    tone: "miss",
+    finalLabel: "Didn't go your way",
+    liveLabel: "Off so far",
+  };
 }

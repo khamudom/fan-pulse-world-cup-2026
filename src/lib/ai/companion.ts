@@ -21,6 +21,7 @@ export interface CompanionInput {
   profile: Profile | null;
   matches: Match[];
   userName?: string;
+  focusMatch?: Match | null;
 }
 
 function formatMatch(m: Match): string {
@@ -77,16 +78,25 @@ function buildTemplateBriefing(input: BriefingInput): string {
   return lines.join("\n");
 }
 
-function buildSystemPrompt(profile: Profile | null, matches: Match[]): string {
+function buildSystemPrompt(
+  profile: Profile | null,
+  matches: Match[],
+  focusMatch?: Match | null
+): string {
   const team = profile?.favorite_country ?? "unknown";
   const matchSummary = matches
     .slice(0, 20)
     .map((m) => formatMatch(m))
     .join("\n");
 
+  const focusSection = focusMatch
+    ? `\nThe user is currently viewing this match: ${formatMatch(focusMatch)}${focusMatch.stadiumName ? ` at ${focusMatch.stadiumName}` : ""}.
+Treat ${focusMatch.homeTeam.name} vs ${focusMatch.awayTeam.name} as the subject of the conversation. Answer about THIS match and its two teams unless the user explicitly names a different team or match. Do not switch to other fixtures (including the user's favorite team) on your own.\n`
+    : "";
+
   return `You are FanPulse, a proactive World Cup 2026 companion. Be concise, warm, and fan-focused.
 The user's favorite team is ${team}.
-Current match data:
+${focusSection}Current match data:
 ${matchSummary || "No match data available."}
 Ground answers in this data. Do not invent scores or fixtures.`;
 }
@@ -142,7 +152,7 @@ export async function generateCompanionReply(input: CompanionInput): Promise<str
       messages: [
         {
           role: "system",
-          content: buildSystemPrompt(input.profile, input.matches),
+          content: buildSystemPrompt(input.profile, input.matches, input.focusMatch),
         },
         {
           role: "user",
@@ -185,7 +195,7 @@ export async function streamCompanionReply(
       messages: [
         {
           role: "system",
-          content: buildSystemPrompt(input.profile, input.matches),
+          content: buildSystemPrompt(input.profile, input.matches, input.focusMatch),
         },
         { role: "user", content: input.message },
       ],

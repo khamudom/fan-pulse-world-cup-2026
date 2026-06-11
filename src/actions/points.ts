@@ -26,6 +26,25 @@ export async function awardPoints(
   return result;
 }
 
+export async function getMyMatchPrediction(
+  matchId: string
+): Promise<{ home: number; away: number } | null> {
+  const user = await getSessionUser();
+  if (!user) return null;
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("predictions")
+    .select("predicted_home, predicted_away")
+    .eq("user_id", user.id)
+    .eq("match_id", matchId)
+    .maybeSingle();
+
+  return data
+    ? { home: data.predicted_home, away: data.predicted_away }
+    : null;
+}
+
 export async function savePrediction(
   matchId: string,
   predictedHome: number,

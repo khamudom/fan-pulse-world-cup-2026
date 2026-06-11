@@ -18,6 +18,12 @@ import type {
 const API_BASE = "https://worldcup26.ir/get";
 const REVALIDATE_SECONDS = 300;
 
+/**
+ * "cached" uses the 5-minute ISR cache (good for static-ish data).
+ * "fresh" bypasses the cache entirely for live data like in-progress scores.
+ */
+export type FetchMode = "cached" | "fresh";
+
 interface ApiGame {
   id: string;
   home_team_id: string;
@@ -72,11 +78,17 @@ interface ApiGroup {
   teams: ApiGroupTeam[];
 }
 
-async function fetchJson<T>(path: string): Promise<T | null> {
+async function fetchJson<T>(
+  path: string,
+  mode: FetchMode = "cached",
+): Promise<T | null> {
   try {
-    const res = await fetch(`${API_BASE}/${path}`, {
-      next: { revalidate: REVALIDATE_SECONDS },
-    });
+    const res = await fetch(
+      `${API_BASE}/${path}`,
+      mode === "fresh"
+        ? { cache: "no-store" }
+        : { next: { revalidate: REVALIDATE_SECONDS } },
+    );
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {
@@ -260,9 +272,13 @@ export async function getTeams(): Promise<ApiResult<Team[]>> {
   return { data: teams, source: "api" };
 }
 
-export async function getMatches(): Promise<ApiResult<Match[]>> {
+export async function getMatches(
+  mode: FetchMode = "cached",
+): Promise<ApiResult<Match[]>> {
+  // Only the games feed carries volatile data (scores, status, minute),
+  // so teams/stadiums always stay on the standard cache.
   const [gamesRes, teamsRes, stadiumsRes] = await Promise.all([
-    fetchJson<{ games: ApiGame[] }>("games"),
+    fetchJson<{ games: ApiGame[] }>("games", mode),
     fetchJson<{ teams: ApiTeam[] }>("teams"),
     fetchJson<{ stadiums: ApiStadium[] }>("stadiums"),
   ]);
@@ -287,8 +303,11 @@ export async function getMatches(): Promise<ApiResult<Match[]>> {
   return { data: matches, source: "api" };
 }
 
-export async function getMatchById(id: string): Promise<ApiResult<Match | null>> {
-  const { data: matches, source, error } = await getMatches();
+export async function getMatchById(
+  id: string,
+  mode: FetchMode = "cached",
+): Promise<ApiResult<Match | null>> {
+  const { data: matches, source, error } = await getMatches(mode);
   const match = matches.find((m) => m.id === id) ?? null;
   if (!match) {
     if (USE_MOCK_FALLBACKS) {

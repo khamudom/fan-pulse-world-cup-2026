@@ -14,11 +14,13 @@ import styles from "./AiCompanionCard.module.css";
 interface AiCompanionCardProps {
   title?: string;
   prompts?: string[];
+  matchId?: string;
 }
 
 export function AiCompanionCard({
   title = "AI World Cup Companion",
   prompts = [],
+  matchId,
 }: AiCompanionCardProps) {
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState<string | null>(null);
@@ -37,7 +39,7 @@ export function AiCompanionCard({
       const res = await fetch("/api/companion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: query }),
+        body: JSON.stringify({ message: query, matchId }),
       });
 
       if (res.status === 401) {

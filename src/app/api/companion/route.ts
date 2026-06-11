@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
   }
 
-  let body: { message?: string };
+  let body: { message?: string; matchId?: string };
   try {
     body = await request.json();
   } catch {
@@ -22,11 +22,15 @@ export async function POST(request: Request) {
   }
 
   const { data: matches } = await getMatches();
+  const focusMatch = body.matchId
+    ? (matches.find((m) => m.id === body.matchId) ?? null)
+    : null;
   const stream = await streamCompanionReply({
     message,
     profile,
     matches,
     userName: profile?.display_name ?? undefined,
+    focusMatch,
   });
 
   return new Response(stream, {

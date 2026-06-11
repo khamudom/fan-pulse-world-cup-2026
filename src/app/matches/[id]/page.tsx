@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { MatchDetailView } from "@/components/MatchDetailView";
 import { USE_PROTOTYPE_DATA } from "@/config/dataSource";
+import { getSessionUser } from "@/lib/auth";
+import { getMyMatchPrediction } from "@/actions/points";
 import { getMatchById } from "@/services/worldCupApi";
 
 interface PageProps {
@@ -18,9 +20,13 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function MatchDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const { data: match, source } = await getMatchById(id);
+  // Fetch fresh so an in-progress match shows the current score on load.
+  const { data: match, source } = await getMatchById(id, "fresh");
 
   if (!match) notFound();
+
+  const user = await getSessionUser();
+  const userPrediction = user ? await getMyMatchPrediction(id) : null;
 
   return (
     <div className="page">
@@ -28,6 +34,8 @@ export default async function MatchDetailPage({ params }: PageProps) {
         match={match}
         matchSource={source}
         showPrototypeData={USE_PROTOTYPE_DATA}
+        isSignedIn={Boolean(user)}
+        userPrediction={userPrediction}
       />
     </div>
   );

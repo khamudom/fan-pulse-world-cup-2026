@@ -7,9 +7,86 @@
 }
 
 .scoreline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.scoreSide {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.scoreTeam {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.scoreValue {
   font-size: var(--text-3xl);
   font-weight: 800;
+  line-height: 1;
+}
+
+.scoreDash {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.liveBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.liveIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-live);
+}
+
+.liveDot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--color-live);
+  animation: livePulse 1.4s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.75);
+  }
+}
+
+.updatedAt {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liveDot {
+    animation: none;
+  }
 }
 
 .comparisonGrid {
