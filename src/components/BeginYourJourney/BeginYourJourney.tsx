@@ -39,16 +39,16 @@ export function BeginYourJourney({
   const mounted = useSyncExternalStore(
     subscribeToMount,
     getClientMounted,
-    getServerMounted
+    getServerMounted,
   );
   const [state, formAction, pending] = useActionState(
     beginJourneyWithNation,
-    initialState
+    initialState,
   );
 
   const sortedTeams = useMemo(
     () => [...teams].sort((a, b) => a.name.localeCompare(b.name)),
-    [teams]
+    [teams],
   );
 
   const filtered = useMemo(() => {
@@ -60,7 +60,11 @@ export function BeginYourJourney({
   const selectedTeam = sortedTeams.find((t) => t.name === selected);
 
   return (
-    <section className={styles.section} id="begin-journey" aria-labelledby="journey-title">
+    <section
+      className={styles.section}
+      id="begin-journey"
+      aria-labelledby="journey-title"
+    >
       <div className={styles.backdrop} aria-hidden="true" />
       <div className={`container ${styles.inner}`}>
         <header className={styles.header}>
@@ -102,7 +106,11 @@ export function BeginYourJourney({
               No nations match &ldquo;{search}&rdquo;. Try another name.
             </p>
           ) : (
-            <ul className={styles.nationGrid} role="listbox" aria-label="Nations">
+            <ul
+              className={styles.nationGrid}
+              role="listbox"
+              aria-label="Nations"
+            >
               {filtered.map((team) => {
                 const isSelected = selected === team.name;
                 return (
@@ -133,11 +141,12 @@ export function BeginYourJourney({
           <input type="hidden" name="country" value={selected ?? ""} />
           {selectedTeam ? (
             <p className={styles.selectionPreview}>
-              You&apos;re standing with{" "}
-              <strong>{selectedTeam.name}</strong>
+              You&apos;re standing with <strong>{selectedTeam.name}</strong>
             </p>
           ) : (
-            <p className={styles.selectionHint}>Select a nation above to continue</p>
+            <p className={styles.selectionHint}>
+              Select a nation above to continue
+            </p>
           )}
           {state.error ? <p className={styles.error}>{state.error}</p> : null}
           <Button type="submit" disabled={!selected || pending}>
@@ -169,7 +178,9 @@ function NationCardContent({ team }: { team: Team }) {
         <span className={styles.flagPlaceholder} aria-hidden="true" />
       )}
       <span className={styles.nationName}>{team.name}</span>
-      {team.group ? <span className={styles.group}>Group {team.group}</span> : null}
+      {team.group ? (
+        <span className={styles.group}>Group {team.group}</span>
+      ) : null}
     </>
   );
 }

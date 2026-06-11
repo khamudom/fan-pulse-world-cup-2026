@@ -31,8 +31,14 @@ export function LoginForm({
   initialMode = "signin",
 }: LoginFormProps) {
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">(initialMode);
-  const [signInState, signInAction, signInPending] = useActionState(signIn, initialState);
-  const [signUpState, signUpAction, signUpPending] = useActionState(signUp, initialState);
+  const [signInState, signInAction, signInPending] = useActionState(
+    signIn,
+    initialState,
+  );
+  const [signUpState, signUpAction, signUpPending] = useActionState(
+    signUp,
+    initialState,
+  );
   const [resetState, resetAction, resetPending] = useActionState(
     requestPasswordReset,
     initialState,
@@ -64,7 +70,8 @@ export function LoginForm({
       </CardTitle>
       {pendingCountry ? (
         <p className={styles.pendingNation}>
-          You chose <strong>{pendingCountry}</strong> — sign in to follow their journey.
+          You chose <strong>{pendingCountry}</strong> — sign in to follow their
+          journey.
         </p>
       ) : null}
     </div>
@@ -103,14 +110,25 @@ export function LoginForm({
         <input type="hidden" name="pendingCountry" value={pendingCountry} />
       ) : null}
       {mode === "signup" ? (
-        <Input label="Display name" name="displayName" placeholder="Your fan name" />
+        <Input
+          label="Display name"
+          name="displayName"
+          placeholder="Your fan name"
+        />
       ) : null}
       {mode === "forgot" ? (
         <p className={styles.forgotHint}>
-          Enter your email and we&apos;ll send you a link to reset your password.
+          Enter your email and we&apos;ll send you a link to reset your
+          password.
         </p>
       ) : null}
-      <Input label="Email" name="email" type="email" required placeholder="you@example.com" />
+      <Input
+        label="Email"
+        name="email"
+        type="email"
+        required
+        placeholder="you@example.com"
+      />
       {mode !== "forgot" ? (
         <>
           <Input

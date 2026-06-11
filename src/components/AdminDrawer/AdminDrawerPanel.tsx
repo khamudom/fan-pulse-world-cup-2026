@@ -45,8 +45,8 @@ export function AdminDrawerPanel({
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>Featured venue</h3>
           <p className={styles.sectionHint}>
-            Choose which stadium appears as featured on the Stadiums and Insights
-            pages.
+            Choose which stadium appears as featured on the Stadiums and
+            Insights pages.
           </p>
           <FeaturedStadiumPicker
             stadiums={stadiums}

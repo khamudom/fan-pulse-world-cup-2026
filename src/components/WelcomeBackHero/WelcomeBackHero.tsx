@@ -25,7 +25,9 @@ function formatWatchdayDate(date = new Date()): string {
     .toUpperCase();
 }
 
-function formatKickoffMeta(match: NonNullable<FanJourneyResult["nextMatch"]>): string {
+function formatKickoffMeta(
+  match: NonNullable<FanJourneyResult["nextMatch"]>,
+): string {
   const parts: string[] = [];
   if (match.stadiumName) {
     parts.push(match.stadiumName);
@@ -50,9 +52,7 @@ export function WelcomeBackHero({
   const levelTitle = getLevelTitle(stats?.level ?? 1, profile.favorite_country);
   const accuracy = Number(stats?.prediction_accuracy ?? 0);
   const predictionRecord =
-    stats && accuracy > 0
-      ? `${Math.round(accuracy)}% accuracy`
-      : "0 for 0";
+    stats && accuracy > 0 ? `${Math.round(accuracy)}% accuracy` : "0 for 0";
 
   const [countdown, setCountdown] = useState(() =>
     journey.kickoff ? getCountdownParts(journey.kickoff, new Date()) : null,
@@ -71,9 +71,7 @@ export function WelcomeBackHero({
       <div className={styles.glow} aria-hidden="true" />
       <div className={styles.inner}>
         <div className={styles.main}>
-          <p className={styles.programmeLabel}>
-            Watchday Programme · {formatWatchdayDate()}
-          </p>
+          <p className={styles.programmeLabel}>{formatWatchdayDate()}</p>
           <h1 id="welcome-hero-title" className={styles.title}>
             {getTimeGreeting()}, {displayName}.{" "}
             <em className={styles.titleAccent}>Your story continues.</em>
@@ -108,17 +106,25 @@ export function WelcomeBackHero({
           >
             <p className={styles.scoreboardEyebrow}>Kicks off in</p>
             <p className={styles.scoreboardMatch}>{journey.label}</p>
-            <div className={styles.scoreboardCountdown} role="timer" aria-live="polite">
+            <div
+              className={styles.scoreboardCountdown}
+              role="timer"
+              aria-live="polite"
+            >
               <div className={styles.scoreboardUnit}>
                 <span className={styles.scoreboardValue}>{countdown.days}</span>
                 <span className={styles.scoreboardUnitLabel}>Days</span>
               </div>
               <div className={styles.scoreboardUnit}>
-                <span className={styles.scoreboardValue}>{countdown.hours}</span>
+                <span className={styles.scoreboardValue}>
+                  {countdown.hours}
+                </span>
                 <span className={styles.scoreboardUnitLabel}>Hrs</span>
               </div>
               <div className={styles.scoreboardUnit}>
-                <span className={styles.scoreboardValue}>{countdown.minutes}</span>
+                <span className={styles.scoreboardValue}>
+                  {countdown.minutes}
+                </span>
                 <span className={styles.scoreboardUnitLabel}>Min</span>
               </div>
             </div>

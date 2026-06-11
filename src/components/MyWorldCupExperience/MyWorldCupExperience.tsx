@@ -38,7 +38,12 @@ const POSITION_LABELS: Record<WorldCupSquadPosition, string> = {
 
 function Flag({ team, className }: { team: Team; className?: string }) {
   if (!team.flag) {
-    return <span className={`${styles.flagPlaceholder} ${className ?? ""}`} aria-hidden="true" />;
+    return (
+      <span
+        className={`${styles.flagPlaceholder} ${className ?? ""}`}
+        aria-hidden="true"
+      />
+    );
   }
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -59,8 +64,10 @@ export function MyWorldCupExperience({
   teamsSource = "api",
   matchesSource = "api",
 }: MyWorldCupExperienceProps) {
-  const { favoriteTeam, secondaryTeam, squad, rivals, fixtures, journey } = data;
-  const nationName = favoriteTeam?.name ?? profile.favorite_country ?? "your nation";
+  const { favoriteTeam, secondaryTeam, squad, rivals, fixtures, journey } =
+    data;
+  const nationName =
+    favoriteTeam?.name ?? profile.favorite_country ?? "your nation";
   const displayName = profile.display_name ?? "Fan";
 
   return (
@@ -88,9 +95,7 @@ export function MyWorldCupExperience({
         />
       ) : null}
 
-      {squad ? (
-        <SquadChapter nationName={nationName} squad={squad} />
-      ) : null}
+      {squad ? <SquadChapter nationName={nationName} squad={squad} /> : null}
 
       {rivals.length > 0 && favoriteTeam?.group ? (
         <RivalsChapter
@@ -202,7 +207,9 @@ function NextChapter({
             <div className={styles.nextMatchTeams}>
               {favoriteTeam ? <Flag team={favoriteTeam} /> : null}
               <span className={styles.nextMatchVs}>vs</span>
-              <span className={styles.nextMatchOpponent}>{journey.opponent}</span>
+              <span className={styles.nextMatchOpponent}>
+                {journey.opponent}
+              </span>
             </div>
             <div className={styles.nextMatchInfo}>
               <p className={styles.nextMatchTitle}>{journey.label}</p>
@@ -433,12 +440,12 @@ function ClosingChapter({ nationName }: { nationName: string }) {
       <div className={`container ${styles.closingInner}`}>
         <h2 className={styles.closingTitle}>This is your World Cup.</h2>
         <p className={styles.closingLead}>
-          {nationName} carries your hopes now. Make your predictions, take on the
-          daily challenges, and live every moment of the journey.
+          {nationName} carries your hopes now. Make your predictions, take on
+          the daily challenges, and live every moment of the journey.
         </p>
         <div className={styles.closingActions}>
           <Link href="/predictor">
-            <Button variant="primary">Make a prediction</Button>
+            <Button variant="outline">Make a prediction</Button>
           </Link>
           <Link href="/challenges">
             <Button variant="outline">Daily challenges</Button>

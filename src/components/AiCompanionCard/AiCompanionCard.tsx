@@ -9,12 +9,7 @@ import {
   Button,
   Input,
 } from "@khamudom/lumen-ui-react";
-import { DataSourceBadge } from "@/components/DataSourceBadge";
 import styles from "./AiCompanionCard.module.css";
-
-const defaultPrompts = [
-  "What should I know before my team's next match?",
-];
 
 interface AiCompanionCardProps {
   title?: string;
@@ -23,7 +18,7 @@ interface AiCompanionCardProps {
 
 export function AiCompanionCard({
   title = "AI World Cup Companion",
-  prompts = defaultPrompts,
+  prompts = [],
 }: AiCompanionCardProps) {
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState<string | null>(null);
@@ -70,25 +65,30 @@ export function AiCompanionCard({
     <Card className={styles.card}>
       <CardHeader className={styles.cardHeader}>
         <CardTitle as="h3">{title}</CardTitle>
-        <DataSourceBadge source="local" />
       </CardHeader>
       <CardContent className={styles.content}>
-        <div className={styles.prompts} role="group" aria-label="Companion prompts">
-          {prompts.map((prompt) => (
-            <Button
-              key={prompt}
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setMessage(prompt);
-                void ask(prompt);
-              }}
-              disabled={loading}
-            >
-              {prompt}
-            </Button>
-          ))}
-        </div>
+        {prompts.length > 0 ? (
+          <div
+            className={styles.prompts}
+            role="group"
+            aria-label="Companion prompts"
+          >
+            {prompts.map((prompt) => (
+              <Button
+                key={prompt}
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setMessage(prompt);
+                  void ask(prompt);
+                }}
+                disabled={loading}
+              >
+                {prompt}
+              </Button>
+            ))}
+          </div>
+        ) : null}
 
         <form
           className={styles.form}
@@ -101,9 +101,13 @@ export function AiCompanionCard({
             label="Ask FanPulse"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Ask about your team, today's matches…"
+            placeholder="What's on your mind?"
           />
-          <Button type="submit" variant="primary" disabled={loading || !message.trim()}>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={loading || !message.trim()}
+          >
             {loading ? "Thinking…" : "Ask"}
           </Button>
         </form>

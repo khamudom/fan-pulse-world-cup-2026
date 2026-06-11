@@ -20,7 +20,9 @@ interface ResetPasswordFormProps {
   embedded?: boolean;
 }
 
-export function ResetPasswordForm({ embedded = false }: ResetPasswordFormProps) {
+export function ResetPasswordForm({
+  embedded = false,
+}: ResetPasswordFormProps) {
   const router = useRouter();
   const { closeResetPasswordModal } = useAuthModal();
   const [state, action, pending] = useActionState(updatePassword, initialState);

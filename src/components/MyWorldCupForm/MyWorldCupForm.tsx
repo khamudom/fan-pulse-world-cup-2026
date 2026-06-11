@@ -32,7 +32,10 @@ export function MyWorldCupForm({
   profile,
   initialCountry,
 }: MyWorldCupFormProps) {
-  const [state, formAction, pending] = useActionState(saveMyWorldCup, initialState);
+  const [state, formAction, pending] = useActionState(
+    saveMyWorldCup,
+    initialState,
+  );
 
   const teamOptions = [
     { value: "", label: "Select country" },
@@ -62,9 +65,7 @@ export function MyWorldCupForm({
             <Select
               label="Favorite country"
               name="favoriteCountry"
-              defaultValue={
-                profile?.favorite_country ?? initialCountry ?? ""
-              }
+              defaultValue={profile?.favorite_country ?? initialCountry ?? ""}
               options={teamOptions}
               required
             />
@@ -77,7 +78,9 @@ export function MyWorldCupForm({
           </div>
 
           {state.error ? <p className={styles.error}>{state.error}</p> : null}
-          {state.success ? <p className={styles.success}>{state.success}</p> : null}
+          {state.success ? (
+            <p className={styles.success}>{state.success}</p>
+          ) : null}
 
           <Button type="submit" disabled={pending}>
             {pending ? "Saving…" : "Save My World Cup"}

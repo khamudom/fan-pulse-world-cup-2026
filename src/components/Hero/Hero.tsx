@@ -77,7 +77,10 @@ export function Hero({
       >
         <div className={styles.content}>
           {sponsor && (
-            <p className={styles.sponsor} aria-label={`Presented by ${sponsor}`}>
+            <p
+              className={styles.sponsor}
+              aria-label={`Presented by ${sponsor}`}
+            >
               Presented by <strong>{sponsor}</strong>
             </p>
           )}

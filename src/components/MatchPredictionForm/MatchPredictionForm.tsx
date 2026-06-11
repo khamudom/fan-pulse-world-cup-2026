@@ -47,7 +47,7 @@ export function MatchPredictionForm({ match }: MatchPredictionFormProps) {
 
     setSubmitted(true);
     setMessage(
-      result.isNew ? "Prediction saved · +25 points!" : "Prediction updated."
+      result.isNew ? "Prediction saved · +25 points!" : "Prediction updated.",
     );
   };
 

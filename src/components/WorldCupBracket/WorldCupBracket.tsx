@@ -63,7 +63,11 @@ function ParticipantRow({
         <span className={styles.flagPlaceholder} aria-hidden="true" />
       )}
       <span className={styles.participantName}>{participant.label}</span>
-      {selected && <span className={styles.advanceMark} aria-hidden="true">▶</span>}
+      {selected && (
+        <span className={styles.advanceMark} aria-hidden="true">
+          ▶
+        </span>
+      )}
       {score !== undefined && <span className={styles.score}>{score}</span>}
     </>
   );
@@ -207,15 +211,25 @@ export function WorldCupBracket({
         </div>
       )}
 
-      <div className={styles.bracketScroll} role="region" aria-label="Knockout bracket">
+      <div
+        className={styles.bracketScroll}
+        role="region"
+        aria-label="Knockout bracket"
+      >
         <div className={styles.bracketGrid}>
           {bracket.rounds.map((round) => (
-            <section key={round.key} className={styles.roundColumn} aria-label={round.label}>
+            <section
+              key={round.key}
+              className={styles.roundColumn}
+              aria-label={round.label}
+            >
               <h3 className={styles.roundTitle}>{round.label}</h3>
               <div
                 className={styles.roundMatches}
                 data-round={round.key}
-                style={{ "--match-count": round.matches.length } as CSSProperties}
+                style={
+                  { "--match-count": round.matches.length } as CSSProperties
+                }
               >
                 {round.matches.map((match) => (
                   <BracketMatchCard

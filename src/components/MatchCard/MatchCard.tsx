@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import Image, { type ImageLoaderProps } from "next/image";
-import { Badge, Button, Card, CardContent, CardFooter, CardHeader } from "@khamudom/lumen-ui-react";
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@khamudom/lumen-ui-react";
 import type { Match } from "@/types";
 import { getStatusLabel, getStatusBadgeVariant } from "@/services/worldCupApi";
 import styles from "./MatchCard.module.css";
@@ -53,13 +60,7 @@ function TeamFlag({ name, flag }: { name: string; flag?: string }) {
   );
 }
 
-function TeamInfo({
-  name,
-  score,
-}: {
-  name: string;
-  score?: number;
-}) {
+function TeamInfo({ name, score }: { name: string; score?: number }) {
   return (
     <div className={styles.teamInfo}>
       <span className={styles.teamName}>{name}</span>
@@ -68,9 +69,7 @@ function TeamInfo({
           {score}
         </span>
       )}
-      {score !== undefined && (
-        <span className="sr-only">Score {score}</span>
-      )}
+      {score !== undefined && <span className="sr-only">Score {score}</span>}
     </div>
   );
 }
@@ -85,9 +84,7 @@ export function MatchCard({ match, featured = false }: MatchCardProps) {
     <Card className={featured ? styles.featured : undefined}>
       <CardHeader className={styles.header}>
         <div className={styles.meta}>
-          {match.group && (
-            <Badge variant="outline">Group {match.group}</Badge>
-          )}
+          {match.group && <Badge variant="outline">Group {match.group}</Badge>}
           <Badge variant={getStatusBadgeVariant(match.status)}>
             {match.status === "live" && (
               <span className={styles.liveDot} aria-hidden="true" />
@@ -128,9 +125,7 @@ export function MatchCard({ match, featured = false }: MatchCardProps) {
       </CardContent>
       <CardFooter>
         <Link href={`/matches/${match.id}`} className={styles.link}>
-          <Button variant="primary">
-            View Match
-          </Button>
+          <Button variant="primary">View Match</Button>
         </Link>
       </CardFooter>
     </Card>

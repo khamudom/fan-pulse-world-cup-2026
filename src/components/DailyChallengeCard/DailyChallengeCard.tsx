@@ -18,7 +18,10 @@ interface DailyChallengeCardProps {
   completed: boolean;
 }
 
-export function DailyChallengeCard({ challenge, completed }: DailyChallengeCardProps) {
+export function DailyChallengeCard({
+  challenge,
+  completed,
+}: DailyChallengeCardProps) {
   const [done, setDone] = useState(completed);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -37,7 +40,7 @@ export function DailyChallengeCard({ challenge, completed }: DailyChallengeCardP
     setMessage(
       result.alreadyCompleted
         ? "Already completed today."
-        : `+${result.points ?? challenge.points} points earned!`
+        : `+${result.points ?? challenge.points} points earned!`,
     );
   };
 
@@ -58,7 +61,9 @@ export function DailyChallengeCard({ challenge, completed }: DailyChallengeCardP
               : "Completes automatically when you visit FanPulse each day."}
           </p>
         ) : challenge.slug === "read-briefing" ? (
-          <p className={styles.note}>Read today&apos;s briefing to complete this challenge.</p>
+          <p className={styles.note}>
+            Read today&apos;s briefing to complete this challenge.
+          </p>
         ) : (
           <Button
             type="button"

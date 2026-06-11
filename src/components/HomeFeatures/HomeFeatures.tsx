@@ -15,7 +15,8 @@ import styles from "./HomeFeatures.module.css";
 const features = [
   {
     title: "Live Match Center",
-    description: "Follow every kickoff, score, and match status across the tournament.",
+    description:
+      "Follow every kickoff, score, and match status across the tournament.",
     href: "/matches",
   },
   {

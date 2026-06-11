@@ -70,7 +70,9 @@ export function PredictorExperience({
 
   const pruneThirdQualifiers = (nextRankings: GroupRankings) => {
     const validIds = new Set(
-      getThirdPlaceCandidates(nextRankings, teams, groups).map((c) => c.team.id),
+      getThirdPlaceCandidates(nextRankings, teams, groups).map(
+        (c) => c.team.id,
+      ),
     );
     setThirdPlaceQualifiers((prev) => prev.filter((id) => validIds.has(id)));
   };
@@ -158,7 +160,8 @@ export function PredictorExperience({
         </div>
         <p className={styles.sectionDesc}>
           Group advancement is decided by final standings, not knockout games.
-          Predict where each team finishes, then build your knockout bracket below.
+          Predict where each team finishes, then build your knockout bracket
+          below.
         </p>
         <GroupStagePredictor
           groups={groups}
@@ -172,16 +175,19 @@ export function PredictorExperience({
         />
       </section>
 
-      <section className={styles.bracketSection} aria-labelledby="knockout-bracket">
+      <section
+        className={styles.bracketSection}
+        aria-labelledby="knockout-bracket"
+      >
         <div className={styles.bracketHeader}>
           <div>
             <h2 id="knockout-bracket" className={styles.sectionTitle}>
               Knockout Bracket
             </h2>
             <p className={styles.sectionDesc}>
-              Seeded from your group predictions. Tap teams to advance them through
-              each round — March Madness style. Switch to Live Bracket to follow
-              real results.
+              Seeded from your group predictions. Tap teams to advance them
+              through each round — March Madness style. Switch to Live Bracket
+              to follow real results.
             </p>
           </div>
           <div className={styles.bracketActions}>
@@ -192,8 +198,8 @@ export function PredictorExperience({
 
         {!isSignedIn && bracketMode === "picks" && (
           <Alert className={styles.signInAlert}>
-            You can preview picks here.{" "}
-            <Link href="/login">Sign in</Link> to save your bracket.
+            You can preview picks here. <Link href="/login">Sign in</Link> to
+            save your bracket.
           </Alert>
         )}
 

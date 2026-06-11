@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import {
+  Button,
   Card,
   CardContent,
   CardHeader,
@@ -50,7 +52,9 @@ export function FanAccoladesBoard({
               {getStreakMessage(streak)} Checked in today.
             </span>
           ) : (
-            <span className={styles.streakCopy}>{getStreakMessage(streak)}</span>
+            <span className={styles.streakCopy}>
+              {getStreakMessage(streak)}
+            </span>
           )}
         </div>
 
@@ -99,6 +103,11 @@ export function FanAccoladesBoard({
                 Earn your first badge — every fan journey starts with a kickoff.
               </p>
             )}
+            <div className={styles.actions}>
+              <Link href="/challenges">
+                <Button variant="primary">View accolades</Button>
+              </Link>
+            </div>
           </>
         ) : (
           <>

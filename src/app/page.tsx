@@ -113,7 +113,7 @@ export default async function HomePage() {
           <div className="container">
             <div className={styles.fixturesHeader}>
               <div>
-                <h2 className={styles.fixturesTitle}>Programme</h2>
+                <h2 className={styles.fixturesTitle}>Fixtures</h2>
                 <p className={styles.fixturesSubtitle}>
                   Upcoming fixtures on your watchlist
                 </p>
@@ -190,7 +190,7 @@ export default async function HomePage() {
         <div className="container">
           <div className={styles.fixturesHeader}>
             <div>
-              <h2 className={styles.fixturesTitle}>Programme</h2>
+              <h2 className={styles.fixturesTitle}>Fixtures</h2>
               <p className={styles.fixturesSubtitle}>
                 Upcoming fixtures from the tournament
               </p>
@@ -212,8 +212,7 @@ export default async function HomePage() {
             <EmptyState
               title="No matches to show"
               message={
-                todaysResult.error ??
-                "No upcoming fixtures from the API."
+                todaysResult.error ?? "No upcoming fixtures from the API."
               }
               actionLabel="Browse all matches"
               actionHref="/matches"

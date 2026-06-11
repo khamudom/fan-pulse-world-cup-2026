@@ -45,8 +45,8 @@ export function FanJourneyCard({
         </CardHeader>
         <CardContent>
           <p className={styles.message}>
-            Pick your favorite country to get a personalized countdown to your team&apos;s
-            next match.
+            Pick your favorite country to get a personalized countdown to your
+            team&apos;s next match.
           </p>
           <Link href="/my-world-cup">
             <Button variant="primary">Set up My World Cup</Button>
@@ -84,10 +84,12 @@ export function FanJourneyCard({
         <p className={styles.matchLabel}>{journey.label}</p>
         <p className={styles.meta}>
           {journey.nextMatch.date} · {journey.nextMatch.time}
-          {journey.nextMatch.stadiumName ? ` · ${journey.nextMatch.stadiumName}` : ""}
+          {journey.nextMatch.stadiumName
+            ? ` · ${journey.nextMatch.stadiumName}`
+            : ""}
         </p>
         <Link href={`/matches/${journey.nextMatch.id}`}>
-          <Button variant="primary">Open match centre</Button>
+          <Button variant="primary">Open match center</Button>
         </Link>
       </CardContent>
     </Card>
