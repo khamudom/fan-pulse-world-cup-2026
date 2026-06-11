@@ -9,7 +9,7 @@ import type { ResolvedTheme } from "@/lib/theme";
 import styles from "./Header.module.css";
 
 const navItems = [
-  { href: "/", label: "Home" },
+  { href: "/", label: "Today" },
   { href: "/my-world-cup", label: "My World Cup", requiresAuth: true },
   { href: "/challenges", label: "Challenges", requiresAuth: true },
   { href: "/matches", label: "Matches" },

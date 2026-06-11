@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Archivo, Barlow_Condensed, Fraunces, Geist_Mono } from "next/font/google";
 import { AdminDrawer } from "@/components/AdminDrawer";
 import { ApiPreviewBanner } from "@/components/ApiPreviewBanner";
 import { AuthModalProvider } from "@/components/AuthModal";
@@ -12,9 +12,21 @@ import { getThemeState } from "@/lib/theme-request";
 import "@khamudom/lumen-ui-react/styles.css";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
+  axes: ["SOFT", "WONK", "opsz"],
+});
+
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+});
+
+const barlowCondensed = Barlow_Condensed({
+  variable: "--font-barlow-condensed",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -38,7 +50,9 @@ export default async function RootLayout({
 }>) {
   const { preference, resolvedTheme } = await getThemeState();
   const htmlClass = [
-    geistSans.variable,
+    fraunces.variable,
+    archivo.variable,
+    barlowCondensed.variable,
     geistMono.variable,
     resolvedTheme === "dark" ? "lumen-dark" : null,
   ]

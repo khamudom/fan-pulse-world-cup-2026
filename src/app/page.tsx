@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Hero } from "@/components/Hero";
 import { WorldCupCountdown } from "@/components/WorldCupCountdown";
 import { SectionHeader } from "@/components/SectionHeader";
-import { MatchCard } from "@/components/MatchCard";
 import { HomeFeatures } from "@/components/HomeFeatures";
 import { ViewAllLink } from "@/components/ViewAllLink";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
@@ -14,25 +13,40 @@ import { FanJourneyCard } from "@/components/FanJourneyCard";
 import { FanAccoladesBoard } from "@/components/FanAccoladesBoard";
 import { AiCompanionCard } from "@/components/AiCompanionCard";
 import { BriefingSection } from "@/components/BriefingContent";
+import { ProgrammeSchedule } from "@/components/ProgrammeSchedule";
 import { getAuthContext } from "@/lib/auth";
-import { getCompanionGreeting, getCachedBriefing } from "@/actions/briefing";
+import { getCachedBriefing } from "@/actions/briefing";
 import { getFanJourney } from "@/lib/fanJourney";
+import { toIsoDate } from "@/lib/matchDate";
 import { getTodaysStory } from "@/lib/todaysStory";
 import { toDataSourceBadge } from "@/lib/dataSourceBadge";
 import { getMatches, getTeams, getTodaysMatches } from "@/services/worldCupApi";
+import type { Match } from "@/types";
 import styles from "./page.module.css";
 
-function isMatchOnDate(date: string, targetIsoDate: string): boolean {
-  if (!date) return false;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date === targetIsoDate;
+function getUpcomingProgrammeMatches(matches: Match[], limit = 12): Match[] {
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + 2);
+  const endIso = endDate.toISOString().slice(0, 10);
 
-  const match = date.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
-  if (!match) return false;
-  const [, month, day, year] = match;
-  return (
-    `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}` ===
-    targetIsoDate
-  );
+  return [...matches]
+    .filter(
+      (match) =>
+        match.status === "scheduled" ||
+        match.status === "notstarted" ||
+        match.status === "live",
+    )
+    .sort((a, b) => {
+      const dateCompare = toIsoDate(a.date).localeCompare(toIsoDate(b.date));
+      if (dateCompare !== 0) return dateCompare;
+      return a.time.localeCompare(b.time);
+    })
+    .filter((match) => {
+      const matchDate = toIsoDate(match.date);
+      return matchDate >= todayIso && matchDate <= endIso;
+    })
+    .slice(0, limit);
 }
 
 export default async function HomePage() {
@@ -44,54 +58,44 @@ export default async function HomePage() {
     getTeams(),
   ]);
 
-  const todays = todaysResult.data.slice(0, 4);
-  const todayIsoDate = new Date().toISOString().slice(0, 10);
-  const hasActualTodayMatches = todays.some((m) =>
-    isMatchOnDate(m.date, todayIsoDate),
-  );
-  const matchSectionTitle = hasActualTodayMatches
-    ? "Today's Matches"
-    : "Upcoming Matches";
-  const matchSectionSubtitle = hasActualTodayMatches
-    ? "Catch up on what's happening today."
-    : "No fixtures today — showing the next scheduled matches.";
-
   const todaysStory = getTodaysStory();
+  const programmeMatches = getUpcomingProgrammeMatches(matchesResult.data);
 
   if (user && profile?.onboarding_complete) {
-    const [greeting, briefing] = await Promise.all([
-      getCompanionGreeting(),
-      getCachedBriefing(),
-    ]);
+    const briefing = await getCachedBriefing();
     const journey = getFanJourney(matchesResult.data, profile);
 
     return (
-      <div className="page">
-        <WelcomeBackHero profile={profile} stats={stats} greeting={greeting} />
+      <div className={`page ${styles.homePage}`}>
+        <WelcomeBackHero profile={profile} stats={stats} journey={journey} />
 
         <StoryToday story={todaysStory} />
 
-        <section className="section" id="briefing">
+        <section className={styles.briefingSection} id="briefing">
           <div className="container">
-            <SectionHeader
-              title="Morning Briefing"
-              subtitle="Your personalized 3-minute read — yesterday's results, today's storylines, and what matters for your team."
-              action={<DataSourceBadge source="local" />}
-            />
-            {briefing.error ? (
-              <EmptyState
-                title="Briefing unavailable"
-                message={briefing.error}
-                actionLabel="Set up My World Cup"
-                actionHref="/my-world-cup"
-              />
-            ) : (
-              <BriefingSection initialContent={briefing.content} />
-            )}
+            <div className={styles.briefingPanel}>
+              <div className={styles.briefingHeader}>
+                <h2 className={styles.briefingTitle}>Morning Briefing</h2>
+                <p className={styles.briefingSubtitle}>
+                  Your personalized 3-minute read — yesterday&apos;s results,
+                  today&apos;s storylines, and what matters for your team.
+                </p>
+              </div>
+              {briefing.error ? (
+                <EmptyState
+                  title="Briefing unavailable"
+                  message={briefing.error}
+                  actionLabel="Set up My World Cup"
+                  actionHref="/my-world-cup"
+                />
+              ) : (
+                <BriefingSection initialContent={briefing.content} />
+              )}
+            </div>
           </div>
         </section>
 
-        <section className="section">
+        <section className={styles.personalSection}>
           <div className="container">
             <div className={styles.personalGrid}>
               <FanJourneyCard
@@ -100,42 +104,50 @@ export default async function HomePage() {
                 matchesSource={matchesResult.source}
               />
               <FanAccoladesBoard stats={stats} variant="compact" />
-              <AiCompanionCard />
+              <AiCompanionCard title="Your World Cup companion" />
             </div>
           </div>
         </section>
 
-        <section className="section sectionAlt">
+        <section className={styles.fixturesSection}>
           <div className="container">
-            <SectionHeader
-              title={matchSectionTitle}
-              subtitle={matchSectionSubtitle}
-              action={
-                <div className={styles.sectionActions}>
-                  <DataSourceBadge
-                    source={toDataSourceBadge(
-                      todaysResult.source,
-                      todays.length > 0,
-                    )}
-                  />
-                  <ViewAllLink href="/matches" label="View all matches" />
-                </div>
-              }
-            />
-            {todays.length > 0 ? (
-              <div className={styles.matchGrid}>
-                {todays.map((match) => (
-                  <MatchCard key={match.id} match={match} />
-                ))}
+            <div className={styles.fixturesHeader}>
+              <div>
+                <h2 className={styles.fixturesTitle}>Programme</h2>
+                <p className={styles.fixturesSubtitle}>
+                  Upcoming fixtures on your watchlist
+                </p>
               </div>
+              <div className={styles.sectionActions}>
+                <DataSourceBadge
+                  source={toDataSourceBadge(
+                    todaysResult.source,
+                    programmeMatches.length > 0,
+                  )}
+                />
+                <ViewAllLink href="/matches" label="View all matches" />
+              </div>
+            </div>
+
+            {programmeMatches.length > 0 ? (
+              <ProgrammeSchedule
+                matches={programmeMatches}
+                favoriteCountry={profile.favorite_country}
+              />
             ) : (
               <EmptyState
                 title="No matches to show"
-                message="No matches scheduled for today."
+                message="No upcoming fixtures from the API."
                 actionLabel="Browse all matches"
                 actionHref="/matches"
               />
             )}
+
+            <footer className={styles.fixturesSignoff}>
+              <p>
+                <em>Tomorrow it changes.</em> Every day is a new chapter.
+              </p>
+            </footer>
           </div>
         </section>
       </div>
@@ -143,7 +155,7 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="page">
+    <div className={`page ${styles.homePage}`}>
       <Hero
         title="The World Is Gathering."
         stats={["48 Nations.", "104 Matches.", "39 Days."]}
@@ -174,35 +186,34 @@ export default async function HomePage() {
 
       <StoryToday story={todaysStory} />
 
-      <section className="section sectionAlt">
+      <section className={styles.fixturesSection}>
         <div className="container">
-          <SectionHeader
-            title={matchSectionTitle}
-            subtitle={matchSectionSubtitle}
-            action={
-              <div className={styles.sectionActions}>
-                <DataSourceBadge
-                  source={toDataSourceBadge(
-                    todaysResult.source,
-                    todays.length > 0,
-                  )}
-                />
-                <ViewAllLink href="/matches" label="View all matches" />
-              </div>
-            }
-          />
-          {todays.length > 0 ? (
-            <div className={styles.matchGrid}>
-              {todays.map((match) => (
-                <MatchCard key={match.id} match={match} />
-              ))}
+          <div className={styles.fixturesHeader}>
+            <div>
+              <h2 className={styles.fixturesTitle}>Programme</h2>
+              <p className={styles.fixturesSubtitle}>
+                Upcoming fixtures from the tournament
+              </p>
             </div>
+            <div className={styles.sectionActions}>
+              <DataSourceBadge
+                source={toDataSourceBadge(
+                  todaysResult.source,
+                  programmeMatches.length > 0,
+                )}
+              />
+              <ViewAllLink href="/matches" label="View all matches" />
+            </div>
+          </div>
+
+          {programmeMatches.length > 0 ? (
+            <ProgrammeSchedule matches={programmeMatches} />
           ) : (
             <EmptyState
               title="No matches to show"
               message={
                 todaysResult.error ??
-                "No matches scheduled for today and no upcoming fixtures from the API."
+                "No upcoming fixtures from the API."
               }
               actionLabel="Browse all matches"
               actionHref="/matches"

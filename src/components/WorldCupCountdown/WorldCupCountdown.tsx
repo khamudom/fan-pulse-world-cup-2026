@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { WORLD_CUP_2026 } from "@/config/tournament";
 import { getCountdownParts, type CountdownParts } from "@/lib/countdown";
 import styles from "./WorldCupCountdown.module.css";
@@ -20,27 +20,46 @@ const countdownUnits: { key: keyof CountdownParts; label: string }[] = [
   { key: "seconds", label: "secs" },
 ];
 
-const emptyCountdown: CountdownParts = {
-  days: 0,
-  hours: 0,
-  minutes: 0,
-  seconds: 0,
-  totalMs: 0,
-};
+let clockSnapshot = 0;
+
+function subscribeToClock(onStoreChange: () => void) {
+  clockSnapshot = Date.now();
+  onStoreChange();
+
+  const timer = window.setInterval(() => {
+    clockSnapshot = Date.now();
+    onStoreChange();
+  }, 1000);
+
+  return () => window.clearInterval(timer);
+}
+
+function getClockSnapshot() {
+  return clockSnapshot;
+}
+
+function getServerClockSnapshot() {
+  return 0;
+}
 
 export function WorldCupCountdown() {
-  const [now, setNow] = useState<Date | null>(null);
-
-  useEffect(() => {
-    setNow(new Date());
-    const timer = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const phase = now ? getCountdownPhase(now) : "countdown";
-  const countdown = now
-    ? getCountdownParts(WORLD_CUP_2026.kickoff, now)
-    : emptyCountdown;
+  const now = useSyncExternalStore(
+    subscribeToClock,
+    getClockSnapshot,
+    getServerClockSnapshot,
+  );
+  const isHydrated = now > 0;
+  const currentDate = new Date(now);
+  const phase = isHydrated ? getCountdownPhase(currentDate) : "countdown";
+  const countdown = isHydrated
+    ? getCountdownParts(WORLD_CUP_2026.kickoff, currentDate)
+    : {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        totalMs: 0,
+      };
 
   return (
     <div className={styles.wrap} aria-label="FIFA World Cup 2026 countdown">
@@ -52,7 +71,7 @@ export function WorldCupCountdown() {
           role="timer"
           aria-live="polite"
           aria-label={
-            now
+            isHydrated
               ? `${countdown.days} days, ${countdown.hours} hours, ${countdown.minutes} minutes, ${countdown.seconds} seconds until kickoff`
               : "Countdown to kickoff"
           }

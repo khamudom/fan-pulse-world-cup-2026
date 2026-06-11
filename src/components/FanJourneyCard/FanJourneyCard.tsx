@@ -74,7 +74,7 @@ export function FanJourneyCard({
   return (
     <Card className={styles.card}>
       <CardHeader className={styles.cardHeader}>
-        <CardTitle as="h2">Your Team Plays In</CardTitle>
+        <CardTitle as="h2">Live Data</CardTitle>
         <CardSourceBadge matchesSource={matchesSource} hasMatch />
       </CardHeader>
       <CardContent>
@@ -87,7 +87,7 @@ export function FanJourneyCard({
           {journey.nextMatch.stadiumName ? ` · ${journey.nextMatch.stadiumName}` : ""}
         </p>
         <Link href={`/matches/${journey.nextMatch.id}`}>
-          <Button variant="primary">View match</Button>
+          <Button variant="primary">Open match centre</Button>
         </Link>
       </CardContent>
     </Card>

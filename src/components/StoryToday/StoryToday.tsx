@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { DataSourceBadge } from "@/components/DataSourceBadge";
 import type { WorldCupStory } from "@/data/worldCupStories";
-import { formatStoryDate } from "@/lib/todaysStory";
 import styles from "./StoryToday.module.css";
 
 interface StoryTodayProps {
@@ -9,7 +7,8 @@ interface StoryTodayProps {
 }
 
 export function StoryToday({ story }: StoryTodayProps) {
-  const storyDate = formatStoryDate();
+  const dropCap = story.teaser.charAt(0);
+  const teaserBody = story.teaser.slice(1);
 
   return (
     <section
@@ -18,49 +17,40 @@ export function StoryToday({ story }: StoryTodayProps) {
       aria-labelledby="story-today-title"
     >
       <div className={styles.inner}>
-        <header className={styles.preamble}>
-          <p className={styles.beat}>Before matches.</p>
-          <p className={styles.beat}>Before standings.</p>
-          <p className={styles.beat}>Before statistics.</p>
-          <div className={styles.divider} aria-hidden="true" />
-        </header>
+        <p className={styles.chapterMarker}>Chapter {story.chapter}</p>
 
-        <div className={styles.body}>
-          <div className={styles.titleRow}>
-            <div>
-              <p className={styles.chapter}>
-                Chapter {story.chapter} · {storyDate}
-              </p>
-              <h2 id="story-today-title" className={styles.sectionTitle}>
-                Today&apos;s World Cup Story
-              </h2>
-            </div>
-            <DataSourceBadge source="local" />
+        <article className={styles.ticket} aria-labelledby="story-today-title">
+          <div className={styles.perforation} aria-hidden="true" />
+          <div className={styles.ticketHeader}>
+            <span className={styles.ticketLabel}>Today&apos;s Tale</span>
+            <span className={styles.ticketStub}>Admit One</span>
           </div>
 
-          <article className={styles.card} aria-labelledby="story-headline">
-            <div className={styles.cardShine} aria-hidden="true" />
-            <p className={styles.cardLabel}>Today&apos;s tale</p>
-            <h3 id="story-headline" className={styles.headline}>
-              {story.headline}
-            </h3>
-            <p className={styles.teaser}>{story.teaser}</p>
-            <p className={styles.hook}>{story.hook}</p>
-          </article>
+          <h2 id="story-today-title" className={styles.headline}>
+            {story.headline}
+          </h2>
 
-          <div className={styles.actions}>
-            <Link href="/story" className={styles.readStory}>
-              Read Story
-            </Link>
-          </div>
+          <p className={styles.teaser}>
+            <span className={styles.dropCap} aria-hidden="true">
+              {dropCap}
+            </span>
+            <span className="sr-only">{dropCap}</span>
+            {teaserBody}
+          </p>
 
-          <footer className={styles.epilogue}>
-            <p className={styles.epilogueLine}>Tomorrow it changes.</p>
-            <p className={styles.epilogueLineAccent}>
-              Every day is a new chapter.
-            </p>
-          </footer>
-        </div>
+          <p className={styles.hook}>{story.hook}</p>
+
+          <Link href="/story" className={styles.cta}>
+            Read tonight&apos;s chapter
+          </Link>
+        </article>
+
+        <footer className={styles.signoff}>
+          <p className={styles.signoffLine}>
+            <em>Tomorrow, a new page turns.</em>
+          </p>
+          <p className={styles.signoffAccent}>Every day is a new chapter.</p>
+        </footer>
       </div>
     </section>
   );

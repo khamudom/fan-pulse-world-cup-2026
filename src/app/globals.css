@@ -2,40 +2,46 @@
 [data-lumen-theme="light"] {
   color-scheme: light;
 
-  /* FIFA official palette */
-  --color-navy: #001021;
-  --color-blue: #00509d;
-  --color-cyan: #00ccff;
+  /* FanPulse stadium palette */
+  --color-pitch-night: #081310;
+  --color-trophy-gold: #d9a441;
+  --color-trophy-gold-light: #f0cc82;
+  --color-pitch-green: #2ea46b;
+  --color-programme-paper: #f4ecda;
+  --color-programme-ink: #241d10;
+  --color-broadcast-red: #e4502e;
 
-  --color-bg: #f0f4f8;
-  --color-surface: #ffffff;
-  --color-surface-elevated: #ffffff;
-  --color-text: #001021;
-  --color-text-muted: #4a667a;
-  --color-text-inverse: #ffffff;
-  --color-primary: #3d9ae8;
-  --color-primary-hover: #2c84cf;
-  --color-accent: #00ccff;
-  --color-accent-muted: #66e5ff;
-  --color-border: #d4e0eb;
-  --color-border-strong: #b0c4d4;
-  --color-header-bg: #001021;
-  --color-footer-bg: #00509d;
-  --color-hero-bg: #001020;
-  --color-live: #dc2626;
-  --color-success: #16a34a;
+  --color-navy: #081310;
+  --color-blue: #1a5c3a;
+  --color-cyan: #2ea46b;
 
-  /* Lumen UI — align buttons and controls with FIFA palette */
-  --lumen-color-primary: #3d9ae8;
-  --lumen-color-on-primary: var(--color-navy);
-  --lumen-color-ring: #00ccff;
+  --color-bg: #081310;
+  --color-surface: #0f1f18;
+  --color-surface-elevated: #152820;
+  --color-text: #e8ede9;
+  --color-text-muted: #8fa89a;
+  --color-text-inverse: #f4ecda;
+  --color-primary: #2ea46b;
+  --color-primary-hover: #38b87a;
+  --color-accent: #d9a441;
+  --color-accent-muted: #f0cc82;
+  --color-border: rgba(244, 236, 218, 0.1);
+  --color-border-strong: rgba(244, 236, 218, 0.2);
+  --color-header-bg: #081310;
+  --color-footer-bg: #0f1f18;
+  --color-hero-bg: #081310;
+  --color-live: #e4502e;
+  --color-success: #2ea46b;
+
+  --lumen-color-primary: #2ea46b;
+  --lumen-color-on-primary: #081310;
+  --lumen-color-ring: #d9a441;
   --lumen-color-background: var(--color-bg);
   --lumen-color-surface: var(--color-surface);
   --lumen-color-border: var(--color-border);
   --lumen-color-text: var(--color-text);
   --lumen-color-text-secondary: var(--color-text-muted);
-  --lumen-color-muted: #e8eef4;
-  /* Above sticky header (100) so drawers/dialogs are not covered */
+  --lumen-color-muted: #152820;
   --lumen-z-modal: 200;
 }
 
@@ -44,33 +50,41 @@
 [data-lumen-theme="dark"] {
   color-scheme: dark;
 
-  --color-bg: #0a1420;
-  --color-surface: #132337;
-  --color-surface-elevated: #1a2d45;
-  --color-text: #e8f0f7;
-  --color-text-muted: #8ba3b8;
-  --color-text-inverse: #ffffff;
-  --color-primary: #3d9ae8;
-  --color-primary-hover: #66b3f0;
-  --color-accent: #00ccff;
-  --color-accent-muted: #66e5ff;
-  --color-border: #243a52;
-  --color-border-strong: #3a5570;
-  --color-header-bg: #001021;
-  --color-footer-bg: #003d78;
-  --color-hero-bg: #000a14;
-  --color-live: #f87171;
-  --color-success: #4ade80;
+  --color-pitch-night: #081310;
+  --color-trophy-gold: #d9a441;
+  --color-trophy-gold-light: #f0cc82;
+  --color-pitch-green: #2ea46b;
+  --color-programme-paper: #f4ecda;
+  --color-programme-ink: #241d10;
+  --color-broadcast-red: #e4502e;
 
-  --lumen-color-primary: #3d9ae8;
-  --lumen-color-on-primary: var(--color-navy);
-  --lumen-color-ring: #00ccff;
+  --color-bg: #081310;
+  --color-surface: #0f1f18;
+  --color-surface-elevated: #152820;
+  --color-text: #e8ede9;
+  --color-text-muted: #8fa89a;
+  --color-text-inverse: #f4ecda;
+  --color-primary: #2ea46b;
+  --color-primary-hover: #38b87a;
+  --color-accent: #d9a441;
+  --color-accent-muted: #f0cc82;
+  --color-border: rgba(244, 236, 218, 0.1);
+  --color-border-strong: rgba(244, 236, 218, 0.2);
+  --color-header-bg: #081310;
+  --color-footer-bg: #0f1f18;
+  --color-hero-bg: #081310;
+  --color-live: #e4502e;
+  --color-success: #2ea46b;
+
+  --lumen-color-primary: #2ea46b;
+  --lumen-color-on-primary: #081310;
+  --lumen-color-ring: #d9a441;
   --lumen-color-background: var(--color-bg);
   --lumen-color-surface: var(--color-surface);
   --lumen-color-border: var(--color-border);
   --lumen-color-text: var(--color-text);
   --lumen-color-text-secondary: var(--color-text-muted);
-  --lumen-color-muted: #1a2d45;
+  --lumen-color-muted: #152820;
   --lumen-input-bg: var(--color-surface-elevated);
   --lumen-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
   --lumen-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -78,7 +92,10 @@
 }
 
 :root {
-  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-fraunces), "Iowan Old Style", "Palatino Linotype", serif;
+  --font-sans: var(--font-archivo), system-ui, -apple-system, sans-serif;
+  --font-ui: var(--font-archivo), system-ui, -apple-system, sans-serif;
+  --font-scoreboard: var(--font-barlow-condensed), "Arial Narrow", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   --text-xs: 0.75rem;
@@ -209,6 +226,15 @@ p {
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
+}
+
+.fontNarrative {
+  font-family: var(--font-serif);
+}
+
+.fontScoreboard {
+  font-family: var(--font-scoreboard);
+  font-variant-numeric: tabular-nums;
 }
 
 .grid2 {

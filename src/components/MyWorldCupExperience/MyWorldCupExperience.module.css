@@ -29,16 +29,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(
-      circle at 20% 0%,
-      color-mix(in srgb, var(--color-cyan) 22%, transparent),
-      transparent 55%
-    ),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-hero-bg) 55%, transparent) 0%,
-      var(--color-hero-bg) 78%
-    );
+  background: rgba(8, 19, 16, 0.72);
 }
 
 .heroInner {
@@ -223,11 +214,7 @@
   gap: clamp(var(--space-6), 5vw, var(--space-12));
   padding: clamp(var(--space-6), 4vw, var(--space-8));
   border-radius: var(--radius-xl);
-  background: linear-gradient(
-    135deg,
-    var(--color-surface-elevated),
-    var(--color-surface)
-  );
+  background: var(--color-surface-elevated);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-md);
 }

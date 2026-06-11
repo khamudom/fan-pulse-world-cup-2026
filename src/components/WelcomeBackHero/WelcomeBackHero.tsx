@@ -1,70 +1,133 @@
 "use client";
 
-import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Button,
-} from "@khamudom/lumen-ui-react";
+import { useEffect, useState } from "react";
+import { getCountdownParts } from "@/lib/countdown";
+import type { FanJourneyResult } from "@/lib/fanJourney";
 import { getLevelTitle } from "@/lib/points";
 import type { Profile, UserStats } from "@/types/database";
 import styles from "./WelcomeBackHero.module.css";
 
+function getTimeGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+function formatWatchdayDate(date = new Date()): string {
+  return date
+    .toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
+    .toUpperCase();
+}
+
+function formatKickoffMeta(match: NonNullable<FanJourneyResult["nextMatch"]>): string {
+  const parts: string[] = [];
+  if (match.stadiumName) {
+    parts.push(match.stadiumName);
+    if (match.city) parts[parts.length - 1] += `, ${match.city}`;
+  }
+  parts.push(`${match.date} · ${match.time}`);
+  return parts.join(" · ");
+}
+
 interface WelcomeBackHeroProps {
   profile: Profile;
   stats: UserStats | null;
-  greeting?: string;
+  journey: FanJourneyResult;
 }
 
 export function WelcomeBackHero({
   profile,
   stats,
-  greeting,
+  journey,
 }: WelcomeBackHeroProps) {
+  const displayName = profile.display_name ?? "Fan";
   const levelTitle = getLevelTitle(stats?.level ?? 1, profile.favorite_country);
+  const accuracy = Number(stats?.prediction_accuracy ?? 0);
+  const predictionRecord =
+    stats && accuracy > 0
+      ? `${Math.round(accuracy)}% accuracy`
+      : "0 for 0";
+
+  const [countdown, setCountdown] = useState(() =>
+    journey.kickoff ? getCountdownParts(journey.kickoff, new Date()) : null,
+  );
+
+  useEffect(() => {
+    if (!journey.kickoff) return;
+    const timer = window.setInterval(() => {
+      setCountdown(getCountdownParts(journey.kickoff!, new Date()));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [journey.kickoff]);
 
   return (
-    <section className={styles.hero}>
+    <section className={styles.hero} aria-labelledby="welcome-hero-title">
+      <div className={styles.glow} aria-hidden="true" />
       <div className={styles.inner}>
-        <p className={styles.eyebrow}>Welcome back</p>
-        <h1 className={styles.title}>{profile.display_name ?? "Fan"}</h1>
-        {greeting ? <p className={styles.greeting}>{greeting}</p> : null}
+        <div className={styles.main}>
+          <p className={styles.programmeLabel}>
+            Watchday Programme · {formatWatchdayDate()}
+          </p>
+          <h1 id="welcome-hero-title" className={styles.title}>
+            {getTimeGreeting()}, {displayName}.{" "}
+            <em className={styles.titleAccent}>Your story continues.</em>
+          </h1>
 
-        <div className={styles.stats}>
-          {profile.favorite_country ? (
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>My Team</span>
-              <span className={styles.statValue}>{profile.favorite_country}</span>
+          <dl className={styles.meta}>
+            {profile.favorite_country ? (
+              <div className={styles.metaItem}>
+                <dt>Following</dt>
+                <dd>{profile.favorite_country}</dd>
+              </div>
+            ) : null}
+            {stats ? (
+              <div className={styles.metaItem}>
+                <dt>Fan Level</dt>
+                <dd>
+                  {stats.level} — {levelTitle}
+                </dd>
+              </div>
+            ) : null}
+            <div className={styles.metaItem}>
+              <dt>Prediction Record</dt>
+              <dd>{predictionRecord}</dd>
             </div>
-          ) : null}
-          {stats ? (
-            <>
-              <div className={styles.stat}>
-                <span className={styles.statLabel}>Level</span>
-                <span className={styles.statValue}>
-                  {stats.level} · {levelTitle}
-                </span>
-              </div>
-              <div className={styles.stat}>
-                <span className={styles.statLabel}>Accuracy</span>
-                <span className={styles.statValue}>
-                  {Number(stats.prediction_accuracy)}%
-                </span>
-              </div>
-            </>
-          ) : null}
+          </dl>
         </div>
 
-        <div className={styles.actions}>
-          <Link href="/#briefing">
-            <Button variant="primary">Today&apos;s Briefing</Button>
-          </Link>
-          <Link href="/challenges">
-            <Button variant="outline">Daily Challenges</Button>
-          </Link>
-        </div>
+        {journey.nextMatch && countdown ? (
+          <aside
+            className={styles.scoreboard}
+            aria-label={`Countdown to ${journey.label}`}
+          >
+            <p className={styles.scoreboardEyebrow}>Kicks off in</p>
+            <p className={styles.scoreboardMatch}>{journey.label}</p>
+            <div className={styles.scoreboardCountdown} role="timer" aria-live="polite">
+              <div className={styles.scoreboardUnit}>
+                <span className={styles.scoreboardValue}>{countdown.days}</span>
+                <span className={styles.scoreboardUnitLabel}>Days</span>
+              </div>
+              <div className={styles.scoreboardUnit}>
+                <span className={styles.scoreboardValue}>{countdown.hours}</span>
+                <span className={styles.scoreboardUnitLabel}>Hrs</span>
+              </div>
+              <div className={styles.scoreboardUnit}>
+                <span className={styles.scoreboardValue}>{countdown.minutes}</span>
+                <span className={styles.scoreboardUnitLabel}>Min</span>
+              </div>
+            </div>
+            <p className={styles.scoreboardMeta}>
+              <span className={styles.liveDot} aria-hidden="true" />
+              {formatKickoffMeta(journey.nextMatch)}
+            </p>
+          </aside>
+        ) : null}
       </div>
     </section>
   );
