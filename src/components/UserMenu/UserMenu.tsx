@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@khamudom/lumen-ui-react";
 import { signOut } from "@/actions/auth";
 import { useAuthModal } from "@/components/AuthModal";
-import { setThemePreference } from "@/actions/theme";
 import type { ResolvedTheme } from "@/lib/theme";
 import styles from "./UserMenu.module.css";
 
@@ -19,16 +18,13 @@ interface UserMenuProps {
 export function UserMenu({
   signedIn,
   displayName,
-  resolvedTheme,
 }: UserMenuProps) {
   const router = useRouter();
   const { openAuthModal } = useAuthModal();
   const [open, setOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const isDark = resolvedTheme === "dark";
   const initial = (displayName ?? "F").charAt(0).toUpperCase();
 
   useEffect(() => {
@@ -50,14 +46,6 @@ export function UserMenu({
       document.removeEventListener("keydown", handleKey);
     };
   }, [open]);
-
-  function handleToggleTheme() {
-    const next: ResolvedTheme = isDark ? "light" : "dark";
-    startTransition(async () => {
-      await setThemePreference(next);
-      router.refresh();
-    });
-  }
 
   async function handleSignOut() {
     setOpen(false);
@@ -121,18 +109,12 @@ export function UserMenu({
             </Link>
           ) : null}
 
-          <button
-            type="button"
-            className={styles.item}
-            role="menuitem"
-            onClick={handleToggleTheme}
-            disabled={isPending}
-          >
-            <span className={styles.itemIcon} aria-hidden="true">
-              {isDark ? "☀" : "☾"}
-            </span>
-            {isDark ? "Light mode" : "Dark mode"}
+          {/* Theme switcher hidden for now.
+          <button type="button" className={styles.item} role="menuitem">
+            <span className={styles.itemIcon} aria-hidden="true" />
+            Theme mode
           </button>
+          */}
 
           <div className={styles.divider} role="separator" />
 
