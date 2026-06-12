@@ -17,6 +17,7 @@ type AuthModalMode = "signin" | "signup";
 interface OpenAuthModalOptions {
   mode?: AuthModalMode;
   pendingCountry?: string;
+  nextPath?: string;
   returnFocusRef?: RefObject<HTMLElement | null>;
 }
 
@@ -38,6 +39,7 @@ export function AuthModalProvider({ children }: AuthModalProviderProps) {
   const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
   const [mode, setMode] = useState<AuthModalMode>("signin");
   const [pendingCountry, setPendingCountry] = useState<string | undefined>();
+  const [nextPath, setNextPath] = useState<string | undefined>();
   const [returnFocusRef, setReturnFocusRef] = useState<
     RefObject<HTMLElement | null> | undefined
   >();
@@ -46,6 +48,7 @@ export function AuthModalProvider({ children }: AuthModalProviderProps) {
     setReturnFocusRef(options?.returnFocusRef);
     setMode(options?.mode ?? "signin");
     setPendingCountry(options?.pendingCountry);
+    setNextPath(options?.nextPath);
     setOpen(true);
   }, []);
 
@@ -84,6 +87,7 @@ export function AuthModalProvider({ children }: AuthModalProviderProps) {
         onOpenChange={setOpen}
         initialMode={mode}
         pendingCountry={pendingCountry}
+        nextPath={nextPath}
         returnFocusRef={returnFocusRef}
       />
       <ResetPasswordModal

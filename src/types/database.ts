@@ -13,6 +13,7 @@ export interface Database {
         Row: {
           id: string;
           display_name: string | null;
+          username: string | null;
           favorite_country: string | null;
           secondary_country: string | null;
           favorite_player_ids: string[];
@@ -23,6 +24,7 @@ export interface Database {
         Insert: {
           id: string;
           display_name?: string | null;
+          username?: string | null;
           favorite_country?: string | null;
           secondary_country?: string | null;
           favorite_player_ids?: string[];
@@ -33,6 +35,7 @@ export interface Database {
         Update: {
           id?: string;
           display_name?: string | null;
+          username?: string | null;
           favorite_country?: string | null;
           secondary_country?: string | null;
           favorite_player_ids?: string[];
@@ -234,9 +237,102 @@ export interface Database {
         };
         Relationships: [];
       };
+      connections: {
+        Row: {
+          id: string;
+          requester_id: string;
+          addressee_id: string;
+          status: "pending" | "accepted" | "declined";
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          requester_id: string;
+          addressee_id: string;
+          status?: "pending" | "accepted" | "declined";
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          requester_id?: string;
+          addressee_id?: string;
+          status?: "pending" | "accepted" | "declined";
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      connection_invites: {
+        Row: {
+          id: string;
+          code: string;
+          owner_id: string;
+          expires_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          code: string;
+          owner_id: string;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          code?: string;
+          owner_id?: string;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      activity_events: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: "nation" | "bracket" | "prediction";
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          type: "nation" | "bracket" | "prediction";
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          type?: "nation" | "bracket" | "prediction";
+          metadata?: Json;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      search_profiles: {
+        Args: { q: string };
+        Returns: {
+          id: string;
+          username: string | null;
+          display_name: string | null;
+          favorite_country: string | null;
+        }[];
+      };
+      redeem_invite: {
+        Args: { p_code: string };
+        Returns: Json;
+      };
+      are_friends: {
+        Args: { a: string; b: string };
+        Returns: boolean;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
@@ -245,3 +341,7 @@ export interface Database {
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type UserStats = Database["public"]["Tables"]["user_stats"]["Row"];
 export type Challenge = Database["public"]["Tables"]["challenges"]["Row"];
+export type Connection = Database["public"]["Tables"]["connections"]["Row"];
+export type ActivityEvent = Database["public"]["Tables"]["activity_events"]["Row"];
+export type ConnectionInvite =
+  Database["public"]["Tables"]["connection_invites"]["Row"];

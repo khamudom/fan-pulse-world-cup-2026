@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth";
 import { normalizeBracketPayload } from "@/lib/bracket";
+import { emitActivityEvent } from "@/lib/activityEvents";
 import { awardPoints } from "@/actions/points";
 import { POINT_VALUES } from "@/lib/points";
 import type {
@@ -82,6 +83,10 @@ export async function saveMyBracketPrediction(
       .eq("id", existing.id);
 
     if (error) return { error: error.message };
+    await emitActivityEvent(user.id, "bracket", {
+      championTeamId: input.championTeamId,
+      championTeamName: input.championTeamName,
+    });
     revalidatePath("/predictor");
     revalidatePath("/profile");
     return { success: true, isNew: false };
@@ -94,6 +99,11 @@ export async function saveMyBracketPrediction(
   });
 
   if (error) return { error: error.message };
+
+  await emitActivityEvent(user.id, "bracket", {
+    championTeamId: input.championTeamId,
+    championTeamName: input.championTeamName,
+  });
 
   await awardPoints("bracket_prediction", POINT_VALUES.prediction, {
     championTeamId: input.championTeamId,

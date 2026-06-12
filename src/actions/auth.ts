@@ -42,6 +42,10 @@ export async function signUp(
 }
 
 function redirectAfterAuth(formData: FormData, defaultPath: string): never {
+  const next = String(formData.get("next") ?? "").trim();
+  if (next && next.startsWith("/") && !next.startsWith("//")) {
+    redirect(next);
+  }
   const country = String(formData.get("pendingCountry") ?? "").trim();
   if (country) {
     redirect(`/my-world-cup?country=${encodeURIComponent(country)}`);

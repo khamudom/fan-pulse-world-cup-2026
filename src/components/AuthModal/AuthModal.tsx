@@ -9,6 +9,7 @@ interface AuthModalProps {
   onOpenChange: (open: boolean) => void;
   initialMode?: "signin" | "signup";
   pendingCountry?: string;
+  nextPath?: string;
   returnFocusRef?: RefObject<HTMLElement | null>;
 }
 
@@ -17,6 +18,7 @@ export function AuthModal({
   onOpenChange,
   initialMode = "signin",
   pendingCountry,
+  nextPath,
   returnFocusRef,
 }: AuthModalProps) {
   return (
@@ -27,10 +29,11 @@ export function AuthModal({
       aria-labelledby="auth-modal-title"
     >
       <LoginForm
-        key={`${open}-${initialMode}-${pendingCountry ?? ""}`}
+        key={`${open}-${initialMode}-${pendingCountry ?? ""}-${nextPath ?? ""}`}
         embedded
         initialMode={initialMode}
         pendingCountry={pendingCountry}
+        nextPath={nextPath}
       />
     </Dialog>
   );

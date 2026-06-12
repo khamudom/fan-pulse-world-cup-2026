@@ -21,12 +21,14 @@ const initialState: AuthActionState = {};
 
 interface LoginFormProps {
   pendingCountry?: string;
+  nextPath?: string;
   embedded?: boolean;
   initialMode?: "signin" | "signup";
 }
 
 export function LoginForm({
   pendingCountry,
+  nextPath,
   embedded = false,
   initialMode = "signin",
 }: LoginFormProps) {
@@ -108,6 +110,9 @@ export function LoginForm({
     <form action={formAction} className={styles.form}>
       {pendingCountry && mode !== "forgot" ? (
         <input type="hidden" name="pendingCountry" value={pendingCountry} />
+      ) : null}
+      {nextPath && mode !== "forgot" ? (
+        <input type="hidden" name="next" value={nextPath} />
       ) : null}
       {mode === "signup" ? (
         <Input

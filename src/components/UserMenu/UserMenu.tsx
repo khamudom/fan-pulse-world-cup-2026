@@ -97,6 +97,20 @@ export function UserMenu({
 
           {signedIn ? (
             <Link
+              href="/friends"
+              className={styles.item}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+            >
+              <span className={styles.itemIcon} aria-hidden="true">
+                👥
+              </span>
+              Friends
+            </Link>
+          ) : null}
+
+          {signedIn ? (
+            <Link
               href="/profile"
               className={styles.item}
               role="menuitem"

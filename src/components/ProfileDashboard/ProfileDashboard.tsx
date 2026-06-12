@@ -9,6 +9,7 @@ import {
   Badge,
 } from "@khamudom/lumen-ui-react";
 import { FanAccoladesBoard } from "@/components/FanAccoladesBoard";
+import { EditableUsername } from "@/components/EditableUsername";
 import { getLevelTitle } from "@/lib/points";
 import type { Profile, UserStats } from "@/types/database";
 import styles from "./ProfileDashboard.module.css";
@@ -58,6 +59,10 @@ export function ProfileDashboard({
                 <Badge variant="secondary">{profile.favorite_country}</Badge>
               </div>
             ) : null}
+            <div>
+              <span className={styles.label}>Find me</span>
+              <EditableUsername username={profile?.username ?? null} />
+            </div>
           </CardContent>
         </Card>
 
@@ -68,6 +73,7 @@ export function ProfileDashboard({
       </div>
 
       <div className={styles.links}>
+        <Link href="/friends">Friends</Link>
         <Link href="/my-world-cup">Edit My World Cup</Link>
         <Link href="/#briefing">Read briefing</Link>
         <Link href="/challenges">Daily challenges</Link>

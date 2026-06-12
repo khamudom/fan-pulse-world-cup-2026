@@ -55,6 +55,12 @@ export function MyWorldCupForm({
             defaultValue={profile?.display_name ?? ""}
             placeholder="How should we greet you?"
           />
+          <Input
+            label="Username"
+            name="username"
+            defaultValue={profile?.username ?? ""}
+            placeholder="footiefan42"
+          />
           <div className={styles.fieldGroup}>
             <div className={styles.fieldLabel}>
               <span>Countries</span>

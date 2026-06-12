@@ -6,16 +6,17 @@ import { useAuthModal } from "./AuthModalProvider";
 
 interface LoginPageOpenerProps {
   country?: string;
+  nextPath?: string;
 }
 
-export function LoginPageOpener({ country }: LoginPageOpenerProps) {
+export function LoginPageOpener({ country, nextPath }: LoginPageOpenerProps) {
   const router = useRouter();
   const { openAuthModal } = useAuthModal();
 
   useEffect(() => {
-    openAuthModal({ pendingCountry: country });
-    router.replace("/");
-  }, [country, openAuthModal, router]);
+    openAuthModal({ pendingCountry: country, nextPath });
+    router.replace(nextPath ?? "/");
+  }, [country, nextPath, openAuthModal, router]);
 
   return null;
 }

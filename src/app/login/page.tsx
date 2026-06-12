@@ -10,12 +10,19 @@ export const metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ country?: string }>;
+  searchParams: Promise<{ country?: string; next?: string }>;
 }) {
   const user = await getSessionUser();
-  if (user) redirect("/");
+  const { country, next } = await searchParams;
+  const nextPath = next?.trim();
 
-  const { country } = await searchParams;
+  if (user) {
+    if (nextPath?.startsWith("/") && !nextPath.startsWith("//")) {
+      redirect(nextPath);
+    }
+    redirect("/");
+  }
+
   const pendingCountry = country?.trim() || undefined;
 
   return (
@@ -30,7 +37,7 @@ export default async function LoginPage({
             </p>
           </div>
         ) : (
-          <LoginPageOpener country={pendingCountry} />
+          <LoginPageOpener country={pendingCountry} nextPath={nextPath} />
         )}
       </div>
     </div>

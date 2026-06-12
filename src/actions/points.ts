@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth";
 import { applyPoints } from "@/lib/apply-points";
+import { emitActivityEvent } from "@/lib/activityEvents";
 import type { Json } from "@/types/database";
 import {
   POINT_VALUES,
@@ -80,6 +81,12 @@ export async function savePrediction(
   });
 
   if (error) return { error: error.message };
+
+  await emitActivityEvent(user.id, "prediction", {
+    matchId,
+    predictedHome,
+    predictedAway,
+  });
 
   await awardPoints("prediction", POINT_VALUES.prediction, { matchId });
   revalidatePath("/predictor");
