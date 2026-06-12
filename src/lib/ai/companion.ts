@@ -105,7 +105,8 @@ export async function generateBriefing(input: BriefingInput): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    return buildTemplateBriefing(input);
+    const news = await generateTeamNews(input.profile);
+    return appendNews(buildTemplateBriefing(input), news);
   }
 
   try {
@@ -131,9 +132,62 @@ export async function generateBriefing(input: BriefingInput): Promise<string> {
       temperature: 0.7,
     });
 
-    return response.choices[0]?.message?.content?.trim() ?? buildTemplateBriefing(input);
+    const briefing =
+      response.choices[0]?.message?.content?.trim() ?? buildTemplateBriefing(input);
+    const news = await generateTeamNews(input.profile);
+    return appendNews(briefing, news);
   } catch {
     return buildTemplateBriefing(input);
+  }
+}
+
+function appendNews(briefing: string, news: string | null): string {
+  if (!news) return briefing;
+  return `${briefing}\n\n${news}`;
+}
+
+/**
+ * Uses OpenAI's Responses API with the built-in web_search tool to pull
+ * real, current news about the user's followed nation plus a couple of broad
+ * tournament storylines. Returns a markdown "Team News" section, or null if
+ * web search is unavailable so the briefing degrades gracefully.
+ */
+export async function generateTeamNews(profile: Profile | null): Promise<string | null> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  const team = profile?.favorite_country;
+
+  if (!apiKey || !team) {
+    return null;
+  }
+
+  try {
+    const openai = new OpenAI({ apiKey });
+
+    const response = await openai.responses.create({
+      model: "gpt-4o",
+      tools: [{ type: "web_search" }],
+      max_output_tokens: 700,
+      instructions:
+        "You are FanPulse, a World Cup 2026 news curator. Search the web for the " +
+        "most recent, credible news and report only verified facts with brief, " +
+        "concrete details. Never invent headlines, quotes, scores, or sources. " +
+        "If you cannot find recent news for a topic, say so plainly.",
+      input:
+        `Write a markdown section titled "## Team News" for a fan following ${team} ` +
+        `at the 2026 World Cup. Search the web for the latest developments and cover:\n` +
+        `1. The most recent news about the ${team} national team (squad, form, ` +
+        `injuries, manager, qualification, friendlies).\n` +
+        `2. Two or three of the biggest current 2026 World Cup storylines across the ` +
+        `tournament.\n\n` +
+        `Use short bullet points (one or two sentences each), group them under bold ` +
+        `subheadings "**${team}**" and "**Around the tournament**", and append a "Source: " ` +
+        `note with the outlet name where helpful. Keep the whole section under 200 words.`,
+    });
+
+    const text = response.output_text?.trim();
+    return text ? text : null;
+  } catch {
+    return null;
   }
 }
 

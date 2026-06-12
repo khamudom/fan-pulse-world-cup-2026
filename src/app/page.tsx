@@ -7,7 +7,6 @@ import { ViewAllLink } from "@/components/ViewAllLink";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
 import { EmptyState } from "@/components/EmptyState";
 import { BeginYourJourney } from "@/components/BeginYourJourney";
-import { StoryToday } from "@/components/StoryToday";
 import { WelcomeBackHero } from "@/components/WelcomeBackHero";
 import { FanJourneyCard } from "@/components/FanJourneyCard";
 import { FanAccoladesBoard } from "@/components/FanAccoladesBoard";
@@ -18,7 +17,6 @@ import { getAuthContext } from "@/lib/auth";
 import { getCachedBriefing } from "@/actions/briefing";
 import { getFanJourney } from "@/lib/fanJourney";
 import { toIsoDate } from "@/lib/matchDate";
-import { getTodaysStory } from "@/lib/todaysStory";
 import { toDataSourceBadge } from "@/lib/dataSourceBadge";
 import { getMatches, getTeams, getTodaysMatches } from "@/services/worldCupApi";
 import type { Match } from "@/types";
@@ -58,7 +56,6 @@ export default async function HomePage() {
     getTeams(),
   ]);
 
-  const todaysStory = getTodaysStory();
   const programmeMatches = getUpcomingProgrammeMatches(matchesResult.data);
 
   if (user && profile?.onboarding_complete) {
@@ -68,8 +65,6 @@ export default async function HomePage() {
     return (
       <div className={`page ${styles.homePage}`}>
         <WelcomeBackHero profile={profile} stats={stats} journey={journey} />
-
-        <StoryToday story={todaysStory} />
 
         <section className={styles.briefingSection} id="briefing">
           <div className="container">
@@ -183,8 +178,6 @@ export default async function HomePage() {
           teamsSource={teamsResult.source}
         />
       ) : null}
-
-      <StoryToday story={todaysStory} />
 
       <section className={styles.fixturesSection}>
         <div className="container">

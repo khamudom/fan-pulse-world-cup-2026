@@ -64,8 +64,17 @@ export function MyWorldCupExperience({
   teamsSource = "api",
   matchesSource = "api",
 }: MyWorldCupExperienceProps) {
-  const { favoriteTeam, secondaryTeam, squad, rivals, fixtures, journey } =
-    data;
+  const {
+    favoriteTeam,
+    secondaryTeam,
+    squad,
+    secondarySquad,
+    rivals,
+    secondaryRivals,
+    fixtures,
+    secondaryFixtures,
+    journey,
+  } = data;
   const nationName =
     favoriteTeam?.name ?? profile.favorite_country ?? "your nation";
   const displayName = profile.display_name ?? "Fan";
@@ -106,7 +115,14 @@ export function MyWorldCupExperience({
       ) : null}
 
       {secondaryTeam ? (
-        <SecondStoryChapter secondaryTeam={secondaryTeam} />
+        <SecondStoryChapter
+          secondaryTeam={secondaryTeam}
+          secondarySquad={secondarySquad}
+          secondaryFixtures={secondaryFixtures}
+          secondaryRivals={secondaryRivals}
+          teamsSource={teamsSource}
+          matchesSource={matchesSource}
+        />
       ) : null}
 
       <ClosingChapter nationName={nationName} />
@@ -258,60 +274,68 @@ function RoadChapter({
             />
           }
         />
-        <ol className={styles.timeline}>
-          {fixtures.map((match) => {
-            const isHome = match.homeTeam.name === favoriteName;
-            const opponent = isHome ? match.awayTeam : match.homeTeam;
-            const finished = match.status === "finished";
-            const won =
-              finished &&
-              ((isHome && match.homeScore > match.awayScore) ||
-                (!isHome && match.awayScore > match.homeScore));
-            return (
-              <li key={match.id} className={styles.timelineItem}>
-                <span className={styles.timelineDot} aria-hidden="true" />
-                <Link
-                  href={`/matches/${match.id}`}
-                  className={styles.timelineCard}
-                >
-                  <div className={styles.timelineTop}>
-                    {match.group ? (
-                      <Badge variant="outline">Group {match.group}</Badge>
-                    ) : null}
-                    <span className={styles.timelineDate}>
-                      {match.date} · {match.time}
-                    </span>
-                  </div>
-                  <div className={styles.timelineMatchup}>
-                    <span className={styles.timelineOpponentLabel}>
-                      {isHome ? "vs" : "away to"}
-                    </span>
-                    <span className={styles.timelineOpponent}>
-                      {opponent.name}
-                    </span>
-                    {finished ? (
-                      <span
-                        className={`${styles.timelineScore} ${won ? styles.scoreWin : ""}`}
-                      >
-                        {isHome
-                          ? `${match.homeScore}–${match.awayScore}`
-                          : `${match.awayScore}–${match.homeScore}`}
-                      </span>
-                    ) : null}
-                  </div>
-                  {match.stadiumName ? (
-                    <span className={styles.timelineVenue}>
-                      {match.stadiumName}
-                      {match.city ? `, ${match.city}` : ""}
-                    </span>
-                  ) : null}
-                </Link>
-              </li>
-            );
-          })}
-        </ol>
+        <FixtureTimeline fixtures={fixtures} teamName={favoriteName} />
       </div>
     </section>
+  );
+}
+
+function FixtureTimeline({
+  fixtures,
+  teamName,
+}: {
+  fixtures: Match[];
+  teamName: string;
+}) {
+  const target = teamName.toLowerCase();
+  return (
+    <ol className={styles.timeline}>
+      {fixtures.map((match) => {
+        const isHome = match.homeTeam.name.toLowerCase() === target;
+        const opponent = isHome ? match.awayTeam : match.homeTeam;
+        const finished = match.status === "finished";
+        const won =
+          finished &&
+          ((isHome && match.homeScore > match.awayScore) ||
+            (!isHome && match.awayScore > match.homeScore));
+        return (
+          <li key={match.id} className={styles.timelineItem}>
+            <span className={styles.timelineDot} aria-hidden="true" />
+            <Link href={`/matches/${match.id}`} className={styles.timelineCard}>
+              <div className={styles.timelineTop}>
+                {match.group ? (
+                  <Badge variant="outline">Group {match.group}</Badge>
+                ) : null}
+                <span className={styles.timelineDate}>
+                  {match.date} · {match.time}
+                </span>
+              </div>
+              <div className={styles.timelineMatchup}>
+                <span className={styles.timelineOpponentLabel}>
+                  {isHome ? "vs" : "away to"}
+                </span>
+                <span className={styles.timelineOpponent}>{opponent.name}</span>
+                {finished ? (
+                  <span
+                    className={`${styles.timelineScore} ${won ? styles.scoreWin : ""}`}
+                  >
+                    {isHome
+                      ? `${match.homeScore}–${match.awayScore}`
+                      : `${match.awayScore}–${match.homeScore}`}
+                  </span>
+                ) : null}
+              </div>
+              {match.stadiumName ? (
+                <span className={styles.timelineVenue}>
+                  {match.stadiumName}
+                  {match.city ? `, ${match.city}` : ""}
+                </span>
+              ) : null}
+            </Link>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
@@ -322,11 +346,6 @@ function SquadChapter({
   nationName: string;
   squad: WorldCupSquad;
 }) {
-  const byPosition = POSITION_ORDER.map((position) => ({
-    position,
-    players: squad.players.filter((p) => p.position === position),
-  })).filter((group) => group.players.length > 0);
-
   return (
     <section className={`section ${styles.chapter}`}>
       <div className="container">
@@ -335,26 +354,39 @@ function SquadChapter({
           title={`Meet the ${nationName} squad`}
           subtitle={`Led by ${squad.coach_en}, captained by ${squad.captain_en} — the names you'll be chanting.`}
         />
-        {squad.status_en ? (
-          <p className={styles.squadStatus}>{squad.status_en}</p>
-        ) : null}
-        <div className={styles.squadGroups}>
-          {byPosition.map(({ position, players }) => (
-            <div key={position} className={styles.squadGroup}>
-              <h3 className={styles.squadGroupTitle}>
-                {POSITION_LABELS[position]}
-                <span className={styles.squadCount}>{players.length}</span>
-              </h3>
-              <ul className={styles.playerList}>
-                {players.map((player) => (
-                  <PlayerRow key={player.id} player={player} />
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+        <SquadGroups squad={squad} />
       </div>
     </section>
+  );
+}
+
+function SquadGroups({ squad }: { squad: WorldCupSquad }) {
+  const byPosition = POSITION_ORDER.map((position) => ({
+    position,
+    players: squad.players.filter((p) => p.position === position),
+  })).filter((group) => group.players.length > 0);
+
+  return (
+    <>
+      {squad.status_en ? (
+        <p className={styles.squadStatus}>{squad.status_en}</p>
+      ) : null}
+      <div className={styles.squadGroups}>
+        {byPosition.map(({ position, players }) => (
+          <div key={position} className={styles.squadGroup}>
+            <h3 className={styles.squadGroupTitle}>
+              {POSITION_LABELS[position]}
+              <span className={styles.squadCount}>{players.length}</span>
+            </h3>
+            <ul className={styles.playerList}>
+              {players.map((player) => (
+                <PlayerRow key={player.id} player={player} />
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -411,7 +443,21 @@ function RivalsChapter({
   );
 }
 
-function SecondStoryChapter({ secondaryTeam }: { secondaryTeam: Team }) {
+function SecondStoryChapter({
+  secondaryTeam,
+  secondarySquad,
+  secondaryFixtures,
+  secondaryRivals,
+  teamsSource,
+  matchesSource,
+}: {
+  secondaryTeam: Team;
+  secondarySquad: WorldCupSquad | null;
+  secondaryFixtures: Match[];
+  secondaryRivals: Team[];
+  teamsSource: ApiDataSource;
+  matchesSource: ApiDataSource;
+}) {
   return (
     <section className={`section ${styles.chapter}`}>
       <div className="container">
@@ -429,6 +475,49 @@ function SecondStoryChapter({ secondaryTeam }: { secondaryTeam: Team }) {
             ) : null}
           </div>
         </div>
+
+        {secondaryFixtures.length > 0 ? (
+          <div className={styles.secondBlock}>
+            <h3 className={styles.secondBlockTitle}>
+              {secondaryTeam.name}&apos;s path
+              <DataSourceBadge
+                source={toDataSourceBadge(matchesSource, true)}
+              />
+            </h3>
+            <FixtureTimeline
+              fixtures={secondaryFixtures}
+              teamName={secondaryTeam.name}
+            />
+          </div>
+        ) : null}
+
+        {secondaryRivals.length > 0 && secondaryTeam.group ? (
+          <div className={styles.secondBlock}>
+            <h3 className={styles.secondBlockTitle}>
+              Group {secondaryTeam.group} rivals
+              <DataSourceBadge
+                source={toDataSourceBadge(teamsSource, true)}
+              />
+            </h3>
+            <div className={styles.rivalGrid}>
+              {secondaryRivals.map((team) => (
+                <div key={team.id} className={styles.rivalCard}>
+                  <Flag team={team} className={styles.rivalFlag} />
+                  <span className={styles.rivalName}>{team.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {secondarySquad ? (
+          <div className={styles.secondBlock}>
+            <h3 className={styles.secondBlockTitle}>
+              {secondaryTeam.name}&apos;s squad
+            </h3>
+            <SquadGroups squad={secondarySquad} />
+          </div>
+        ) : null}
       </div>
     </section>
   );

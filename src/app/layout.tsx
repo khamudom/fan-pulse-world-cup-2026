@@ -3,7 +3,7 @@ import { Archivo, Barlow_Condensed, Fraunces, Geist_Mono } from "next/font/googl
 import { AdminDrawer } from "@/components/AdminDrawer";
 import { ApiPreviewBanner } from "@/components/ApiPreviewBanner";
 import { AuthModalProvider } from "@/components/AuthModal";
-import { DataSourceLegend } from "@/components/DataSourceLegend";
+// import { DataSourceLegend } from "@/components/DataSourceLegend";
 import { CheckInCelebrationContainer } from "@/components/CheckInCelebration";
 import { HeaderContainer } from "@/components/Header/HeaderContainer";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -71,7 +71,7 @@ export default async function RootLayout({
           <AuthModalProvider>
             <ScrollToTop />
             <ApiPreviewBanner />
-            <DataSourceLegend />
+            {/* <DataSourceLegend /> */}
             <AdminDrawer />
             <HeaderContainer />
             <CheckInCelebrationContainer />

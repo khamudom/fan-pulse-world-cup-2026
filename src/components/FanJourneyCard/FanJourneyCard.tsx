@@ -89,7 +89,7 @@ export function FanJourneyCard({
             : ""}
         </p>
         <Link href={`/matches/${journey.nextMatch.id}`}>
-          <Button variant="primary">Open match center</Button>
+          <Button variant="primary">Open match</Button>
         </Link>
       </CardContent>
     </Card>

@@ -520,6 +520,20 @@
   margin-bottom: var(--space-2);
 }
 
+.secondBlock {
+  margin-top: var(--space-8);
+}
+
+.secondBlockTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
 /* ---------- Closing ---------- */
 .closing {
   background: var(--color-hero-bg);

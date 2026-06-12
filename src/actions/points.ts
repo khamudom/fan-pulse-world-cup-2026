@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth";
 import { applyPoints } from "@/lib/apply-points";
+import { completeChallengeBySlug } from "@/lib/checkin";
 import { emitActivityEvent } from "@/lib/activityEvents";
 import type { Json } from "@/types/database";
 import {
@@ -89,6 +90,9 @@ export async function savePrediction(
   });
 
   await awardPoints("prediction", POINT_VALUES.prediction, { matchId });
+
+  await completeChallengeBySlug(user.id, "predict-today");
+
   revalidatePath("/predictor");
   revalidatePath("/challenges");
   return { success: true, isNew: true };

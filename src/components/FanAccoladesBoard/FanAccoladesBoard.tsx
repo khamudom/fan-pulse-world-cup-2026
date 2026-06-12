@@ -11,6 +11,7 @@ import {
 import {
   FAN_ACCOLADES,
   getAccoladeBoard,
+  getAccoladeCriteria,
   getStreakMessage,
 } from "@/lib/accolades";
 import type { UserStats } from "@/types/database";
@@ -33,6 +34,7 @@ export function FanAccoladesBoard({
   const checkedInToday = stats?.last_check_in === todayIso();
   const board = getAccoladeBoard(stats);
   const isCompact = variant === "compact";
+  const recentEarned = [...board.earned].reverse().slice(0, 4);
 
   return (
     <Card className={styles.card}>
@@ -83,9 +85,9 @@ export function FanAccoladesBoard({
         {isCompact ? (
           <>
             <span className={styles.sectionLabel}>Your badges</span>
-            {board.earned.length > 0 ? (
+            {recentEarned.length > 0 ? (
               <div className={styles.badgeGridCompact}>
-                {board.earned.map((accolade) => (
+                {recentEarned.map((accolade) => (
                   <div
                     key={accolade.id}
                     className={`${styles.badge} ${styles.badgeCompact} ${styles.badgeEarned}`}
@@ -134,9 +136,15 @@ export function FanAccoladesBoard({
                       {accolade.emoji}
                     </span>
                     <span className={styles.badgeTitle}>{accolade.title}</span>
-                    {!earned ? (
-                      <p className={styles.badgeTagline}>{accolade.tagline}</p>
-                    ) : null}
+                    <p className={styles.badgeTagline}>{accolade.tagline}</p>
+                    <span
+                      className={`${styles.badgeCriteria} ${
+                        earned ? styles.badgeCriteriaEarned : ""
+                      }`}
+                    >
+                      {earned ? "✓ " : ""}
+                      {getAccoladeCriteria(accolade)}
+                    </span>
                   </div>
                 );
               })}

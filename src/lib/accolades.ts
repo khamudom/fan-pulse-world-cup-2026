@@ -149,6 +149,17 @@ export function isAccoladeEarned(accolade: Accolade, stats: UserStats): boolean 
   return getStatValue(stats, accolade.category) >= accolade.threshold;
 }
 
+export function getAccoladeCriteria(accolade: Accolade): string {
+  switch (accolade.category) {
+    case "points":
+      return `${accolade.threshold.toLocaleString()} points`;
+    case "streak":
+      return `${accolade.threshold}-day streak`;
+    case "level":
+      return `Level ${accolade.threshold}`;
+  }
+}
+
 export function getAccoladeProgress(
   accolade: Accolade,
   stats: UserStats,

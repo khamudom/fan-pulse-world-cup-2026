@@ -59,7 +59,9 @@ export interface MyWorldCupData {
   squad: WorldCupSquad | null;
   secondarySquad: WorldCupSquad | null;
   rivals: Team[];
+  secondaryRivals: Team[];
   fixtures: Match[];
+  secondaryFixtures: Match[];
   journey: FanJourneyResult;
 }
 
@@ -78,7 +80,9 @@ export function assembleMyWorldCup(
     squad: findSquadByName(profile?.favorite_country),
     secondarySquad: findSquadByName(profile?.secondary_country),
     rivals: getGroupRivals(teams, favoriteTeam),
+    secondaryRivals: getGroupRivals(teams, secondaryTeam),
     fixtures: getNationFixtures(matches, favoriteTeam),
+    secondaryFixtures: getNationFixtures(matches, secondaryTeam),
     journey: getFanJourney(matches, profile, now),
   };
 }

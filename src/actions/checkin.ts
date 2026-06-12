@@ -1,16 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth";
-import { awardPoints } from "@/actions/points";
-import { ensureDailyCheckIn } from "@/lib/checkin";
+import { completeChallengeBySlug, ensureDailyCheckIn } from "@/lib/checkin";
 
 export type { DailyCheckInStatus } from "@/lib/checkin";
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
 
 function revalidateCheckInPaths() {
   revalidatePath("/", "layout");
@@ -38,42 +32,15 @@ export async function completeChallenge(slug: string) {
   const user = await getSessionUser();
   if (!user) return { error: "Not signed in." };
 
-  const supabase = await createClient();
-  const { data: challenge } = await supabase
-    .from("challenges")
-    .select("*")
-    .eq("slug", slug)
-    .eq("active", true)
-    .maybeSingle();
+  const result = await completeChallengeBySlug(user.id, slug);
 
-  if (!challenge) return { error: "Challenge not found." };
-
-  const today = todayIso();
-  const { data: existing } = await supabase
-    .from("challenge_completions")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("challenge_id", challenge.id)
-    .eq("completed_date", today)
-    .maybeSingle();
-
-  if (existing) {
+  if (!result.completed) {
     return { success: true, alreadyCompleted: true };
   }
 
-  const { error } = await supabase.from("challenge_completions").insert({
-    user_id: user.id,
-    challenge_id: challenge.id,
-    completed_date: today,
-  });
-
-  if (error) return { error: error.message };
-
-  await awardPoints("challenge", challenge.points, { slug });
-
   revalidatePath("/challenges");
   revalidatePath("/profile");
-  return { success: true, alreadyCompleted: false, points: challenge.points };
+  return { success: true, alreadyCompleted: false, points: result.points };
 }
 
 export async function markBriefingRead() {

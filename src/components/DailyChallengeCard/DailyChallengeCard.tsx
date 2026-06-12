@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -64,6 +65,18 @@ export function DailyChallengeCard({
           <p className={styles.note}>
             Read today&apos;s briefing to complete this challenge.
           </p>
+        ) : challenge.slug === "predict-today" ? (
+          done ? (
+            <p className={styles.note}>
+              Predictions submitted — nice work! See you at kickoff.
+            </p>
+          ) : (
+            <Link href="/matches">
+              <Button type="button" variant="primary">
+                Predict matches
+              </Button>
+            </Link>
+          )
         ) : (
           <Button
             type="button"

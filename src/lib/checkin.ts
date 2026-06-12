@@ -13,6 +13,44 @@ export type DailyCheckInStatus = {
   pointsEarned: number;
 };
 
+export async function completeChallengeBySlug(
+  userId: string,
+  slug: string,
+): Promise<{ completed: boolean; points: number }> {
+  const supabase = await createClient();
+
+  const { data: challenge } = await supabase
+    .from("challenges")
+    .select("*")
+    .eq("slug", slug)
+    .eq("active", true)
+    .maybeSingle();
+
+  if (!challenge) return { completed: false, points: 0 };
+
+  const today = todayIso();
+  const { data: existing } = await supabase
+    .from("challenge_completions")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("challenge_id", challenge.id)
+    .eq("completed_date", today)
+    .maybeSingle();
+
+  if (existing) return { completed: false, points: 0 };
+
+  const { error } = await supabase.from("challenge_completions").insert({
+    user_id: userId,
+    challenge_id: challenge.id,
+    completed_date: today,
+  });
+
+  if (error) return { completed: false, points: 0 };
+
+  await applyPoints(userId, "challenge", challenge.points, { slug });
+  return { completed: true, points: challenge.points };
+}
+
 export async function ensureDailyCheckIn(
   userId: string,
 ): Promise<DailyCheckInStatus> {
