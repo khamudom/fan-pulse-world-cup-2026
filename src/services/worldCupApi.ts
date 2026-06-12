@@ -468,6 +468,6 @@ export function getStatusBadgeVariant(
     case "halftime":
       return "warning";
     default:
-      return "default";
+      return "secondary";
   }
 }

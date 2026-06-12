@@ -62,6 +62,12 @@ export default async function HomePage() {
     const briefing = await getCachedBriefing();
     const journey = getFanJourney(matchesResult.data, profile);
 
+    const briefingDate = new Date().toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    });
+
     return (
       <div className={`page ${styles.homePage}`}>
         <WelcomeBackHero profile={profile} stats={stats} journey={journey} />
@@ -70,7 +76,9 @@ export default async function HomePage() {
           <div className="container">
             <div className={styles.briefingPanel}>
               <div className={styles.briefingHeader}>
-                <h2 className={styles.briefingTitle}>Morning Briefing</h2>
+                <h2 className={styles.briefingTitle}>
+                  Morning Briefing for {briefingDate}
+                </h2>
                 <p className={styles.briefingSubtitle}>
                   Your personalized 3-minute read — yesterday&apos;s results,
                   today&apos;s storylines, and what matters for your team.

@@ -25,7 +25,7 @@
   font-family: var(--font-serif);
   font-size: clamp(var(--text-2xl), 3vw, var(--text-3xl));
   font-weight: 600;
-  color: var(--color-trophy-gold-light);
+  color: var(--color-text-inverse);
 }
 
 .briefingSubtitle {

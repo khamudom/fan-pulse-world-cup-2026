@@ -7,9 +7,9 @@ import { Hero } from "@/components/Hero";
 import { SectionHeader } from "@/components/SectionHeader";
 import { MatchPredictionForm } from "@/components/MatchPredictionForm";
 import { AiInsightCard } from "@/components/AiInsightCard";
-import { ArticleCard } from "@/components/ArticleCard";
+// import { ArticleCard } from "@/components/ArticleCard"; // hidden: Related Stories (mock data)
 import { getLiveMatch } from "@/actions/liveMatch";
-import { contentData, getMatchComparison } from "@/services/contentApi";
+import { contentData } from "@/services/contentApi";
 import { getStatusLabel, getStatusBadgeVariant } from "@/services/worldCupApi";
 import type { Match } from "@/types";
 import styles from "./MatchDetailView.module.css";
@@ -38,7 +38,7 @@ function formatUpdatedTime(date: Date): string {
 }
 
 const mockMatchInsights = contentData.matchInsights;
-const mockArticles = contentData.articles;
+// const mockArticles = contentData.articles; // hidden: Related Stories (mock data)
 
 interface MatchDetailViewProps {
   match: Match;
@@ -117,11 +117,12 @@ export function MatchDetailView({
     };
   }, [isLive, refresh]);
 
-  const comparisons = getMatchComparison(
-    match.id,
-    match.homeTeam.name,
-    match.awayTeam.name,
-  ).data;
+  // Team Comparison is hidden for now (mock data only).
+  // const comparisons = getMatchComparison(
+  //   match.id,
+  //   match.homeTeam.name,
+  //   match.awayTeam.name,
+  // ).data;
 
   return (
     <>
@@ -179,6 +180,7 @@ export function MatchDetailView({
         )}
       </Hero>
 
+      {/* Team Comparison is hidden for now (mock data only).
       {showPrototypeData ? (
         <section className="section">
           <div className="container">
@@ -226,6 +228,7 @@ export function MatchDetailView({
           </div>
         </section>
       ) : null}
+      */}
 
       {isSignedIn || showPrototypeData ? (
         <section className="section sectionAlt">
@@ -252,6 +255,7 @@ export function MatchDetailView({
         </section>
       ) : null}
 
+      {/* Related Stories is hidden for now (mock data only).
       {showPrototypeData ? (
         <section className="section">
           <div className="container">
@@ -267,6 +271,7 @@ export function MatchDetailView({
           </div>
         </section>
       ) : null}
+      */}
     </>
   );
 }

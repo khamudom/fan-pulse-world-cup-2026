@@ -63,10 +63,12 @@ export function MatchPredictionForm({
     match.status === "halftime" ||
     match.status === "finished";
   const isFinal = match.status === "finished";
+  const isLocked =
+    match.status === "halftime" || match.status === "finished";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!winner) return;
+    if (!winner || isLocked) return;
 
     const home = homeScore !== "" ? parseInt(homeScore, 10) : 0;
     const away = awayScore !== "" ? parseInt(awayScore, 10) : 0;
@@ -108,7 +110,7 @@ export function MatchPredictionForm({
       <CardHeader>
         <CardTitle as="h2">Match Prediction</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className={styles.content}>
         {saved ? (
           <PredictionSummary saved={saved} match={match} hasResult={hasResult} isFinal={isFinal} />
         ) : null}
@@ -144,13 +146,20 @@ export function MatchPredictionForm({
               onChange={(e) => setAwayScore(e.target.value)}
             />
           </div>
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading || isLocked}>
             {loading
               ? "Saving…"
               : saved
                 ? "Update Prediction"
                 : "Submit Prediction"}
           </Button>
+          {isLocked ? (
+            <p className={styles.locked} role="status">
+              {isFinal
+                ? "This match has finished — predictions are closed."
+                : "Predictions are closed once the match reaches half time."}
+            </p>
+          ) : null}
           {message ? (
             <p className={styles.success} role="status">
               {message}

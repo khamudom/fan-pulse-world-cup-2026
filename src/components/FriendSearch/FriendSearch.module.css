@@ -2,15 +2,30 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.input :global(.lumen-input-field) {
+  gap: var(--space-3);
 }
 
 .row {
+  --search-control-height: 2.5rem;
   display: flex;
+  align-items: flex-end;
   gap: var(--space-2);
 }
 
 .input {
   flex: 1;
+}
+
+.input :global(.lumen-input) {
+  height: var(--search-control-height);
+}
+
+.button {
+  height: var(--search-control-height);
 }
 
 .results {

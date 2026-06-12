@@ -1,3 +1,7 @@
+.content {
+  margin-top: var(--space-4);
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -13,6 +17,12 @@
 .success {
   font-size: var(--text-sm);
   color: var(--color-success);
+  font-weight: 500;
+}
+
+.locked {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 

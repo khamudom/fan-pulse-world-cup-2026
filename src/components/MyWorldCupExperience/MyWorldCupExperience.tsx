@@ -301,7 +301,7 @@ function FixtureTimeline({
         return (
           <li key={match.id} className={styles.timelineItem}>
             <span className={styles.timelineDot} aria-hidden="true" />
-            <Link href={`/matches/${match.id}`} className={styles.timelineCard}>
+            <div className={styles.timelineCard}>
               <div className={styles.timelineTop}>
                 {match.group ? (
                   <Badge variant="outline">Group {match.group}</Badge>
@@ -331,7 +331,15 @@ function FixtureTimeline({
                   {match.city ? `, ${match.city}` : ""}
                 </span>
               ) : null}
-            </Link>
+              <div className={styles.timelineFooter}>
+                <Link
+                  href={`/matches/${match.id}`}
+                  className={styles.timelinePreview}
+                >
+                  Preview
+                </Link>
+              </div>
+            </div>
           </li>
         );
       })}

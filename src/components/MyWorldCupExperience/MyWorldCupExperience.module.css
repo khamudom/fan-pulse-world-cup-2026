@@ -306,13 +306,15 @@
   border-radius: var(--radius-lg);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
-.timelineCard:hover {
+/* .timelineCard:hover {
   border-color: var(--color-primary);
   transform: translateX(2px);
-}
+} */
 
 .timelineTop {
   display: flex;
@@ -365,6 +367,35 @@
   margin-top: var(--space-2);
   font-size: var(--text-sm);
   color: var(--color-text-muted);
+}
+
+.timelineFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-4);
+}
+
+.timelinePreview {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(244, 236, 218, 0.2);
+  background: transparent;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-text-inverse);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+  white-space: nowrap;
+}
+
+.timelinePreview:hover {
+  border-color: rgba(46, 164, 107, 0.5);
+  background: rgba(46, 164, 107, 0.1);
 }
 
 /* ---------- Squad ---------- */

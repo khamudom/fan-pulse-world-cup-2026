@@ -32,6 +32,10 @@ const variants: Record<
 };
 
 export function DataSourceBadge({ source, label }: DataSourceBadgeProps) {
+  if (process.env.NODE_ENV === "production") {
+    return null;
+  }
+
   return (
     <Badge
       variant={variants[source]}

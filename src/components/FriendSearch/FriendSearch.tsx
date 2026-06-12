@@ -59,7 +59,12 @@ export function FriendSearch() {
           onChange={(event) => setQuery(event.target.value)}
           placeholder="e.g. Baloo710 or footiefan42"
         />
-        <Button type="submit" variant="primary" loading={isSearching}>
+        <Button
+          type="submit"
+          variant="primary"
+          loading={isSearching}
+          className={styles.button}
+        >
           Search
         </Button>
       </form>
