@@ -132,6 +132,7 @@ function BracketMatchCard({
           <span className={styles.matchDate}>
             <LocalKickoff
               kickoffUtc={match.kickoffUtc}
+              venueTimeZone={match.venueTimeZone}
               fallbackDate={match.date}
               fallbackTime={match.time}
             />

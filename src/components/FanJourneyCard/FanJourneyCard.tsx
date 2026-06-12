@@ -86,6 +86,7 @@ export function FanJourneyCard({
         <p className={styles.meta}>
           <LocalKickoff
             kickoffUtc={journey.nextMatch.kickoffUtc}
+            venueTimeZone={journey.nextMatch.venueTimeZone}
             fallbackDate={journey.nextMatch.date}
             fallbackTime={journey.nextMatch.time}
           />

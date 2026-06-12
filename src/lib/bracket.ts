@@ -362,6 +362,7 @@ function buildMatchState(
     date: useLiveMatch ? liveMatch.date : undefined,
     time: useLiveMatch ? liveMatch.time : undefined,
     kickoffUtc: useLiveMatch ? liveMatch.kickoffUtc : undefined,
+    venueTimeZone: useLiveMatch ? liveMatch.venueTimeZone : undefined,
     canPick: isPickable,
   };
 }

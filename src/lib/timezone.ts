@@ -87,6 +87,46 @@ export function zonedLocalToUtcIso(
   return new Date(utcMs).toISOString();
 }
 
+export function formatKickoffInTimeZone(
+  kickoffUtc: string,
+  timeZone: string,
+  locale?: string,
+): UserKickoffDisplay {
+  const instant = new Date(kickoffUtc);
+  const resolvedLocale = locale ?? undefined;
+
+  const dateFormatter = new Intl.DateTimeFormat(resolvedLocale, {
+    timeZone,
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
+  });
+
+  const timeFormatter = new Intl.DateTimeFormat(resolvedLocale, {
+    timeZone,
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
+  });
+
+  const date = dateFormatter.format(instant);
+  const timeWithZone = timeFormatter.format(instant);
+  const timeZoneLabel =
+    new Intl.DateTimeFormat(resolvedLocale, {
+      timeZone,
+      timeZoneName: "short",
+    })
+      .formatToParts(instant)
+      .find((part) => part.type === "timeZoneName")?.value ?? "";
+
+  return {
+    date,
+    time: timeWithZone,
+    timeZone: timeZoneLabel,
+    dateTime: instant.toISOString(),
+  };
+}
+
 export function formatKickoffInUserTz(
   kickoffUtc: string,
   locale?: string,

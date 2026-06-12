@@ -39,6 +39,7 @@ export interface BracketMatchState {
   date?: string;
   time?: string;
   kickoffUtc?: string;
+  venueTimeZone?: string;
   canPick: boolean;
 }
 

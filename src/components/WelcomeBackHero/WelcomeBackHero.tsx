@@ -41,6 +41,7 @@ function formatKickoffMeta(
       {parts.length > 0 ? `${parts.join(" · ")} · ` : null}
       <LocalKickoff
         kickoffUtc={match.kickoffUtc}
+        venueTimeZone={match.venueTimeZone}
         fallbackDate={match.date}
         fallbackTime={match.time}
       />

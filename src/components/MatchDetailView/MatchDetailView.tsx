@@ -133,6 +133,7 @@ export function MatchDetailView({
           <>
             <LocalKickoff
               kickoffUtc={match.kickoffUtc}
+              venueTimeZone={match.venueTimeZone}
               fallbackDate={match.date}
               fallbackTime={match.time}
             />

@@ -1,7 +1,11 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { formatKickoffInUserTz } from "@/lib/timezone";
+import {
+  formatKickoffInTimeZone,
+  formatKickoffInUserTz,
+} from "@/lib/timezone";
+import styles from "./LocalKickoff.module.css";
 
 function subscribeNoop() {
   return () => {};
@@ -19,22 +23,39 @@ function useIsHydrated(): boolean {
   return useSyncExternalStore(subscribeNoop, getClientHydrated, getServerHydrated);
 }
 
+function getUserTimeZone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+function getServerTimeZone(): string {
+  return "";
+}
+
+function useUserTimeZone(): string {
+  return useSyncExternalStore(subscribeNoop, getUserTimeZone, getServerTimeZone);
+}
+
 export interface LocalKickoffProps {
   kickoffUtc?: string;
+  venueTimeZone?: string;
   fallbackDate: string;
   fallbackTime?: string;
   mode?: "dateTime" | "time";
   className?: string;
+  showVenueTime?: boolean;
 }
 
 export function LocalKickoff({
   kickoffUtc,
+  venueTimeZone,
   fallbackDate,
   fallbackTime,
   mode = "dateTime",
   className,
+  showVenueTime = true,
 }: LocalKickoffProps) {
   const hydrated = useIsHydrated();
+  const userTimeZone = useUserTimeZone();
 
   if (!kickoffUtc || !hydrated) {
     const fallback =
@@ -48,13 +69,33 @@ export function LocalKickoff({
   }
 
   const formatted = formatKickoffInUserTz(kickoffUtc);
-  const content =
+  const primary =
     mode === "time" ? formatted.time : `${formatted.date} · ${formatted.time}`;
 
+  const showVenueSubtext =
+    showVenueTime &&
+    venueTimeZone &&
+    userTimeZone &&
+    venueTimeZone !== userTimeZone;
+
+  const venueFormatted = showVenueSubtext
+    ? formatKickoffInTimeZone(kickoffUtc, venueTimeZone)
+    : null;
+  const venueLine = venueFormatted
+    ? mode === "time"
+      ? venueFormatted.time
+      : `${venueFormatted.date} · ${venueFormatted.time}`
+    : null;
+
   return (
-    <time className={className} dateTime={formatted.dateTime}>
-      {content}
-    </time>
+    <span className={[styles.wrap, className].filter(Boolean).join(" ")}>
+      <time className={styles.primary} dateTime={formatted.dateTime}>
+        {primary}
+      </time>
+      {venueLine ? (
+        <span className={styles.venueSubtext}>{venueLine} local</span>
+      ) : null}
+    </span>
   );
 }
 

@@ -72,6 +72,7 @@ export function ProgrammeSchedule({
                     <LocalKickoff
                       className={styles.matchTime}
                       kickoffUtc={match.kickoffUtc}
+                      venueTimeZone={match.venueTimeZone}
                       fallbackDate={match.date}
                       fallbackTime={match.time}
                       mode="time"

@@ -98,6 +98,7 @@ export function MatchCard({ match, featured = false }: MatchCardProps) {
         <div className={styles.details}>
           <LocalKickoff
             kickoffUtc={match.kickoffUtc}
+            venueTimeZone={match.venueTimeZone}
             fallbackDate={match.date}
             fallbackTime={match.time}
           />

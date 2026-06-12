@@ -233,6 +233,7 @@ function NextChapter({
               <p className={styles.nextMatchMeta}>
                 <LocalKickoff
                   kickoffUtc={journey.nextMatch.kickoffUtc}
+                  venueTimeZone={journey.nextMatch.venueTimeZone}
                   fallbackDate={journey.nextMatch.date}
                   fallbackTime={journey.nextMatch.time}
                 />
@@ -314,6 +315,7 @@ function FixtureTimeline({
                 <span className={styles.timelineDate}>
                   <LocalKickoff
                     kickoffUtc={match.kickoffUtc}
+                    venueTimeZone={match.venueTimeZone}
                     fallbackDate={match.date}
                     fallbackTime={match.time}
                   />
