@@ -14,6 +14,11 @@ function toIsoDate(date: string): string {
 }
 
 function parseMatchDateTime(match: Match): Date | null {
+  if (match.kickoffUtc) {
+    const kickoff = new Date(match.kickoffUtc);
+    return Number.isNaN(kickoff.getTime()) ? null : kickoff;
+  }
+
   const iso = toIsoDate(match.date);
   const timeMatch = match.time.match(/(\d+):(\d+)\s*(AM|PM)?/i);
   if (!timeMatch) return new Date(`${iso}T12:00:00`);

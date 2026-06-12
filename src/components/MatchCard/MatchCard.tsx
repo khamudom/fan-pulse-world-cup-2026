@@ -12,6 +12,9 @@ import {
 } from "@khamudom/lumen-ui-react";
 import type { Match } from "@/types";
 import { getStatusLabel, getStatusBadgeVariant } from "@/services/worldCupApi";
+import {
+  LocalKickoff,
+} from "@/components/LocalKickoff";
 import styles from "./MatchCard.module.css";
 
 interface MatchCardProps {
@@ -20,25 +23,6 @@ interface MatchCardProps {
 }
 
 const passthroughLoader = ({ src }: ImageLoaderProps) => src;
-
-function getDateTimeValue(date: string, time: string): string {
-  const dateMatch = date.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
-  const timeMatch = time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-
-  if (!dateMatch || !timeMatch) return `${date} ${time}`;
-
-  const [, month, day, year] = dateMatch;
-  const [, hourPart, minute, period] = timeMatch;
-  const hour = parseInt(hourPart, 10);
-  const normalizedHour =
-    period.toUpperCase() === "PM" && hour !== 12
-      ? hour + 12
-      : period.toUpperCase() === "AM" && hour === 12
-        ? 0
-        : hour;
-
-  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${String(normalizedHour).padStart(2, "0")}:${minute}`;
-}
 
 function TeamFlag({ name, flag }: { name: string; flag?: string }) {
   return (
@@ -112,9 +96,11 @@ export function MatchCard({ match, featured = false }: MatchCardProps) {
           </div>
         </div>
         <div className={styles.details}>
-          <time dateTime={getDateTimeValue(match.date, match.time)}>
-            {match.date} · {match.time}
-          </time>
+          <LocalKickoff
+            kickoffUtc={match.kickoffUtc}
+            fallbackDate={match.date}
+            fallbackTime={match.time}
+          />
           {match.stadiumName && (
             <span>
               {match.stadiumName}

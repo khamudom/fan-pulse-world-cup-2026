@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Badge, Button } from "@khamudom/lumen-ui-react";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
+import { LocalKickoff } from "@/components/LocalKickoff";
 import { toDataSourceBadge, type ApiDataSource } from "@/lib/dataSourceBadge";
 import type { MyWorldCupData } from "@/lib/myWorldCup";
 import type {
@@ -230,7 +231,11 @@ function NextChapter({
             <div className={styles.nextMatchInfo}>
               <p className={styles.nextMatchTitle}>{journey.label}</p>
               <p className={styles.nextMatchMeta}>
-                {journey.nextMatch.date} · {journey.nextMatch.time}
+                <LocalKickoff
+                  kickoffUtc={journey.nextMatch.kickoffUtc}
+                  fallbackDate={journey.nextMatch.date}
+                  fallbackTime={journey.nextMatch.time}
+                />
                 {journey.nextMatch.stadiumName
                   ? ` · ${journey.nextMatch.stadiumName}`
                   : ""}
@@ -307,7 +312,11 @@ function FixtureTimeline({
                   <Badge variant="outline">Group {match.group}</Badge>
                 ) : null}
                 <span className={styles.timelineDate}>
-                  {match.date} · {match.time}
+                  <LocalKickoff
+                    kickoffUtc={match.kickoffUtc}
+                    fallbackDate={match.date}
+                    fallbackTime={match.time}
+                  />
                 </span>
               </div>
               <div className={styles.timelineMatchup}>

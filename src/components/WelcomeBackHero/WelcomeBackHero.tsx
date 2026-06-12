@@ -1,10 +1,12 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useClientClock } from "@/lib/client-clock";
 import { getCountdownParts, type CountdownParts } from "@/lib/countdown";
 import type { FanJourneyResult } from "@/lib/fanJourney";
 import { getLevelTitle } from "@/lib/points";
 import type { Profile, UserStats } from "@/types/database";
+import { LocalKickoff } from "@/components/LocalKickoff";
 import styles from "./WelcomeBackHero.module.css";
 
 function getTimeGreeting(): string {
@@ -27,14 +29,23 @@ function formatWatchdayDate(date = new Date()): string {
 
 function formatKickoffMeta(
   match: NonNullable<FanJourneyResult["nextMatch"]>,
-): string {
+): ReactNode {
   const parts: string[] = [];
   if (match.stadiumName) {
     parts.push(match.stadiumName);
     if (match.city) parts[parts.length - 1] += `, ${match.city}`;
   }
-  parts.push(`${match.date} · ${match.time}`);
-  return parts.join(" · ");
+
+  return (
+    <>
+      {parts.length > 0 ? `${parts.join(" · ")} · ` : null}
+      <LocalKickoff
+        kickoffUtc={match.kickoffUtc}
+        fallbackDate={match.date}
+        fallbackTime={match.time}
+      />
+    </>
+  );
 }
 
 interface WelcomeBackHeroProps {
@@ -62,10 +73,13 @@ export function WelcomeBackHero({
     seconds: 0,
     totalMs: 0,
   };
+  const kickoffTarget = journey.nextMatch?.kickoffUtc
+    ? new Date(journey.nextMatch.kickoffUtc)
+    : journey.kickoff;
   const countdown =
-    journey.kickoff && isHydrated
-      ? getCountdownParts(journey.kickoff, now)
-      : journey.kickoff
+    kickoffTarget && isHydrated
+      ? getCountdownParts(kickoffTarget, now)
+      : kickoffTarget
         ? emptyCountdown
         : null;
 

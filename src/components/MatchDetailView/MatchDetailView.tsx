@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@khamudom/lumen-ui-react";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
 import { Hero } from "@/components/Hero";
+import { LocalKickoff } from "@/components/LocalKickoff";
 import { SectionHeader } from "@/components/SectionHeader";
 import { MatchPredictionForm } from "@/components/MatchPredictionForm";
 import { AiInsightCard } from "@/components/AiInsightCard";
@@ -128,7 +129,16 @@ export function MatchDetailView({
     <>
       <Hero
         title={`${match.homeTeam.name} vs ${match.awayTeam.name}`}
-        subtitle={`${match.date} · ${match.time}${match.stadiumName ? ` · ${match.stadiumName}` : ""}`}
+        subtitle={
+          <>
+            <LocalKickoff
+              kickoffUtc={match.kickoffUtc}
+              fallbackDate={match.date}
+              fallbackTime={match.time}
+            />
+            {match.stadiumName ? ` · ${match.stadiumName}` : ""}
+          </>
+        }
         compact
       >
         <div className={styles.heroMeta}>

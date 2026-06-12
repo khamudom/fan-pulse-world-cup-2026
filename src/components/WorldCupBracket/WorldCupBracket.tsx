@@ -8,6 +8,7 @@ import {
   getBracketProgress,
   getNextPickableMatchId,
 } from "@/lib/bracket";
+import { LocalKickoff } from "@/components/LocalKickoff";
 import type {
   BracketMatchState,
   BracketParticipant,
@@ -129,8 +130,11 @@ function BracketMatchCard({
         )}
         {match.date && (
           <span className={styles.matchDate}>
-            {match.date}
-            {match.time ? ` · ${match.time}` : ""}
+            <LocalKickoff
+              kickoffUtc={match.kickoffUtc}
+              fallbackDate={match.date}
+              fallbackTime={match.time}
+            />
           </span>
         )}
       </header>

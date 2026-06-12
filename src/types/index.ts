@@ -27,6 +27,10 @@ export interface Match {
   matchday?: string;
   date: string;
   time: string;
+  /** Absolute kickoff instant (ISO 8601 UTC), derived from venue-local schedule time. */
+  kickoffUtc?: string;
+  /** IANA timezone for the venue (e.g. America/Los_Angeles). */
+  venueTimeZone?: string;
   stadiumId?: string;
   stadiumName?: string;
   city?: string;

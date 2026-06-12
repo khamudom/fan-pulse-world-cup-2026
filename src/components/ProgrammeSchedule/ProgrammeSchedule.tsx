@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { LocalKickoff } from "@/components/LocalKickoff";
 import { toIsoDate } from "@/lib/matchDate";
 import type { Match } from "@/types";
 import styles from "./ProgrammeSchedule.module.css";
@@ -68,9 +69,13 @@ export function ProgrammeSchedule({
                       isYourTeam ? styles.matchRowHighlight : ""
                     }`}
                   >
-                    <time className={styles.matchTime} dateTime={match.time}>
-                      {match.time}
-                    </time>
+                    <LocalKickoff
+                      className={styles.matchTime}
+                      kickoffUtc={match.kickoffUtc}
+                      fallbackDate={match.date}
+                      fallbackTime={match.time}
+                      mode="time"
+                    />
 
                     <div className={styles.matchTeams}>
                       <div className={styles.team}>

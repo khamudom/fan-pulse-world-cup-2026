@@ -7,6 +7,11 @@ import {
   mockTeamsApiResponse,
   type WorldCupApiTeam,
 } from "@/data/api/worldcup/teams";
+import {
+  parseLocalDateTimeString,
+  zonedLocalToUtcIso,
+} from "@/lib/timezone";
+import { getVenueTimeZone } from "@/lib/venueTimeZones";
 import type {
   ApiResult,
   Group,
@@ -222,6 +227,11 @@ function mapGameToMatch(game: ApiGame, teamMap: Map<string, ApiTeam>, stadiumMap
   const awayApi = teamMap.get(game.away_team_id);
   const stadium = stadiumMap.get(game.stadium_id);
   const { date, time } = parseDateTime(game.local_date);
+  const venueTimeZone = getVenueTimeZone(stadium?.city_en, stadium?.country_en);
+  const localDateTime = parseLocalDateTimeString(game.local_date);
+  const kickoffUtc = localDateTime
+    ? zonedLocalToUtcIso(localDateTime, venueTimeZone)
+    : undefined;
 
   return {
     id: game.id,
@@ -245,6 +255,8 @@ function mapGameToMatch(game: ApiGame, teamMap: Map<string, ApiTeam>, stadiumMap
     matchday: game.matchday,
     date,
     time,
+    kickoffUtc,
+    venueTimeZone,
     stadiumId: game.stadium_id,
     stadiumName: stadium?.name_en,
     city: stadium?.city_en,

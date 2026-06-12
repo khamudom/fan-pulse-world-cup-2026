@@ -38,6 +38,7 @@ export interface BracketMatchState {
   awayScore?: number;
   date?: string;
   time?: string;
+  kickoffUtc?: string;
   canPick: boolean;
 }
 

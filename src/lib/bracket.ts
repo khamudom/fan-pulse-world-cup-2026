@@ -361,6 +361,7 @@ function buildMatchState(
     awayScore: useLiveMatch ? liveMatch.awayScore : undefined,
     date: useLiveMatch ? liveMatch.date : undefined,
     time: useLiveMatch ? liveMatch.time : undefined,
+    kickoffUtc: useLiveMatch ? liveMatch.kickoffUtc : undefined,
     canPick: isPickable,
   };
 }
