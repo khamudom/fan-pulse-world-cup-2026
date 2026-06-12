@@ -27,7 +27,7 @@ export function FriendFeed({ items }: FriendFeedProps) {
   if (items.length === 0) {
     return (
       <p className={styles.empty}>
-        No activity yet. Connect with friends to see their picks here.
+        No activity yet. Make predictions or save your bracket to get started.
       </p>
     );
   }

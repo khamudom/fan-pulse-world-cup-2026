@@ -50,7 +50,9 @@ export function DailyChallengeCard({
       <CardHeader>
         <div className={styles.headerRow}>
           <CardTitle as="h3">{challenge.title}</CardTitle>
-          <Badge variant="outline">+{challenge.points} pts</Badge>
+          {challenge.points > 0 ? (
+            <Badge variant="outline">+{challenge.points} pts</Badge>
+          ) : null}
         </div>
       </CardHeader>
       <CardContent>
@@ -60,10 +62,6 @@ export function DailyChallengeCard({
             {done
               ? "Welcome back reward claimed — see you tomorrow!"
               : "Completes automatically when you visit FanPulse each day."}
-          </p>
-        ) : challenge.slug === "read-briefing" ? (
-          <p className={styles.note}>
-            Read today&apos;s briefing to complete this challenge.
           </p>
         ) : challenge.slug === "predict-today" ? (
           done ? (

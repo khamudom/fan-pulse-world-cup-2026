@@ -2,7 +2,6 @@ export const POINT_VALUES = {
   daily_check_in: 10,
   prediction: 25,
   poll_vote: 5,
-  read_briefing: 15,
   challenge: 50,
 } as const;
 

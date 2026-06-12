@@ -478,14 +478,13 @@ export async function getFriendFeed(limit = 30): Promise<FeedItem[]> {
   if (!user) return [];
 
   const friends = await listFriends();
-  const friendIds = friends.map((f) => f.id);
-  if (friendIds.length === 0) return [];
+  const feedUserIds = [user.id, ...friends.map((f) => f.id)];
 
   const supabase = await createClient();
   const { data: events } = await supabase
     .from("activity_events")
     .select("*")
-    .in("user_id", friendIds)
+    .in("user_id", feedUserIds)
     .order("created_at", { ascending: false })
     .limit(limit);
 

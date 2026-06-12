@@ -42,7 +42,3 @@ export async function completeChallenge(slug: string) {
   revalidatePath("/profile");
   return { success: true, alreadyCompleted: false, points: result.points };
 }
-
-export async function markBriefingRead() {
-  return completeChallenge("read-briefing");
-}

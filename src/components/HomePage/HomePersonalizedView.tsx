@@ -117,9 +117,7 @@ export function HomePersonalizedView({
           )}
 
           <footer className={styles.fixturesSignoff}>
-            <p>
-              <em>Tomorrow it changes.</em> Every day is a new chapter.
-            </p>
+            <p>Every day is a new chapter.</p>
           </footer>
         </div>
       </section>

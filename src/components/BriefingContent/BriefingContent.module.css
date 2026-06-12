@@ -7,7 +7,6 @@
 
 .body {
   line-height: 1.7;
-  margin-bottom: var(--space-6);
   font-family: var(--font-ui);
   font-size: var(--text-base);
   color: var(--color-text-inverse);
@@ -78,27 +77,6 @@
   border: none;
   border-top: 1px solid rgba(244, 236, 218, 0.1);
   margin: var(--space-5) 0;
-}
-
-.article :global(.lumen-button--primary) {
-  --lumen-button-bg: transparent;
-  --lumen-button-color: var(--color-trophy-gold);
-  --lumen-button-border: var(--color-trophy-gold);
-  --lumen-button-hover-bg: rgba(217, 164, 65, 0.1);
-  --lumen-button-hover-color: var(--color-trophy-gold-light);
-  --lumen-button-hover-border: var(--color-trophy-gold-light);
-}
-
-.article :global(.lumen-button--primary).readButton {
-  --lumen-button-bg: rgba(217, 164, 65, 0.12);
-  --lumen-button-color: var(--color-trophy-gold);
-  --lumen-button-border: rgba(217, 164, 65, 0.5);
-  cursor: default;
-  opacity: 1;
-}
-
-.readButton:disabled {
-  opacity: 1;
 }
 
 .prompt {
