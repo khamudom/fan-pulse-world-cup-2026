@@ -16,15 +16,15 @@ export async function performDailyCheckIn() {
   const user = await getSessionUser();
   if (!user) return { error: "Not signed in." };
 
-  const result = await ensureDailyCheckIn(user.id);
-  if (result.justCheckedIn) {
+  const result = await ensureDailyCheckIn(user.id, { awaitWrites: true });
+  if (result.status.justCheckedIn) {
     revalidateCheckInPaths();
   }
 
   return {
     success: true as const,
-    alreadyCheckedIn: result.alreadyCheckedIn,
-    streak: result.streak,
+    alreadyCheckedIn: result.status.alreadyCheckedIn,
+    streak: result.status.streak,
   };
 }
 

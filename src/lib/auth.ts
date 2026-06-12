@@ -44,11 +44,17 @@ export const getAuthContext = cache(async (): Promise<AuthContext> => {
     return { user: null, profile: null, stats: null, checkIn: null };
   }
 
-  const profile = await getProfile(user.id);
-  const checkIn = await ensureDailyCheckIn(user.id);
-  const stats = await getUserStats(user.id);
+  const [profile, checkInResult] = await Promise.all([
+    getProfile(user.id),
+    ensureDailyCheckIn(user.id),
+  ]);
 
-  return { user, profile, stats, checkIn };
+  return {
+    user,
+    profile,
+    stats: checkInResult.stats,
+    checkIn: checkInResult.status,
+  };
 });
 
 export function isSupabaseConfigured(): boolean {

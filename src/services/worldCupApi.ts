@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { USE_MOCK_FALLBACKS } from "@/config/dataSource";
 import { mockGamesApiResponse } from "@/data/api/worldcup/games";
 import { mockGroupsApiResponse } from "@/data/api/worldcup/groups";
@@ -252,7 +253,7 @@ function mapGameToMatch(game: ApiGame, teamMap: Map<string, ApiTeam>, stadiumMap
   };
 }
 
-export async function getTeams(): Promise<ApiResult<Team[]>> {
+async function getTeamsUncached(): Promise<ApiResult<Team[]>> {
   const response = await fetchJson<{ teams: ApiTeam[] }>("teams");
   if (!response?.teams?.length) {
     if (USE_MOCK_FALLBACKS) {
@@ -272,7 +273,7 @@ export async function getTeams(): Promise<ApiResult<Team[]>> {
   return { data: teams, source: "api" };
 }
 
-export async function getMatches(
+async function getMatchesUncached(
   mode: FetchMode = "cached",
 ): Promise<ApiResult<Match[]>> {
   // Only the games feed carries volatile data (scores, status, minute),
@@ -303,6 +304,9 @@ export async function getMatches(
   return { data: matches, source: "api" };
 }
 
+export const getTeams = cache(getTeamsUncached);
+export const getMatches = cache(getMatchesUncached);
+
 export async function getMatchById(
   id: string,
   mode: FetchMode = "cached",
@@ -328,7 +332,7 @@ export async function getMatchById(
   return { data: match, source, error };
 }
 
-export async function getGroups(): Promise<ApiResult<Group[]>> {
+async function getGroupsUncached(): Promise<ApiResult<Group[]>> {
   const [groupsRes, teamsRes] = await Promise.all([
     fetchJson<{ groups: ApiGroup[] }>("groups"),
     fetchJson<{ teams: ApiTeam[] }>("teams"),
@@ -368,7 +372,7 @@ export async function getGroups(): Promise<ApiResult<Group[]>> {
   return { data: groups.sort((a, b) => a.name.localeCompare(b.name)), source: "api" };
 }
 
-export async function getStadiums(): Promise<ApiResult<Stadium[]>> {
+async function getStadiumsUncached(): Promise<ApiResult<Stadium[]>> {
   const [stadiumsRes, gamesRes] = await Promise.all([
     fetchJson<{ stadiums: ApiStadium[] }>("stadiums"),
     fetchJson<{ games: ApiGame[] }>("games"),
@@ -400,6 +404,9 @@ export async function getStadiums(): Promise<ApiResult<Stadium[]>> {
 
   return { data: stadiums, source: "api" };
 }
+
+export const getGroups = cache(getGroupsUncached);
+export const getStadiums = cache(getStadiumsUncached);
 
 export async function getTodaysMatches(): Promise<ApiResult<Match[]>> {
   const { data: matches, source, error } = await getMatches();

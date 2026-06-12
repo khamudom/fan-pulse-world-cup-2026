@@ -1,9 +1,9 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Button } from "@khamudom/lumen-ui-react";
 import { WORLD_CUP_2026 } from "@/config/tournament";
+import { useClientClock } from "@/lib/client-clock";
 import { getCountdownParts, type CountdownParts } from "@/lib/countdown";
 import styles from "./WorldCupCountdown.module.css";
 
@@ -22,36 +22,8 @@ const countdownUnits: { key: keyof CountdownParts; label: string }[] = [
   { key: "seconds", label: "secs" },
 ];
 
-let clockSnapshot = 0;
-
-function subscribeToClock(onStoreChange: () => void) {
-  clockSnapshot = Date.now();
-  onStoreChange();
-
-  const timer = window.setInterval(() => {
-    clockSnapshot = Date.now();
-    onStoreChange();
-  }, 1000);
-
-  return () => window.clearInterval(timer);
-}
-
-function getClockSnapshot() {
-  return clockSnapshot;
-}
-
-function getServerClockSnapshot() {
-  return 0;
-}
-
 export function WorldCupCountdown() {
-  const now = useSyncExternalStore(
-    subscribeToClock,
-    getClockSnapshot,
-    getServerClockSnapshot,
-  );
-  const isHydrated = now > 0;
-  const currentDate = new Date(now);
+  const { now: currentDate, isHydrated } = useClientClock();
   const phase = isHydrated ? getCountdownPhase(currentDate) : "countdown";
   const countdown = isHydrated
     ? getCountdownParts(WORLD_CUP_2026.kickoff, currentDate)

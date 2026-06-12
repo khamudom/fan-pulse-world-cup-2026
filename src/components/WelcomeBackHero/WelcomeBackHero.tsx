@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getCountdownParts } from "@/lib/countdown";
+import { useClientClock } from "@/lib/client-clock";
+import { getCountdownParts, type CountdownParts } from "@/lib/countdown";
 import type { FanJourneyResult } from "@/lib/fanJourney";
 import { getLevelTitle } from "@/lib/points";
 import type { Profile, UserStats } from "@/types/database";
@@ -54,17 +54,20 @@ export function WelcomeBackHero({
   const predictionRecord =
     stats && accuracy > 0 ? `${Math.round(accuracy)}% accuracy` : "0 for 0";
 
-  const [countdown, setCountdown] = useState(() =>
-    journey.kickoff ? getCountdownParts(journey.kickoff, new Date()) : null,
-  );
-
-  useEffect(() => {
-    if (!journey.kickoff) return;
-    const timer = window.setInterval(() => {
-      setCountdown(getCountdownParts(journey.kickoff!, new Date()));
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, [journey.kickoff]);
+  const { now, isHydrated } = useClientClock();
+  const emptyCountdown: CountdownParts = {
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    totalMs: 0,
+  };
+  const countdown =
+    journey.kickoff && isHydrated
+      ? getCountdownParts(journey.kickoff, now)
+      : journey.kickoff
+        ? emptyCountdown
+        : null;
 
   return (
     <section className={styles.hero} aria-labelledby="welcome-hero-title">
