@@ -23,12 +23,14 @@ interface HeaderProps {
   signedIn?: boolean;
   displayName?: string | null;
   resolvedTheme: ResolvedTheme;
+  incomingRequestCount?: number;
 }
 
 export function Header({
   signedIn = false,
   displayName,
   resolvedTheme,
+  incomingRequestCount = 0,
 }: HeaderProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -70,6 +72,16 @@ export function Header({
                   aria-current={pathname === item.href ? "page" : undefined}
                 >
                   {item.label}
+                  {item.href === "/friends" && incomingRequestCount > 0 ? (
+                    <span
+                      className={styles.navBadge}
+                      aria-label={`${incomingRequestCount} pending friend ${
+                        incomingRequestCount === 1 ? "request" : "requests"
+                      }`}
+                    >
+                      {incomingRequestCount}
+                    </span>
+                  ) : null}
                 </Link>
               </li>
             ))}

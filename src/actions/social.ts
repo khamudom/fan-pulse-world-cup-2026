@@ -8,10 +8,12 @@ import { normalizeBracketPayload } from "@/lib/bracket";
 import {
   generateInviteCode,
   validateUsername,
+  type ConnectionRelationship,
   type FeedItem,
   type FriendRequestSummary,
   type FriendSummary,
   type LeaderboardEntry,
+  type UserSearchResult,
 } from "@/lib/social";
 import { getMatches } from "@/services/worldCupApi";
 
@@ -72,27 +74,67 @@ export async function setUsername(value: string): Promise<SocialActionState> {
 
 export async function searchUsers(query: string) {
   const user = await getSessionUser();
-  if (!user) return { error: "Not signed in.", results: [] as FriendSummary[] };
+  if (!user)
+    return { error: "Not signed in.", results: [] as UserSearchResult[] };
 
   const trimmed = query.trim();
   if (trimmed.length < 2) {
-    return { error: "Enter at least 2 characters.", results: [] as FriendSummary[] };
+    return {
+      error: "Enter at least 2 characters.",
+      results: [] as UserSearchResult[],
+    };
   }
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("search_profiles", { q: trimmed });
 
-  if (error) return { error: error.message, results: [] as FriendSummary[] };
+  if (error) return { error: error.message, results: [] as UserSearchResult[] };
 
-  const results: FriendSummary[] = (data ?? [])
-    .filter((row) => row.id !== user.id)
-    .map((row) => ({
+  const rows = (data ?? []).filter((row) => row.id !== user.id);
+
+  // Look up any existing connection between the current user and each result so
+  // the UI can show the correct action (Add / Accept / Sent / Friends).
+  const { data: connections } = await supabase
+    .from("connections")
+    .select("id, requester_id, addressee_id, status")
+    .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
+
+  const relationByUserId = new Map<
+    string,
+    { relationship: ConnectionRelationship; connectionId: string | null }
+  >();
+
+  for (const connection of connections ?? []) {
+    const otherId =
+      connection.requester_id === user.id
+        ? connection.addressee_id
+        : connection.requester_id;
+
+    if (connection.status === "accepted") {
+      relationByUserId.set(otherId, {
+        relationship: "friends",
+        connectionId: connection.id,
+      });
+    } else if (connection.status === "pending") {
+      const isOutgoing = connection.requester_id === user.id;
+      relationByUserId.set(otherId, {
+        relationship: isOutgoing ? "outgoing_pending" : "incoming_pending",
+        connectionId: connection.id,
+      });
+    }
+  }
+
+  const results: UserSearchResult[] = rows.map((row) => {
+    const relation = relationByUserId.get(row.id);
+    return {
       id: row.id,
       username: row.username,
       displayName: row.display_name,
       favoriteCountry: row.favorite_country,
-      connectionId: "",
-    }));
+      relationship: relation?.relationship ?? "none",
+      connectionId: relation?.connectionId ?? null,
+    };
+  });
 
   return { results };
 }
@@ -327,6 +369,20 @@ export async function listIncomingRequests(): Promise<FriendRequestSummary[]> {
       createdAt: c.created_at,
     };
   });
+}
+
+export async function countIncomingRequests(): Promise<number> {
+  const user = await getSessionUser();
+  if (!user) return 0;
+
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("connections")
+    .select("id", { count: "exact", head: true })
+    .eq("addressee_id", user.id)
+    .eq("status", "pending");
+
+  return count ?? 0;
 }
 
 export async function listOutgoingRequests(): Promise<FriendRequestSummary[]> {

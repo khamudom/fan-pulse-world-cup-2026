@@ -3,22 +3,27 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input } from "@khamudom/lumen-ui-react";
-import { searchUsers, sendFriendRequest } from "@/actions/social";
-import type { FriendSummary } from "@/lib/social";
+import {
+  respondToFriendRequest,
+  searchUsers,
+  sendFriendRequest,
+} from "@/actions/social";
+import type { ConnectionRelationship, UserSearchResult } from "@/lib/social";
 import styles from "./FriendSearch.module.css";
 
-function displayName(user: FriendSummary): string {
+function displayName(user: UserSearchResult): string {
   return user.displayName ?? user.username ?? "Fan";
 }
 
 export function FriendSearch() {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<FriendSummary[]>([]);
+  const [results, setResults] = useState<UserSearchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
   const [isSearching, startSearch] = useTransition();
-  const [isSending, startSend] = useTransition();
+  const [, startSend] = useTransition();
 
   function handleSearch(event: React.FormEvent) {
     event.preventDefault();
@@ -35,18 +40,95 @@ export function FriendSearch() {
     });
   }
 
+  function updateRelationship(
+    userId: string,
+    relationship: ConnectionRelationship,
+  ) {
+    setResults((current) =>
+      current.map((user) =>
+        user.id === userId ? { ...user, relationship } : user,
+      ),
+    );
+  }
+
   function handleAdd(userId: string) {
     setError(null);
     setSuccess(null);
+    setPendingUserId(userId);
     startSend(async () => {
       const result = await sendFriendRequest(userId);
+      setPendingUserId(null);
       if (result.error) {
         setError(result.error);
         return;
       }
+      // sendFriendRequest auto-accepts when a reverse request already exists.
+      const becameFriends = /connected/i.test(result.success ?? "");
+      updateRelationship(userId, becameFriends ? "friends" : "outgoing_pending");
       setSuccess(result.success ?? "Request sent.");
       router.refresh();
     });
+  }
+
+  function handleAccept(userId: string, connectionId: string) {
+    setError(null);
+    setSuccess(null);
+    setPendingUserId(userId);
+    startSend(async () => {
+      const result = await respondToFriendRequest(connectionId, true);
+      setPendingUserId(null);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      updateRelationship(userId, "friends");
+      setSuccess(result.success ?? "You're now connected!");
+      router.refresh();
+    });
+  }
+
+  function renderAction(user: UserSearchResult) {
+    const isBusy = pendingUserId === user.id;
+
+    switch (user.relationship) {
+      case "friends":
+        return (
+          <Button type="button" variant="ghost" disabled>
+            Friends
+          </Button>
+        );
+      case "outgoing_pending":
+        return (
+          <Button type="button" variant="ghost" disabled>
+            Request sent
+          </Button>
+        );
+      case "incoming_pending":
+        return (
+          <Button
+            type="button"
+            variant="primary"
+            loading={isBusy}
+            onClick={() =>
+              user.connectionId &&
+              handleAccept(user.id, user.connectionId)
+            }
+          >
+            Accept request
+          </Button>
+        );
+      default:
+        return (
+          <Button
+            type="button"
+            variant="outline"
+            loading={isBusy}
+            onClick={() => handleAdd(user.id)}
+          >
+            Add friend
+          </Button>
+        );
+    }
   }
 
   return (
@@ -87,14 +169,7 @@ export function FriendSearch() {
                   </p>
                 ) : null}
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                loading={isSending}
-                onClick={() => handleAdd(user.id)}
-              >
-                Add friend
-              </Button>
+              {renderAction(user)}
             </li>
           ))}
         </ul>

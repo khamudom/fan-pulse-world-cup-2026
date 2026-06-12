@@ -28,6 +28,22 @@ export type FriendSummary = {
   connectionId: string;
 };
 
+export type ConnectionRelationship =
+  | "none"
+  | "friends"
+  | "outgoing_pending"
+  | "incoming_pending";
+
+export type UserSearchResult = {
+  id: string;
+  username: string | null;
+  displayName: string | null;
+  favoriteCountry: string | null;
+  relationship: ConnectionRelationship;
+  /** Set when there is a pending request, so it can be accepted or cancelled. */
+  connectionId: string | null;
+};
+
 export type FriendRequestSummary = {
   id: string;
   userId: string;
