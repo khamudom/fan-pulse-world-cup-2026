@@ -1,11 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@khamudom/lumen-ui-react";
+import { useLayoutEffect, useState } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Badge,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@khamudom/lumen-ui-react";
 import { LocalKickoff } from "@/components/LocalKickoff";
 import { toIsoDate } from "@/lib/matchDate";
 import type { Match, Stadium } from "@/types";
 import styles from "./StadiumCard.module.css";
+
+const MATCHES_ACCORDION_VALUE = "matches";
+const DESKTOP_MEDIA_QUERY = "(min-width: 768px)";
 
 interface StadiumCardProps {
   stadium: Stadium;
@@ -19,6 +33,72 @@ function sortMatchesByKickoff(matches: Match[]): Match[] {
     const bKey = b.kickoffUtc ?? `${toIsoDate(b.date)}T${b.time ?? ""}`;
     return aKey.localeCompare(bKey);
   });
+}
+
+function StadiumMatchesAccordion({ matches }: { matches: Match[] }) {
+  const [value, setValue] = useState<string | undefined>(undefined);
+  const [userTouched, setUserTouched] = useState(false);
+
+  useLayoutEffect(() => {
+    const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
+
+    const syncDefault = () => {
+      if (!userTouched) {
+        setValue(mediaQuery.matches ? MATCHES_ACCORDION_VALUE : undefined);
+      }
+    };
+
+    syncDefault();
+    mediaQuery.addEventListener("change", syncDefault);
+    return () => mediaQuery.removeEventListener("change", syncDefault);
+  }, [userTouched]);
+
+  return (
+    <Accordion
+      collapsible
+      className={styles.matchesAccordion}
+      value={value}
+      onValueChange={(next) => {
+        setUserTouched(true);
+        setValue(next);
+      }}
+    >
+      <AccordionItem value={MATCHES_ACCORDION_VALUE}>
+        <AccordionTrigger className={styles.matchesTrigger}>
+          <span className={styles.matchesTriggerLabel}>
+            Matches
+            <span className={styles.matchesCount}>{matches.length}</span>
+          </span>
+        </AccordionTrigger>
+        <AccordionContent className={styles.matchesContent}>
+          <ul className={styles.matchList}>
+            {matches.map((match) => (
+              <li key={match.id}>
+                <Link href={`/matches/${match.id}`} className={styles.matchLink}>
+                  <LocalKickoff
+                    className={styles.matchDate}
+                    kickoffUtc={match.kickoffUtc}
+                    venueTimeZone={match.venueTimeZone}
+                    fallbackDate={match.date}
+                    fallbackTime={match.time}
+                    showVenueTime={false}
+                  />
+                  <span className={styles.matchTeams}>
+                    {match.homeTeam.name}
+                    <span className={styles.vs}>vs</span>
+                    {match.awayTeam.name}
+                  </span>
+                  {match.group && (
+                    <span className={styles.matchGroup}>Group {match.group}</span>
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
 }
 
 export function StadiumCard({
@@ -69,36 +149,7 @@ export function StadiumCard({
         </dl>
 
         {sortedMatches.length > 0 && (
-          <div className={styles.matchesSection}>
-            <h4 className={styles.matchesHeading}>
-              Matches
-              <span className={styles.matchesCount}>{sortedMatches.length}</span>
-            </h4>
-            <ul className={styles.matchList}>
-              {sortedMatches.map((match) => (
-                <li key={match.id}>
-                  <Link href={`/matches/${match.id}`} className={styles.matchLink}>
-                    <LocalKickoff
-                      className={styles.matchDate}
-                      kickoffUtc={match.kickoffUtc}
-                      venueTimeZone={match.venueTimeZone}
-                      fallbackDate={match.date}
-                      fallbackTime={match.time}
-                      showVenueTime={false}
-                    />
-                    <span className={styles.matchTeams}>
-                      {match.homeTeam.name}
-                      <span className={styles.vs}>vs</span>
-                      {match.awayTeam.name}
-                    </span>
-                    {match.group && (
-                      <span className={styles.matchGroup}>Group {match.group}</span>
-                    )}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <StadiumMatchesAccordion matches={sortedMatches} />
         )}
       </CardContent>
     </Card>

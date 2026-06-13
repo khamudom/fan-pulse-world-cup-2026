@@ -7,7 +7,7 @@ export function getUpcomingProgrammeMatches(
 ): Match[] {
   const todayIso = new Date().toISOString().slice(0, 10);
   const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 2);
+  endDate.setDate(endDate.getDate() + 1);
   const endIso = endDate.toISOString().slice(0, 10);
 
   return [...matches]

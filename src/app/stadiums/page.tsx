@@ -3,10 +3,6 @@ import { SectionHeader } from "@/components/SectionHeader";
 import { StadiumCard } from "@/components/StadiumCard";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
 import { EmptyState } from "@/components/EmptyState";
-import {
-  getFeaturedStadiumIdFromCookies,
-  resolveFeaturedStadium,
-} from "@/lib/featuredStadium";
 import { getMatches, getStadiums } from "@/services/worldCupApi";
 import type { Match } from "@/types";
 import styles from "./page.module.css";
@@ -27,15 +23,11 @@ export const metadata = {
 };
 
 export default async function StadiumsPage() {
-  const [{ data: stadiums, source }, { data: matches }, preferredId] =
-    await Promise.all([
-      getStadiums(),
-      getMatches(),
-      getFeaturedStadiumIdFromCookies(),
-    ]);
+  const [{ data: stadiums, source }, { data: matches }] = await Promise.all([
+    getStadiums(),
+    getMatches(),
+  ]);
   const matchesByStadium = groupMatchesByStadium(matches);
-  const featured = resolveFeaturedStadium(stadiums, preferredId);
-  const rest = stadiums.filter((s) => s.id !== featured?.id);
 
   return (
     <div className="page">
@@ -46,42 +38,24 @@ export default async function StadiumsPage() {
       />
 
       {stadiums.length > 0 ? (
-        <>
-          <section className="section">
-            <div className="container">
-              <SectionHeader
-                title="Featured Venue"
-                action={<DataSourceBadge source={source === "mock" ? "mock" : "api"} />}
-              />
-              {featured && (
+        <section className="section">
+          <div className="container">
+            <SectionHeader
+              title="All Stadiums"
+              subtitle={`${stadiums.length} venues${source === "mock" ? " (fallback data)" : ""}`}
+              action={<DataSourceBadge source={source === "mock" ? "mock" : "api"} />}
+            />
+            <div className={styles.grid}>
+              {stadiums.map((stadium) => (
                 <StadiumCard
-                  stadium={featured}
-                  matches={matchesByStadium.get(featured.id) ?? []}
-                  featured
+                  key={stadium.id}
+                  stadium={stadium}
+                  matches={matchesByStadium.get(stadium.id) ?? []}
                 />
-              )}
+              ))}
             </div>
-          </section>
-
-          <section className="section sectionAlt">
-            <div className="container">
-              <SectionHeader
-                title="All Stadiums"
-                subtitle={`${stadiums.length} venues${source === "mock" ? " (fallback data)" : ""}`}
-                action={<DataSourceBadge source={source === "mock" ? "mock" : "api"} />}
-              />
-              <div className={styles.grid}>
-                {rest.map((stadium) => (
-                  <StadiumCard
-                    key={stadium.id}
-                    stadium={stadium}
-                    matches={matchesByStadium.get(stadium.id) ?? []}
-                  />
-                ))}
-              </div>
-            </div>
-          </section>
-        </>
+          </div>
+        </section>
       ) : (
         <section className="section">
           <div className="container">
