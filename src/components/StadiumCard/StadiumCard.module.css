@@ -38,20 +38,38 @@
   text-align: right;
 }
 
-.matchesAccordion {
+.matchesDetails {
   margin-top: var(--space-5);
-  border: 0;
   border-top: 1px solid rgba(244, 236, 218, 0.08);
-  border-radius: 0;
-  background: transparent;
 }
 
 .matchesTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
   padding: var(--space-4) 0 0;
+  list-style: none;
+  cursor: pointer;
+}
+
+.matchesTrigger::-webkit-details-marker {
+  display: none;
 }
 
 .matchesTrigger:hover {
   text-decoration: none;
+}
+
+.matchesIcon {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform 0.15s ease;
+}
+
+.matchesDetails[open] .matchesIcon {
+  transform: rotate(180deg);
 }
 
 .matchesTriggerLabel {

@@ -1,12 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
   Badge,
   Card,
   CardContent,
@@ -18,7 +14,6 @@ import { toIsoDate } from "@/lib/matchDate";
 import type { Match, Stadium } from "@/types";
 import styles from "./StadiumCard.module.css";
 
-const MATCHES_ACCORDION_VALUE = "matches";
 const DESKTOP_MEDIA_QUERY = "(min-width: 768px)";
 
 interface StadiumCardProps {
@@ -35,69 +30,71 @@ function sortMatchesByKickoff(matches: Match[]): Match[] {
   });
 }
 
+function MatchesChevron() {
+  return (
+    <svg
+      className={styles.matchesIcon}
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
 function StadiumMatchesAccordion({ matches }: { matches: Match[] }) {
-  const [value, setValue] = useState<string | undefined>(undefined);
-  const [userTouched, setUserTouched] = useState(false);
+  const detailsRef = useRef<HTMLDetailsElement>(null);
 
   useLayoutEffect(() => {
-    const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
-
-    const syncDefault = () => {
-      if (!userTouched) {
-        setValue(mediaQuery.matches ? MATCHES_ACCORDION_VALUE : undefined);
-      }
-    };
-
-    syncDefault();
-    mediaQuery.addEventListener("change", syncDefault);
-    return () => mediaQuery.removeEventListener("change", syncDefault);
-  }, [userTouched]);
+    if (detailsRef.current) {
+      detailsRef.current.open = window.matchMedia(DESKTOP_MEDIA_QUERY).matches;
+    }
+  }, []);
 
   return (
-    <Accordion
-      collapsible
-      className={styles.matchesAccordion}
-      value={value}
-      onValueChange={(next) => {
-        setUserTouched(true);
-        setValue(next);
-      }}
-    >
-      <AccordionItem value={MATCHES_ACCORDION_VALUE}>
-        <AccordionTrigger className={styles.matchesTrigger}>
-          <span className={styles.matchesTriggerLabel}>
-            Matches
-            <span className={styles.matchesCount}>{matches.length}</span>
-          </span>
-        </AccordionTrigger>
-        <AccordionContent className={styles.matchesContent}>
-          <ul className={styles.matchList}>
-            {matches.map((match) => (
-              <li key={match.id}>
-                <Link href={`/matches/${match.id}`} className={styles.matchLink}>
-                  <LocalKickoff
-                    className={styles.matchDate}
-                    kickoffUtc={match.kickoffUtc}
-                    venueTimeZone={match.venueTimeZone}
-                    fallbackDate={match.date}
-                    fallbackTime={match.time}
-                    showVenueTime={false}
-                  />
-                  <span className={styles.matchTeams}>
-                    {match.homeTeam.name}
-                    <span className={styles.vs}>vs</span>
-                    {match.awayTeam.name}
-                  </span>
-                  {match.group && (
-                    <span className={styles.matchGroup}>Group {match.group}</span>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <details ref={detailsRef} className={styles.matchesDetails}>
+      <summary className={styles.matchesTrigger}>
+        <span className={styles.matchesTriggerLabel}>
+          Matches
+          <span className={styles.matchesCount}>{matches.length}</span>
+        </span>
+        <MatchesChevron />
+      </summary>
+      <div className={styles.matchesContent}>
+        <ul className={styles.matchList}>
+          {matches.map((match) => (
+            <li key={match.id}>
+              <Link href={`/matches/${match.id}`} className={styles.matchLink}>
+                <LocalKickoff
+                  className={styles.matchDate}
+                  kickoffUtc={match.kickoffUtc}
+                  venueTimeZone={match.venueTimeZone}
+                  fallbackDate={match.date}
+                  fallbackTime={match.time}
+                  showVenueTime={false}
+                />
+                <span className={styles.matchTeams}>
+                  {match.homeTeam.name}
+                  <span className={styles.vs}>vs</span>
+                  {match.awayTeam.name}
+                </span>
+                {match.group && (
+                  <span className={styles.matchGroup}>Group {match.group}</span>
+                )}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </details>
   );
 }
 
