@@ -1,13 +1,14 @@
 import { countIncomingRequests } from "@/actions/social";
 import { getAuthContext } from "@/lib/auth";
-import { getThemeState } from "@/lib/theme-request";
+import type { ResolvedTheme } from "@/lib/theme";
 import { Header } from "./Header";
 
-export async function HeaderContainer() {
-  const [{ user, profile }, { resolvedTheme }] = await Promise.all([
-    getAuthContext(),
-    getThemeState(),
-  ]);
+type HeaderContainerProps = {
+  resolvedTheme: ResolvedTheme;
+};
+
+export async function HeaderContainer({ resolvedTheme }: HeaderContainerProps) {
+  const { user, profile } = await getAuthContext();
 
   const incomingRequestCount = user ? await countIncomingRequests() : 0;
 

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Archivo, Barlow_Condensed, Fraunces, Geist_Mono } from "next/font/google";
+import { Archivo, Barlow_Condensed, Fraunces } from "next/font/google";
+import { DeferredApiPreviewBanner } from "@/components/ApiPreviewBanner/DeferredApiPreviewBanner";
 import { AdminDrawer } from "@/components/AdminDrawer";
-import { ApiPreviewBanner } from "@/components/ApiPreviewBanner";
 import { AuthModalProvider } from "@/components/AuthModal";
 // import { DataSourceLegend } from "@/components/DataSourceLegend";
 import { CheckInCelebrationContainer } from "@/components/CheckInCelebration";
@@ -16,7 +16,6 @@ import "./globals.css";
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
-  axes: ["SOFT", "WONK", "opsz"],
 });
 
 const archivo = Archivo({
@@ -27,12 +26,7 @@ const archivo = Archivo({
 const barlowCondensed = Barlow_Condensed({
   variable: "--font-barlow-condensed",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -54,7 +48,6 @@ export default async function RootLayout({
     fraunces.variable,
     archivo.variable,
     barlowCondensed.variable,
-    geistMono.variable,
     resolvedTheme === "dark" ? "lumen-dark" : null,
   ]
     .filter(Boolean)
@@ -73,10 +66,10 @@ export default async function RootLayout({
             <Suspense fallback={null}>
               <ScrollToTop />
             </Suspense>
-            <ApiPreviewBanner />
+            <DeferredApiPreviewBanner />
             {/* <DataSourceLegend /> */}
             <AdminDrawer />
-            <HeaderContainer />
+            <HeaderContainer resolvedTheme={resolvedTheme} />
             <CheckInCelebrationContainer />
             <main id="main-content">{children}</main>
           </AuthModalProvider>

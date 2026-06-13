@@ -1,0 +1,33 @@
+.loading {
+  padding-block: var(--space-8);
+}
+
+.heroBlock {
+  height: 12rem;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-border) 35%, transparent);
+  margin-bottom: var(--space-8);
+}
+
+.contentRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.row,
+.rowShort {
+  height: 3.5rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-border) 25%, transparent);
+}
+
+.rowShort {
+  width: 65%;
+}
+
+@media (min-width: 768px) {
+  .heroBlock {
+    height: 16rem;
+  }
+}

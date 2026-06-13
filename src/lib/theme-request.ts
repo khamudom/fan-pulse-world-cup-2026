@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import {
   parseThemePreference,
@@ -13,7 +14,7 @@ export type ThemeState = {
   resolvedTheme: ResolvedTheme;
 };
 
-export async function getThemeState(): Promise<ThemeState> {
+export const getThemeState = cache(async (): Promise<ThemeState> => {
   const cookieStore = await cookies();
   const headerStore = await headers();
   const preference =
@@ -23,4 +24,4 @@ export async function getThemeState(): Promise<ThemeState> {
     prefersDarkFromHeaders(headerStore)
   );
   return { preference, resolvedTheme };
-}
+});

@@ -1,7 +1,13 @@
 import { redirect } from "next/navigation";
+import { Geist_Mono } from "next/font/google";
 import { LoginPageOpener } from "@/components/AuthModal";
 import { getSessionUser, isSupabaseConfigured } from "@/lib/auth";
 import styles from "./page.module.css";
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata = {
   title: "Sign in",
@@ -26,7 +32,7 @@ export default async function LoginPage({
   const pendingCountry = country?.trim() || undefined;
 
   return (
-    <div className={`page ${styles.page}`}>
+    <div className={`page ${styles.page} ${geistMono.variable}`}>
       <div className="container">
         {!isSupabaseConfigured() ? (
           <div className={styles.notice}>

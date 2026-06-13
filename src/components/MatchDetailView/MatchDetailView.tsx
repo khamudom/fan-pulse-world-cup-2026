@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Image, { type ImageLoaderProps } from "next/image";
+import Image from "next/image";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@khamudom/lumen-ui-react";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
 import { Hero } from "@/components/Hero";
@@ -18,15 +18,11 @@ import styles from "./MatchDetailView.module.css";
 
 const LIVE_POLL_INTERVAL_MS = 60000;
 
-const passthroughLoader = ({ src }: ImageLoaderProps) => src;
-
 function TeamFlag({ name, flag }: { name: string; flag?: string }) {
   return (
     <div className={styles.teamFlag}>
       {flag ? (
         <Image
-          loader={passthroughLoader}
-          unoptimized
           src={flag}
           alt={`${name} flag`}
           className={styles.flag}

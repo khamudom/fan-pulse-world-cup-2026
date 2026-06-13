@@ -82,7 +82,6 @@ export function ProgrammeSchedule({
                       <div className={styles.team}>
                         {match.homeTeam.flag ? (
                           <Image
-                            unoptimized
                             src={match.homeTeam.flag}
                             alt=""
                             width={28}
@@ -106,7 +105,6 @@ export function ProgrammeSchedule({
                       <div className={styles.team}>
                         {match.awayTeam.flag ? (
                           <Image
-                            unoptimized
                             src={match.awayTeam.flag}
                             alt=""
                             width={28}

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { homeHeroBackground } from "@/assets/homeHero";
 import { Hero } from "@/components/Hero";
@@ -5,39 +6,24 @@ import { WorldCupCountdown } from "@/components/WorldCupCountdown";
 import { SectionHeader } from "@/components/SectionHeader";
 import { HomeFeatures } from "@/components/HomeFeatures";
 import {
-  HomeGuestAsyncSections,
-  HomePersonalizedView,
+  HomeGuestDataSections,
+  HomeGuestSkeleton,
+  HomePageSkeleton,
+  HomePersonalizedAsyncView,
 } from "@/components/HomePage";
-import { getCachedBriefing } from "@/actions/briefing";
-import { getAuthContext } from "@/lib/auth";
-import { getMatches, getTeams, getTodaysMatches } from "@/services/worldCupApi";
+import { getProfile, getSessionUser } from "@/lib/auth";
 import styles from "./page.module.css";
 
 export default async function HomePage() {
-  const [
-    { user, profile, stats },
-    matchesResult,
-    todaysResult,
-    teamsResult,
-    briefing,
-  ] = await Promise.all([
-    getAuthContext(),
-    getMatches(),
-    getTodaysMatches(),
-    getTeams(),
-    getCachedBriefing(),
-  ]);
+  const user = await getSessionUser();
+  const profile = user ? await getProfile(user.id) : null;
 
   if (user && profile?.onboarding_complete) {
     return (
       <div className={`page ${styles.homePage}`}>
-        <HomePersonalizedView
-          profile={profile}
-          stats={stats}
-          matchesResult={matchesResult}
-          todaysResult={todaysResult}
-          briefing={briefing}
-        />
+        <Suspense fallback={<HomePageSkeleton />}>
+          <HomePersonalizedAsyncView />
+        </Suspense>
       </div>
     );
   }
@@ -69,12 +55,11 @@ export default async function HomePage() {
         aside={<WorldCupCountdown />}
       />
 
-      <HomeGuestAsyncSections
-        showBeginJourney={!profile?.onboarding_complete}
-        teamsResult={teamsResult}
-        matchesResult={matchesResult}
-        todaysResult={todaysResult}
-      />
+      <Suspense fallback={<HomeGuestSkeleton />}>
+        <HomeGuestDataSections
+          showBeginJourney={!profile?.onboarding_complete}
+        />
+      </Suspense>
 
       <section className="section">
         <div className="container">

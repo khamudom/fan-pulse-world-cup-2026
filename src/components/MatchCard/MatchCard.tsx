@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image, { type ImageLoaderProps } from "next/image";
+import Image from "next/image";
 import {
   Badge,
   Button,
@@ -22,15 +22,11 @@ interface MatchCardProps {
   featured?: boolean;
 }
 
-const passthroughLoader = ({ src }: ImageLoaderProps) => src;
-
 function TeamFlag({ name, flag }: { name: string; flag?: string }) {
   return (
     <div className={styles.teamFlag}>
       {flag ? (
         <Image
-          loader={passthroughLoader}
-          unoptimized
           src={flag}
           alt={`${name} flag`}
           className={styles.flag}

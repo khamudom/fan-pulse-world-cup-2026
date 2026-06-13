@@ -3,7 +3,23 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isStaleAuthSessionError } from "@/lib/supabase/session";
 import type { Database } from "@/types/database";
 
+function hasSupabaseAuthCookies(request: NextRequest): boolean {
+  return request.cookies
+    .getAll()
+    .some((cookie) => cookie.name.includes("-auth-token"));
+}
+
+function withClientHints(response: NextResponse): NextResponse {
+  response.headers.set("Accept-CH", "Sec-CH-Prefers-Color-Scheme");
+  response.headers.set("Critical-CH", "Sec-CH-Prefers-Color-Scheme");
+  return response;
+}
+
 export async function updateSession(request: NextRequest) {
+  if (!hasSupabaseAuthCookies(request)) {
+    return withClientHints(NextResponse.next({ request }));
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(
@@ -30,17 +46,8 @@ export async function updateSession(request: NextRequest) {
   const { error } = await supabase.auth.getUser();
 
   if (error && isStaleAuthSessionError(error)) {
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: "local" });
   }
 
-  supabaseResponse.headers.set(
-    "Accept-CH",
-    "Sec-CH-Prefers-Color-Scheme"
-  );
-  supabaseResponse.headers.set(
-    "Critical-CH",
-    "Sec-CH-Prefers-Color-Scheme"
-  );
-
-  return supabaseResponse;
+  return withClientHints(supabaseResponse);
 }

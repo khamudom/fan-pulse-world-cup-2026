@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import {
   createContext,
   useCallback,
@@ -9,8 +10,16 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
-import { AuthModal } from "./AuthModal";
-import { ResetPasswordModal } from "./ResetPasswordModal";
+
+const AuthModal = dynamic(
+  () => import("./AuthModal").then((mod) => mod.AuthModal),
+  { ssr: false },
+);
+
+const ResetPasswordModal = dynamic(
+  () => import("./ResetPasswordModal").then((mod) => mod.ResetPasswordModal),
+  { ssr: false },
+);
 
 type AuthModalMode = "signin" | "signup";
 
@@ -82,18 +91,22 @@ export function AuthModalProvider({ children }: AuthModalProviderProps) {
   return (
     <AuthModalContext.Provider value={value}>
       {children}
-      <AuthModal
-        open={open}
-        onOpenChange={setOpen}
-        initialMode={mode}
-        pendingCountry={pendingCountry}
-        nextPath={nextPath}
-        returnFocusRef={returnFocusRef}
-      />
-      <ResetPasswordModal
-        open={resetPasswordOpen}
-        onOpenChange={setResetPasswordOpen}
-      />
+      {open ? (
+        <AuthModal
+          open={open}
+          onOpenChange={setOpen}
+          initialMode={mode}
+          pendingCountry={pendingCountry}
+          nextPath={nextPath}
+          returnFocusRef={returnFocusRef}
+        />
+      ) : null}
+      {resetPasswordOpen ? (
+        <ResetPasswordModal
+          open={resetPasswordOpen}
+          onOpenChange={setResetPasswordOpen}
+        />
+      ) : null}
     </AuthModalContext.Provider>
   );
 }

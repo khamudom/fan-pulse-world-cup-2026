@@ -102,6 +102,10 @@ async function fetchJson<T>(
   }
 }
 
+const fetchTeamsJson = cache(async () =>
+  fetchJson<{ teams: ApiTeam[] }>("teams"),
+);
+
 function parseStatus(finished: string, timeElapsed: string): MatchStatus {
   const finishedUpper = finished?.toUpperCase();
   if (finishedUpper === "TRUE") return "finished";
@@ -266,7 +270,7 @@ function mapGameToMatch(game: ApiGame, teamMap: Map<string, ApiTeam>, stadiumMap
 }
 
 async function getTeamsUncached(): Promise<ApiResult<Team[]>> {
-  const response = await fetchJson<{ teams: ApiTeam[] }>("teams");
+  const response = await fetchTeamsJson();
   if (!response?.teams?.length) {
     if (USE_MOCK_FALLBACKS) {
       return { data: mapMockTeams(), source: "mock", error: "Using fallback team data" };
@@ -292,7 +296,7 @@ async function getMatchesUncached(
   // so teams/stadiums always stay on the standard cache.
   const [gamesRes, teamsRes, stadiumsRes] = await Promise.all([
     fetchJson<{ games: ApiGame[] }>("games", mode),
-    fetchJson<{ teams: ApiTeam[] }>("teams"),
+    fetchTeamsJson(),
     fetchJson<{ stadiums: ApiStadium[] }>("stadiums"),
   ]);
 

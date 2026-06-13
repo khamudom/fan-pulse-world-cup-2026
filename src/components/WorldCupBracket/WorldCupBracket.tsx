@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import Image, { type ImageLoaderProps } from "next/image";
+import Image from "next/image";
 import { Button } from "@khamudom/lumen-ui-react";
 import {
   buildBracketState,
@@ -17,8 +17,6 @@ import type {
 } from "@/types/bracket";
 import type { Group, Match, Team } from "@/types";
 import styles from "./WorldCupBracket.module.css";
-
-const passthroughLoader = ({ src }: ImageLoaderProps) => src;
 
 export type BracketMode = "live" | "picks";
 
@@ -52,8 +50,6 @@ function ParticipantRow({
     <>
       {participant.team?.flag ? (
         <Image
-          loader={passthroughLoader}
-          unoptimized
           src={participant.team.flag}
           alt=""
           width={20}

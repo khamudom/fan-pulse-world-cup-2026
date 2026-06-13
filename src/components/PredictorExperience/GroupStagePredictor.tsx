@@ -1,13 +1,11 @@
 "use client";
 
-import Image, { type ImageLoaderProps } from "next/image";
+import Image from "next/image";
 import { Badge } from "@khamudom/lumen-ui-react";
 import { getThirdPlaceCandidates } from "@/lib/bracket";
 import type { GroupRankings } from "@/types/bracket";
 import type { Group, Team } from "@/types";
 import styles from "./GroupStagePredictor.module.css";
-
-const passthroughLoader = ({ src }: ImageLoaderProps) => src;
 
 const POSITION_LABELS = ["1st", "2nd", "3rd", "4th"];
 
@@ -26,8 +24,6 @@ function TeamFlag({ flag, name }: { flag?: string; name: string }) {
   if (!flag) return <span className={styles.flagPlaceholder} aria-hidden="true" />;
   return (
     <Image
-      loader={passthroughLoader}
-      unoptimized
       src={flag}
       alt={`${name} flag`}
       width={22}
