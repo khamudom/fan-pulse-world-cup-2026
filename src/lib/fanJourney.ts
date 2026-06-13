@@ -34,6 +34,10 @@ function parseMatchDateTime(match: Match): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
+function teamMatchesFavorite(match: Match, favorite: string): boolean {
+  return match.homeTeam.name === favorite || match.awayTeam.name === favorite;
+}
+
 function teamMatchesProfile(match: Match, profile: Profile): boolean {
   const teams = [profile.favorite_country, profile.secondary_country].filter(Boolean);
   if (teams.length === 0) return false;
@@ -42,12 +46,40 @@ function teamMatchesProfile(match: Match, profile: Profile): boolean {
   );
 }
 
+function isLiveMatchStatus(status: Match["status"]): boolean {
+  return status === "live" || status === "halftime";
+}
+
 export interface FanJourneyResult {
   nextMatch: Match | null;
+  lastMatch: Match | null;
   kickoff: Date | null;
   countdown: ReturnType<typeof getCountdownParts> | null;
   label: string;
+  lastMatchLabel: string | null;
   opponent: string | null;
+}
+
+function getMatchOpponent(match: Match, favorite: string): string {
+  return match.homeTeam.name === favorite
+    ? match.awayTeam.name
+    : match.homeTeam.name;
+}
+
+function getLastFinishedMatch(
+  matches: Match[],
+  favorite: string
+): Match | null {
+  const finished = matches
+    .filter(
+      (m) =>
+        m.status === "finished" && teamMatchesFavorite(m, favorite)
+    )
+    .map((m) => ({ match: m, kickoff: parseMatchDateTime(m) }))
+    .filter((item): item is { match: Match; kickoff: Date } => !!item.kickoff)
+    .sort((a, b) => b.kickoff.getTime() - a.kickoff.getTime());
+
+  return finished[0]?.match ?? null;
 }
 
 export function getFanJourney(
@@ -55,13 +87,40 @@ export function getFanJourney(
   profile: Profile | null,
   now = new Date()
 ): FanJourneyResult {
+  // Journey panels track the user's primary nation only — not secondary_country.
   if (!profile?.favorite_country) {
     return {
       nextMatch: null,
+      lastMatch: null,
       kickoff: null,
       countdown: null,
       label: "Set up My World Cup",
+      lastMatchLabel: null,
       opponent: null,
+    };
+  }
+
+  const favorite = profile.favorite_country;
+  const lastMatch = getLastFinishedMatch(matches, favorite);
+  const lastMatchLabel = lastMatch
+    ? `${favorite} vs ${getMatchOpponent(lastMatch, favorite)}`
+    : null;
+
+  const live = matches.find(
+    (m) => isLiveMatchStatus(m.status) && teamMatchesFavorite(m, favorite)
+  );
+
+  if (live) {
+    const opponent = getMatchOpponent(live, favorite);
+
+    return {
+      nextMatch: live,
+      lastMatch,
+      kickoff: parseMatchDateTime(live),
+      countdown: null,
+      label: `${favorite} vs ${opponent}`,
+      lastMatchLabel,
+      opponent,
     };
   }
 
@@ -69,7 +128,7 @@ export function getFanJourney(
     .filter(
       (m) =>
         (m.status === "scheduled" || m.status === "notstarted") &&
-        teamMatchesProfile(m, profile)
+        teamMatchesFavorite(m, favorite)
     )
     .map((m) => ({ match: m, kickoff: parseMatchDateTime(m) }))
     .filter((item): item is { match: Match; kickoff: Date } => {
@@ -82,24 +141,24 @@ export function getFanJourney(
   if (!next) {
     return {
       nextMatch: null,
+      lastMatch,
       kickoff: null,
       countdown: null,
-      label: `${profile.favorite_country} has no upcoming matches`,
+      label: `${favorite} has no upcoming matches`,
+      lastMatchLabel,
       opponent: null,
     };
   }
 
-  const favorite = profile.favorite_country;
-  const opponent =
-    next.match.homeTeam.name === favorite
-      ? next.match.awayTeam.name
-      : next.match.homeTeam.name;
+  const opponent = getMatchOpponent(next.match, favorite);
 
   return {
     nextMatch: next.match,
+    lastMatch,
     kickoff: next.kickoff,
     countdown: getCountdownParts(next.kickoff, now),
     label: `${favorite} vs ${opponent}`,
+    lastMatchLabel,
     opponent,
   };
 }

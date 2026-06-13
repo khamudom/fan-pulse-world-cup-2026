@@ -5,6 +5,7 @@ import { useClientClock } from "@/lib/client-clock";
 import { getCountdownParts, type CountdownParts } from "@/lib/countdown";
 import type { FanJourneyResult } from "@/lib/fanJourney";
 import { getLevelTitle } from "@/lib/points";
+import type { Match } from "@/types";
 import type { Profile, UserStats } from "@/types/database";
 import { LocalKickoff } from "@/components/LocalKickoff";
 import styles from "./WelcomeBackHero.module.css";
@@ -25,6 +26,25 @@ function formatWatchdayDate(date = new Date()): string {
       year: "numeric",
     })
     .toUpperCase();
+}
+
+function isFavoriteTeamMatch(
+  match: Match,
+  favoriteCountry: string | null | undefined,
+): boolean {
+  if (!favoriteCountry) return false;
+  return (
+    match.homeTeam.name === favoriteCountry ||
+    match.awayTeam.name === favoriteCountry
+  );
+}
+
+function getFavoriteMatchLabel(match: Match, favoriteCountry: string): string {
+  const opponent =
+    match.homeTeam.name === favoriteCountry
+      ? match.awayTeam.name
+      : match.homeTeam.name;
+  return `${favoriteCountry} vs ${opponent}`;
 }
 
 function formatKickoffMeta(
@@ -61,7 +81,18 @@ export function WelcomeBackHero({
   journey,
 }: WelcomeBackHeroProps) {
   const displayName = profile.display_name ?? "Fan";
-  const levelTitle = getLevelTitle(stats?.level ?? 1, profile.favorite_country);
+  const favoriteCountry = profile.favorite_country;
+  const heroMatch =
+    favoriteCountry &&
+    journey.nextMatch &&
+    isFavoriteTeamMatch(journey.nextMatch, favoriteCountry)
+      ? journey.nextMatch
+      : null;
+  const heroLabel =
+    heroMatch && favoriteCountry
+      ? getFavoriteMatchLabel(heroMatch, favoriteCountry)
+      : null;
+  const levelTitle = getLevelTitle(stats?.level ?? 1, favoriteCountry);
   const accuracy = Number(stats?.prediction_accuracy ?? 0);
   const predictionRecord =
     stats && accuracy > 0 ? `${Math.round(accuracy)}% accuracy` : "0 for 0";
@@ -74,9 +105,11 @@ export function WelcomeBackHero({
     seconds: 0,
     totalMs: 0,
   };
-  const kickoffTarget = journey.nextMatch?.kickoffUtc
-    ? new Date(journey.nextMatch.kickoffUtc)
-    : journey.kickoff;
+  const kickoffTarget = heroMatch?.kickoffUtc
+    ? new Date(heroMatch.kickoffUtc)
+    : journey.kickoff && heroMatch
+      ? journey.kickoff
+      : null;
   const countdown =
     kickoffTarget && isHydrated
       ? getCountdownParts(kickoffTarget, now)
@@ -96,10 +129,10 @@ export function WelcomeBackHero({
           </h1>
 
           <dl className={styles.meta}>
-            {profile.favorite_country ? (
+            {favoriteCountry ? (
               <div className={styles.metaItem}>
                 <dt>Following</dt>
-                <dd>{profile.favorite_country}</dd>
+                <dd>{favoriteCountry}</dd>
               </div>
             ) : null}
             {stats ? (
@@ -117,13 +150,13 @@ export function WelcomeBackHero({
           </dl>
         </div>
 
-        {journey.nextMatch && countdown ? (
+        {heroMatch && heroLabel && countdown ? (
           <aside
             className={styles.scoreboard}
-            aria-label={`Countdown to ${journey.label}`}
+            aria-label={`Countdown to ${heroLabel}`}
           >
             <p className={styles.scoreboardEyebrow}>Kicks off in</p>
-            <p className={styles.scoreboardMatch}>{journey.label}</p>
+            <p className={styles.scoreboardMatch}>{heroLabel}</p>
             <div
               className={styles.scoreboardCountdown}
               role="timer"
@@ -148,7 +181,7 @@ export function WelcomeBackHero({
             </div>
             <p className={styles.scoreboardMeta}>
               <span className={styles.liveDot} aria-hidden="true" />
-              {formatKickoffMeta(journey.nextMatch)}
+              {formatKickoffMeta(heroMatch)}
             </p>
           </aside>
         ) : null}

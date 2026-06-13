@@ -1,5 +1,6 @@
 import { AiCompanionCard } from "@/components/AiCompanionCard";
 import { BriefingSection } from "@/components/BriefingContent";
+import { LocalTodayDate } from "@/components/LocalTodayDate";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
 import { EmptyState } from "@/components/EmptyState";
 import { FanAccoladesBoard } from "@/components/FanAccoladesBoard";
@@ -32,12 +33,6 @@ export function HomePersonalizedView({
   const journey = getFanJourney(matchesResult.data, profile);
   const programmeMatches = getUpcomingProgrammeMatches(matchesResult.data);
 
-  const briefingDate = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
-
   return (
     <>
       <WelcomeBackHero profile={profile} stats={stats} journey={journey} />
@@ -47,7 +42,7 @@ export function HomePersonalizedView({
           <div className={styles.briefingPanel}>
             <div className={styles.briefingHeader}>
               <h2 className={styles.briefingTitle}>
-                Morning Briefing for {briefingDate}
+                Morning Briefing for <LocalTodayDate />
               </h2>
               <p className={styles.briefingSubtitle}>
                 Your personalized 3-minute read — yesterday&apos;s results,
