@@ -7,18 +7,33 @@ import {
   getFeaturedStadiumIdFromCookies,
   resolveFeaturedStadium,
 } from "@/lib/featuredStadium";
-import { getStadiums } from "@/services/worldCupApi";
+import { getMatches, getStadiums } from "@/services/worldCupApi";
+import type { Match } from "@/types";
 import styles from "./page.module.css";
+
+function groupMatchesByStadium(matches: Match[]): Map<string, Match[]> {
+  const byStadium = new Map<string, Match[]>();
+  for (const match of matches) {
+    if (!match.stadiumId) continue;
+    const list = byStadium.get(match.stadiumId) ?? [];
+    list.push(match);
+    byStadium.set(match.stadiumId, list);
+  }
+  return byStadium;
+}
 
 export const metadata = {
   title: "Stadiums",
 };
 
 export default async function StadiumsPage() {
-  const [{ data: stadiums, source }, preferredId] = await Promise.all([
-    getStadiums(),
-    getFeaturedStadiumIdFromCookies(),
-  ]);
+  const [{ data: stadiums, source }, { data: matches }, preferredId] =
+    await Promise.all([
+      getStadiums(),
+      getMatches(),
+      getFeaturedStadiumIdFromCookies(),
+    ]);
+  const matchesByStadium = groupMatchesByStadium(matches);
   const featured = resolveFeaturedStadium(stadiums, preferredId);
   const rest = stadiums.filter((s) => s.id !== featured?.id);
 
@@ -38,7 +53,13 @@ export default async function StadiumsPage() {
                 title="Featured Venue"
                 action={<DataSourceBadge source={source === "mock" ? "mock" : "api"} />}
               />
-              {featured && <StadiumCard stadium={featured} featured />}
+              {featured && (
+                <StadiumCard
+                  stadium={featured}
+                  matches={matchesByStadium.get(featured.id) ?? []}
+                  featured
+                />
+              )}
             </div>
           </section>
 
@@ -51,7 +72,11 @@ export default async function StadiumsPage() {
               />
               <div className={styles.grid}>
                 {rest.map((stadium) => (
-                  <StadiumCard key={stadium.id} stadium={stadium} />
+                  <StadiumCard
+                    key={stadium.id}
+                    stadium={stadium}
+                    matches={matchesByStadium.get(stadium.id) ?? []}
+                  />
                 ))}
               </div>
             </div>
