@@ -39,9 +39,14 @@ export function MatchDateTimeline({
   const selectedRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    selectedRef.current?.scrollIntoView({
-      inline: "center",
-      block: "nearest",
+    const container = scrollRef.current;
+    const selected = selectedRef.current;
+    if (!container || !selected) return;
+
+    const targetLeft =
+      selected.offsetLeft - (container.clientWidth - selected.offsetWidth) / 2;
+    container.scrollTo({
+      left: Math.max(0, targetLeft),
       behavior: "smooth",
     });
   }, [selectedDate]);

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Archivo, Barlow_Condensed, Fraunces, Geist_Mono } from "next/font/google";
 import { AdminDrawer } from "@/components/AdminDrawer";
 import { ApiPreviewBanner } from "@/components/ApiPreviewBanner";
@@ -69,7 +70,9 @@ export default async function RootLayout({
       <body suppressHydrationWarning>
         <ThemeProvider preference={preference}>
           <AuthModalProvider>
-            <ScrollToTop />
+            <Suspense fallback={null}>
+              <ScrollToTop />
+            </Suspense>
             <ApiPreviewBanner />
             {/* <DataSourceLegend /> */}
             <AdminDrawer />

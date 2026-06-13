@@ -7,7 +7,12 @@ export const metadata = {
   description: "World Cup 2026 match schedule and group standings.",
 };
 
-export default async function MatchesPage() {
+export default async function MatchesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ section?: string }>;
+}) {
+  const { section } = await searchParams;
   const [matchesResult, groupsResult] = await Promise.all([
     getMatches(),
     getGroups(),
@@ -39,6 +44,7 @@ export default async function MatchesPage() {
         groupCount={groupCount || groups.length}
         matchesSource={matchesSource}
         groupsSource={groupsSource}
+        initialSection={section}
       />
     </div>
   );

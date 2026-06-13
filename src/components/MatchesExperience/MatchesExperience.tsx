@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Hero } from "@/components/Hero";
 import { MatchDateTimeline } from "@/components/MatchDateTimeline";
 import { MatchCard } from "@/components/MatchCard";
@@ -24,6 +24,7 @@ interface MatchesExperienceProps {
   groupCount: number;
   matchesSource: "api" | "mock";
   groupsSource: "api" | "mock";
+  initialSection?: string;
 }
 
 function getMatchesDayIntro(matchCount: number, dateLabel: string): string {
@@ -42,7 +43,9 @@ export function MatchesExperience({
   groupCount,
   matchesSource,
   groupsSource,
+  initialSection,
 }: MatchesExperienceProps) {
+  const groupStandingsRef = useRef<HTMLElement>(null);
   const dates = useMemo(() => getUniqueMatchDates(matches), [matches]);
   const [selectedDate, setSelectedDate] = useState(() =>
     getDefaultSelectedDate(dates)
@@ -55,6 +58,24 @@ export function MatchesExperience({
 
   const dateLabel = selectedDate ? formatSelectedDateLabel(selectedDate) : "";
   const sourceNote = matchesSource === "mock" ? " (fallback data)" : "";
+
+  useEffect(() => {
+    const shouldScroll =
+      initialSection === "group-standings" ||
+      window.location.hash === "#group-standings";
+    if (!shouldScroll) return;
+
+    const scrollToStandings = () => {
+      groupStandingsRef.current?.scrollIntoView({
+        behavior: "auto",
+        block: "start",
+      });
+    };
+
+    scrollToStandings();
+    const frame = requestAnimationFrame(scrollToStandings);
+    return () => cancelAnimationFrame(frame);
+  }, [initialSection]);
 
   return (
     <>
@@ -120,7 +141,11 @@ export function MatchesExperience({
         </section>
       )}
 
-      <section className="section sectionAlt">
+      <section
+        ref={groupStandingsRef}
+        id="group-standings"
+        className={`section sectionAlt ${styles.groupStandingsSection}`}
+      >
         <div className="container">
           <SectionHeader
             title="Group Standings"

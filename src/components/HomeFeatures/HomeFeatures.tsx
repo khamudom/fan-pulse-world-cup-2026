@@ -25,24 +25,30 @@ const features = [
     href: "/predictor",
   },
   {
-    title: "Fan Polls",
-    description: "Vote on the biggest questions and see how fans are leaning.",
-    href: "/predictor",
-  },
-  {
     title: "Group Standings",
     description: "Track every group from A through L with live standings.",
-    href: "/matches",
+    href: "/matches?section=group-standings",
+  },
+  {
+    title: "Stadiums",
+    description:
+      "Explore World Cup 2026 venues across USA, Mexico, and Canada.",
+    href: "/stadiums",
   },
 ];
 
 export function HomeFeatures() {
   return (
     <div className={styles.featureGrid}>
-      {features.map((feature) => (
+      {features.map((feature) => {
+        const isDeepLink =
+          feature.href.includes("#") || feature.href.includes("section=");
+
+        return (
         <Link
           key={feature.title}
           href={feature.href}
+          scroll={!isDeepLink}
           className={styles.featureLink}
         >
           <Card className={styles.featureCard} interactive>
@@ -60,7 +66,8 @@ export function HomeFeatures() {
             </CardFooter>
           </Card>
         </Link>
-      ))}
+        );
+      })}
     </div>
   );
 }
