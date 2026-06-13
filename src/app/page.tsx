@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { homeHeroBackground } from "@/assets/homeHero";
 import { Hero } from "@/components/Hero";
 import { WorldCupCountdown } from "@/components/WorldCupCountdown";
 import { SectionHeader } from "@/components/SectionHeader";
@@ -48,19 +49,23 @@ export default async function HomePage() {
         stats={["48 Nations.", "104 Matches.", "39 Days."]}
         tagline="One World Cup Journey."
         subtitle="Choose the nation you'll stand behind and begin your journey to the Final."
-        backgroundImage="/images/soccer-background-vector.avif"
-        actions={[
-          {
-            label: "Choose My Nation",
-            href: user ? "/my-world-cup" : "/login",
-            variant: "primary",
-          },
-          {
-            label: "Explore The Tournament",
-            href: "/matches",
-            variant: "outline",
-          },
-        ]}
+        backgroundImage={homeHeroBackground}
+        actions={
+          user
+            ? [
+                {
+                  label: "Choose My Nation",
+                  href: "/my-world-cup",
+                  variant: "primary",
+                },
+                {
+                  label: "Explore The Tournament",
+                  href: "/matches",
+                  variant: "outline",
+                },
+              ]
+            : []
+        }
         aside={<WorldCupCountdown />}
       />
 

@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isStaleAuthSessionError } from "@/lib/supabase/session";
 import type { Database } from "@/types/database";
 
 export async function updateSession(request: NextRequest) {
@@ -26,7 +27,11 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  const { error } = await supabase.auth.getUser();
+
+  if (error && isStaleAuthSessionError(error)) {
+    await supabase.auth.signOut();
+  }
 
   supabaseResponse.headers.set(
     "Accept-CH",

@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState, useMemo, useState, useSyncExternalStore } from "react";
-import { Button, Input } from "@khamudom/lumen-ui-react";
+import { useActionState, useMemo, useState } from "react";
+import { Button } from "@khamudom/lumen-ui-react";
 import {
   beginJourneyWithNation,
   type ProfileActionState,
@@ -12,18 +12,6 @@ import type { Team } from "@/types";
 import styles from "./BeginYourJourney.module.css";
 
 const initialState: ProfileActionState = {};
-
-function subscribeToMount() {
-  return () => {};
-}
-
-function getClientMounted() {
-  return true;
-}
-
-function getServerMounted() {
-  return false;
-}
 
 interface BeginYourJourneyProps {
   teams: Team[];
@@ -36,11 +24,6 @@ export function BeginYourJourney({
 }: BeginYourJourneyProps) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
-  const mounted = useSyncExternalStore(
-    subscribeToMount,
-    getClientMounted,
-    getServerMounted,
-  );
   const [state, formAction, pending] = useActionState(
     beginJourneyWithNation,
     initialState,
@@ -76,9 +59,6 @@ export function BeginYourJourney({
             <br />
             Experience every moment.
           </h2>
-          <p className={styles.closer}>
-            The World Cup starts with one decision.
-          </p>
           <p className={styles.question}>Who are you standing behind?</p>
         </header>
 
@@ -91,15 +71,24 @@ export function BeginYourJourney({
               source={toDataSourceBadge(teamsSource, teams.length > 0)}
             />
           </div>
-          <Input
-            id="nation-search"
-            type="search"
-            placeholder="Search all 48 nations…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Find your nation"
-            autoComplete="off"
-          />
+          <form
+            className={styles.search}
+            role="search"
+            onSubmit={(event) => event.preventDefault()}
+          >
+            <input
+              id="nation-search"
+              className={styles.searchInput}
+              type="search"
+              name="nation-query"
+              placeholder="Search all 48 nations…"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              aria-label="Find your nation"
+              autoComplete="off"
+              enterKeyHint="search"
+            />
+          </form>
 
           {filtered.length === 0 ? (
             <p className={styles.empty} role="status">
@@ -115,21 +104,15 @@ export function BeginYourJourney({
                 const isSelected = selected === team.name;
                 return (
                   <li key={team.id} role="presentation">
-                    {mounted ? (
-                      <button
-                        type="button"
-                        role="option"
-                        aria-selected={isSelected}
-                        className={`${styles.nation} ${isSelected ? styles.nationSelected : ""}`}
-                        onClick={() => setSelected(team.name)}
-                      >
-                        <NationCardContent team={team} />
-                      </button>
-                    ) : (
-                      <div className={styles.nation} aria-hidden="true">
-                        <NationCardContent team={team} />
-                      </div>
-                    )}
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      className={`${styles.nation} ${isSelected ? styles.nationSelected : ""}`}
+                      onClick={() => setSelected(team.name)}
+                    >
+                      <NationCardContent team={team} />
+                    </button>
                   </li>
                 );
               })}

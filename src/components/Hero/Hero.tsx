@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { Button } from "@khamudom/lumen-ui-react";
 import styles from "./Hero.module.css";
@@ -23,7 +23,7 @@ interface HeroProps {
   aside?: React.ReactNode;
   asideWide?: boolean;
   children?: React.ReactNode;
-  backgroundImage?: string;
+  backgroundImage?: string | StaticImageData;
   backgroundImageFit?: "default" | "photo" | "fullWidth";
 }
 

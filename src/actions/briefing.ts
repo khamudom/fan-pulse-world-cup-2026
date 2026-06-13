@@ -1,8 +1,8 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { getAuthContext, getSessionUser } from "@/lib/auth";
+import { getAuthContext } from "@/lib/auth";
 import { generateBriefing } from "@/lib/ai/companion";
+import { createClient } from "@/lib/supabase/server";
 import {
   getFanJourney,
   getMatchesForDate,
@@ -18,7 +18,7 @@ export async function getCachedBriefing(): Promise<{
   content: string | null;
   error?: string;
 }> {
-  const user = await getSessionUser();
+  const { user } = await getAuthContext();
   if (!user) {
     return { content: null, error: "Sign in to read your briefing." };
   }

@@ -1,15 +1,25 @@
 import { cache } from "react";
 import { ensureDailyCheckIn, type DailyCheckInStatus } from "@/lib/checkin";
 import { createClient } from "@/lib/supabase/server";
+import { isStaleAuthSessionError } from "@/lib/supabase/session";
 import type { Profile, UserStats } from "@/types/database";
 
-export async function getSessionUser() {
+export const getSessionUser = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
+
+  if (error) {
+    if (isStaleAuthSessionError(error)) {
+      await supabase.auth.signOut();
+    }
+    return null;
+  }
+
   return user;
-}
+});
 
 export async function getProfile(userId: string): Promise<Profile | null> {
   const supabase = await createClient();
