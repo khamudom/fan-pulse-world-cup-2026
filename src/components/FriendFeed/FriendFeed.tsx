@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ViewFriendLink } from "@/components/ViewFriendLink";
 import type { FeedItem } from "@/lib/social";
 import styles from "./FriendFeed.module.css";
 
@@ -10,6 +11,10 @@ const TYPE_ICONS: Record<FeedItem["type"], string> = {
 
 interface FriendFeedProps {
   items: FeedItem[];
+}
+
+function displayName(item: FeedItem): string {
+  return item.displayName ?? item.username ?? "Fan";
 }
 
 function formatRelativeTime(iso: string): string {
@@ -47,6 +52,7 @@ export function FriendFeed({ items }: FriendFeedProps) {
             </p>
             <p className={styles.time}>{formatRelativeTime(item.createdAt)}</p>
           </div>
+          <ViewFriendLink userId={item.userId} name={displayName(item)} />
         </li>
       ))}
     </ul>

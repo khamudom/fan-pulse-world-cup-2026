@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { Button } from "@khamudom/lumen-ui-react";
+import { ViewFriendLink } from "@/components/ViewFriendLink";
 import { removeConnection } from "@/actions/social";
 import type { FriendSummary } from "@/lib/social";
 import styles from "./FriendsList.module.css";
@@ -53,6 +54,11 @@ export function FriendsList({ friends }: FriendsListProps) {
             ) : null}
           </div>
           <div className={styles.actions}>
+            <ViewFriendLink
+              userId={friend.id}
+              name={displayName(friend)}
+              variant="button"
+            />
             <Button
               type="button"
               variant="outline"

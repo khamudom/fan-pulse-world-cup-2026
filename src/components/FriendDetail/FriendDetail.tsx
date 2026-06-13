@@ -45,7 +45,7 @@ export function FriendDetail({ profile }: FriendDetailProps) {
             <span className={styles.statValue}>{profile.stats.level}</span>
           </div>
           <div className={styles.stat}>
-            <span className={styles.statLabel}>Accuracy</span>
+            <span className={styles.statLabel}>Prediction accuracy</span>
             <span className={styles.statValue}>
               {profile.stats.predictionAccuracy}%
             </span>
@@ -73,18 +73,32 @@ export function FriendDetail({ profile }: FriendDetailProps) {
                 <span className={styles.match}>
                   {prediction.homeTeam} vs {prediction.awayTeam}
                 </span>
-                <span className={styles.score}>
-                  {prediction.predictedHome}–{prediction.predictedAway}
-                </span>
-                {prediction.resolved ? (
+                <div className={styles.scores}>
+                  {prediction.isFinished ? (
+                    <>
+                      <span className={styles.finalScore}>
+                        {prediction.actualHome}–{prediction.actualAway}
+                      </span>
+                      <span className={styles.predictedScore}>
+                        Predicted {prediction.predictedHome}–
+                        {prediction.predictedAway}
+                      </span>
+                    </>
+                  ) : (
+                    <span className={styles.finalScore}>
+                      {prediction.predictedHome}–{prediction.predictedAway}
+                    </span>
+                  )}
+                </div>
+                {prediction.isFinished ? (
                   <span
                     className={`${styles.badge} ${
-                      prediction.correct
+                      prediction.isCorrect
                         ? styles.badgeCorrect
                         : styles.badgeWrong
                     }`}
                   >
-                    {prediction.correct ? "Correct" : "Miss"}
+                    {prediction.isCorrect ? "Correct" : "Miss"}
                   </span>
                 ) : (
                   <span className={`${styles.badge} ${styles.badgePending}`}>

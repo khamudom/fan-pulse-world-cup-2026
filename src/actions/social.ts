@@ -547,8 +547,10 @@ export type FriendProfileData = {
     awayTeam: string;
     predictedHome: number;
     predictedAway: number;
-    correct: boolean | null;
-    resolved: boolean;
+    actualHome: number | null;
+    actualAway: number | null;
+    isFinished: boolean;
+    isCorrect: boolean | null;
   }[];
   isFriend: boolean;
 };
@@ -622,14 +624,22 @@ export async function getFriendProfile(
     championTeamName: bracketPayload?.championTeamName ?? null,
     recentPredictions: (predictions ?? []).map((p) => {
       const match = matchMap.get(p.match_id);
+      const isFinished = match?.status === "finished";
+      const isCorrect = isFinished
+        ? p.predicted_home === match.homeScore &&
+          p.predicted_away === match.awayScore
+        : null;
+
       return {
         matchId: p.match_id,
         homeTeam: match?.homeTeam.name ?? "Home",
         awayTeam: match?.awayTeam.name ?? "Away",
         predictedHome: p.predicted_home,
         predictedAway: p.predicted_away,
-        correct: p.correct,
-        resolved: p.resolved,
+        actualHome: isFinished ? match.homeScore : null,
+        actualAway: isFinished ? match.awayScore : null,
+        isFinished,
+        isCorrect,
       };
     }),
     isFriend: Boolean(connection) || isSelf,

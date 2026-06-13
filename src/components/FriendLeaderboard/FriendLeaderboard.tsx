@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ViewFriendLink } from "@/components/ViewFriendLink";
 import type { LeaderboardEntry } from "@/lib/social";
 import styles from "./FriendLeaderboard.module.css";
 
@@ -20,15 +21,12 @@ export function FriendLeaderboard({ entries }: FriendLeaderboardProps) {
         >
           <span className={styles.rank}>{entry.rank}</span>
           <div className={styles.info}>
-            {entry.isSelf ? (
+            <Link href={`/friends/${entry.userId}`} className={styles.link}>
               <span className={styles.name}>
-                {displayName(entry)} (you)
+                {displayName(entry)}
+                {entry.isSelf ? " (you)" : ""}
               </span>
-            ) : (
-              <Link href={`/friends/${entry.userId}`} className={styles.link}>
-                <span className={styles.name}>{displayName(entry)}</span>
-              </Link>
-            )}
+            </Link>
             {entry.favoriteCountry ? (
               <p className={styles.meta}>Standing behind {entry.favoriteCountry}</p>
             ) : null}
@@ -36,9 +34,14 @@ export function FriendLeaderboard({ entries }: FriendLeaderboardProps) {
           <div className={styles.stats}>
             <p className={styles.points}>{entry.points} pts</p>
             <p className={styles.accuracy}>
-              Lv {entry.level} · {entry.predictionAccuracy}% accuracy
+              Lv {entry.level} · {entry.predictionAccuracy}% prediction accuracy
             </p>
           </div>
+          <ViewFriendLink
+            userId={entry.userId}
+            name={displayName(entry)}
+            label={entry.isSelf ? "View your profile" : undefined}
+          />
         </li>
       ))}
     </ol>
