@@ -26,6 +26,40 @@ interface HeaderProps {
   incomingRequestCount?: number;
 }
 
+function MenuIcon() {
+  return (
+    <svg
+      className={styles.menuToggleIcon}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      className={styles.menuToggleIcon}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
 export function Header({
   signedIn = false,
   displayName,
@@ -41,20 +75,37 @@ export function Header({
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <Link
-          href="/"
-          className={styles.logo}
-          aria-label="World Cup FanPulse home"
-        >
-          <span className={styles.logoMark} aria-hidden="true">
-            ⚽
-          </span>
-          <span className={styles.logoText}>
-            Fan<span className={styles.logoAccent}>Pulse</span>
-          </span>
-        </Link>
+        <div className={styles.brand}>
+          <Link
+            href="/"
+            className={styles.logo}
+            aria-label="World Cup FanPulse home"
+          >
+            <span className={styles.logoMark} aria-hidden="true">
+              ⚽
+            </span>
+            <span className={styles.logoText}>
+              Fan<span className={styles.logoAccent}>Pulse</span>
+            </span>
+          </Link>
+
+          <div className={styles.menuToggleWrap}>
+            <Button
+              type="button"
+              variant="ghost"
+              className={styles.menuToggle}
+              aria-expanded={menuOpen}
+              aria-controls="main-nav"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? <CloseIcon /> : <MenuIcon />}
+            </Button>
+          </div>
+        </div>
 
         <nav
+          id="main-nav"
           className={`${styles.nav} ${menuOpen ? styles.navOpen : ""}`}
           aria-label="Main navigation"
         >
@@ -94,19 +145,6 @@ export function Header({
             displayName={displayName}
             resolvedTheme={resolvedTheme}
           />
-          <div className={styles.menuToggleWrap}>
-            <Button
-              type="button"
-              variant="ghost"
-              className={styles.menuToggle}
-              aria-expanded={menuOpen}
-              aria-controls="main-nav"
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              {menuOpen ? "✕" : "☰"}
-            </Button>
-          </div>
         </div>
       </div>
     </header>
