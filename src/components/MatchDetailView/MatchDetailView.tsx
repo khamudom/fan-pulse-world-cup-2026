@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image, { type ImageLoaderProps } from "next/image";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@khamudom/lumen-ui-react";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
 import { Hero } from "@/components/Hero";
@@ -16,6 +17,28 @@ import type { Match } from "@/types";
 import styles from "./MatchDetailView.module.css";
 
 const LIVE_POLL_INTERVAL_MS = 60000;
+
+const passthroughLoader = ({ src }: ImageLoaderProps) => src;
+
+function TeamFlag({ name, flag }: { name: string; flag?: string }) {
+  return (
+    <div className={styles.teamFlag}>
+      {flag ? (
+        <Image
+          loader={passthroughLoader}
+          unoptimized
+          src={flag}
+          alt={`${name} flag`}
+          className={styles.flag}
+          width={200}
+          height={134}
+        />
+      ) : (
+        <span className={styles.flagPlaceholder} aria-hidden="true" />
+      )}
+    </div>
+  );
+}
 
 function formatInterval(ms: number): string {
   const seconds = Math.round(ms / 1000);
@@ -128,7 +151,43 @@ export function MatchDetailView({
   return (
     <>
       <Hero
-        title={`${match.homeTeam.name} vs ${match.awayTeam.name}`}
+        title={
+          <>
+            <span className="sr-only">
+              {match.homeTeam.name} vs {match.awayTeam.name}
+              {showScore
+                ? `, ${match.homeScore} to ${match.awayScore}`
+                : ""}
+            </span>
+            <div className={styles.matchup} aria-hidden="true">
+              <div className={styles.team}>
+                <TeamFlag
+                  name={match.homeTeam.name}
+                  flag={match.homeTeam.flag}
+                />
+                <span className={styles.teamName}>{match.homeTeam.name}</span>
+              </div>
+
+              {showScore ? (
+                <div className={styles.scoreCenter}>
+                  <span className={styles.scoreValue}>{match.homeScore}</span>
+                  <span className={styles.scoreDash}>–</span>
+                  <span className={styles.scoreValue}>{match.awayScore}</span>
+                </div>
+              ) : (
+                <span className={styles.vs}>vs</span>
+              )}
+
+              <div className={styles.team}>
+                <TeamFlag
+                  name={match.awayTeam.name}
+                  flag={match.awayTeam.flag}
+                />
+                <span className={styles.teamName}>{match.awayTeam.name}</span>
+              </div>
+            </div>
+          </>
+        }
         subtitle={
           <>
             <LocalKickoff
@@ -141,30 +200,13 @@ export function MatchDetailView({
           </>
         }
         compact
+        centered
       >
         <div className={styles.heroMeta}>
           <DataSourceBadge source={matchSource === "mock" ? "mock" : "api"} />
           <Badge variant={getStatusBadgeVariant(match.status)}>
             {getStatusLabel(match.status)}
           </Badge>
-          {showScore && (
-            <p
-              className={styles.scoreline}
-              aria-label={`Score: ${match.homeTeam.name} ${match.homeScore}, ${match.awayTeam.name} ${match.awayScore}`}
-            >
-              <span className={styles.scoreSide}>
-                <span className={styles.scoreTeam}>{match.homeTeam.name}</span>
-                <span className={styles.scoreValue}>{match.homeScore}</span>
-              </span>
-              <span className={styles.scoreDash} aria-hidden="true">
-                –
-              </span>
-              <span className={styles.scoreSide}>
-                <span className={styles.scoreValue}>{match.awayScore}</span>
-                <span className={styles.scoreTeam}>{match.awayTeam.name}</span>
-              </span>
-            </p>
-          )}
           {match.group && <Badge variant="outline">Group {match.group}</Badge>}
         </div>
 

@@ -52,6 +52,25 @@
   padding: var(--space-10) 0 var(--space-8);
 }
 
+.centered .content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.centered .title {
+  max-width: none;
+  width: 100%;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: normal;
+}
+
+.centered .subtitle {
+  max-width: none;
+}
+
 .inner {
   position: relative;
   z-index: 1;

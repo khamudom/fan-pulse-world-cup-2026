@@ -19,6 +19,7 @@ interface HeroProps {
   actions?: HeroAction[];
   sponsor?: string;
   compact?: boolean;
+  centered?: boolean;
   aside?: React.ReactNode;
   asideWide?: boolean;
   children?: React.ReactNode;
@@ -34,6 +35,7 @@ export function Hero({
   actions = [],
   sponsor,
   compact = false,
+  centered = false,
   aside,
   asideWide = false,
   children,
@@ -42,7 +44,7 @@ export function Hero({
 }: HeroProps) {
   return (
     <section
-      className={`${styles.hero} ${compact ? styles.compact : ""} ${backgroundImage ? styles.hasBackground : ""}`}
+      className={`${styles.hero} ${compact ? styles.compact : ""} ${centered ? styles.centered : ""} ${backgroundImage ? styles.hasBackground : ""}`}
       aria-labelledby="hero-title"
     >
       {backgroundImage ? (
