@@ -53,7 +53,7 @@ export function useClientTime(): { now: Date; isReady: boolean } {
 
 let tickingMs = 0;
 const tickingListeners = new Set<() => void>();
-const tickingTimers = new Map<number, ReturnType<typeof setInterval>>();
+const tickingTimers = new Map<number, number>();
 
 function notifyTickingListeners(): void {
   tickingListeners.forEach((listener) => listener());
