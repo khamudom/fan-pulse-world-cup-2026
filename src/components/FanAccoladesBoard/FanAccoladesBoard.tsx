@@ -34,7 +34,7 @@ export function FanAccoladesBoard({
   const checkedInToday = stats?.last_check_in === todayIso();
   const board = getAccoladeBoard(stats);
   const isCompact = variant === "compact";
-  const recentEarned = [...board.earned].reverse().slice(0, 4);
+  const recentEarned = [...board.earned].reverse().slice(0, 3);
 
   return (
     <Card className={styles.card}>
