@@ -15,10 +15,7 @@ interface UserMenuProps {
   resolvedTheme: ResolvedTheme;
 }
 
-export function UserMenu({
-  signedIn,
-  displayName,
-}: UserMenuProps) {
+export function UserMenu({ signedIn, displayName }: UserMenuProps) {
   const router = useRouter();
   const { openAuthModal } = useAuthModal();
   const [open, setOpen] = useState(false);
@@ -97,20 +94,6 @@ export function UserMenu({
 
           {signedIn ? (
             <Link
-              href="/friends"
-              className={styles.item}
-              role="menuitem"
-              onClick={() => setOpen(false)}
-            >
-              <span className={styles.itemIcon} aria-hidden="true">
-                👥
-              </span>
-              Friends
-            </Link>
-          ) : null}
-
-          {signedIn ? (
-            <Link
               href="/profile"
               className={styles.item}
               role="menuitem"
@@ -130,7 +113,9 @@ export function UserMenu({
           </button>
           */}
 
-          <div className={styles.divider} role="separator" />
+          {signedIn ? (
+            <div className={styles.divider} role="separator" />
+          ) : null}
 
           {signedIn ? (
             <button
