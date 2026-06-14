@@ -71,6 +71,25 @@ export function getLocalTodayIso(date: Date = new Date()): string {
   return `${year}-${month}-${day}`;
 }
 
+/** Calendar date (YYYY-MM-DD) for an instant in an IANA timezone. */
+export function getIsoDateInTimeZone(date: Date, timeZone: string): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+export function addCalendarDays(isoDate: string, days: number): string {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  const shifted = new Date(year, month - 1, day + days);
+  const y = shifted.getFullYear();
+  const m = String(shifted.getMonth() + 1).padStart(2, "0");
+  const d = String(shifted.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 export function getDefaultSelectedDate(
   dates: string[],
   referenceDate: Date = new Date(),

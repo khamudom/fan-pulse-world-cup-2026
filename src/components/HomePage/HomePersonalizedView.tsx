@@ -1,5 +1,6 @@
 import { AiCompanionCard } from "@/components/AiCompanionCard";
 import { BriefingSection } from "@/components/BriefingContent";
+import { BriefingTimeZoneSync } from "@/components/BriefingContent/BriefingTimeZoneSync";
 import { LocalTodayDate } from "@/components/LocalTodayDate";
 import { EmptyState } from "@/components/EmptyState";
 import { FanAccoladesBoard } from "@/components/FanAccoladesBoard";
@@ -33,6 +34,7 @@ export function HomePersonalizedView({
       <WelcomeBackHero profile={profile} stats={stats} journey={journey} />
 
       <section className={styles.briefingSection} id="briefing">
+        <BriefingTimeZoneSync />
         <div className="container">
           <div className={styles.briefingPanel}>
             <div className={styles.briefingHeader}>

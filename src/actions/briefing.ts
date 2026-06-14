@@ -2,14 +2,23 @@
 
 import { getAuthContext } from "@/lib/auth";
 import { generateBriefing } from "@/lib/ai/companion";
-import { createClient } from "@/lib/supabase/server";
 import {
-  getFanJourney,
-  getMatchesForDate,
-  getRelevantYesterdayMatches,
-} from "@/lib/fanJourney";
-import { getLocalTodayIso } from "@/lib/matchDate";
+  getBriefingTodayIso,
+  getBriefingTodayMatches,
+  getBriefingYesterdayMatches,
+} from "@/lib/briefingContext";
+import {
+  getBriefingTimeZone,
+  setBriefingTimeZoneCookie,
+} from "@/lib/briefingTimeZone";
+import { createClient } from "@/lib/supabase/server";
+import { getFanJourney } from "@/lib/fanJourney";
 import { getMatches } from "@/services/worldCupApi";
+
+/** Persist the visitor timezone so briefing dates match their local calendar day. */
+export async function syncBriefingTimeZone(timeZone: string): Promise<boolean> {
+  return setBriefingTimeZoneCookie(timeZone);
+}
 
 export async function getCachedBriefing(): Promise<{
   content: string | null;
@@ -20,12 +29,17 @@ export async function getCachedBriefing(): Promise<{
     return { content: null, error: "Sign in to read your briefing." };
   }
 
+  const timeZone = await getBriefingTimeZone();
+  if (!timeZone) {
+    return { content: null };
+  }
+
   const supabase = await createClient();
   const { data } = await supabase
     .from("daily_briefings")
     .select("content")
     .eq("user_id", user.id)
-    .eq("briefing_date", getLocalTodayIso())
+    .eq("briefing_date", getBriefingTodayIso(new Date(), timeZone))
     .maybeSingle();
 
   return { content: data?.content ?? null };
@@ -41,7 +55,17 @@ export async function getOrCreateDailyBriefing(): Promise<{
     return { content: "", cached: false, error: "Sign in to read your briefing." };
   }
 
-  const today = getLocalTodayIso();
+  const timeZone = await getBriefingTimeZone();
+  if (!timeZone) {
+    return {
+      content: "",
+      cached: false,
+      error: "Could not determine your local date. Refresh and try again.",
+    };
+  }
+
+  const now = new Date();
+  const today = getBriefingTodayIso(now, timeZone);
   const supabase = await createClient();
 
   const { data: cached } = await supabase
@@ -56,9 +80,8 @@ export async function getOrCreateDailyBriefing(): Promise<{
   }
 
   const { data: matches } = await getMatches();
-  const now = new Date();
-  const yesterdayMatches = getRelevantYesterdayMatches(matches, profile, now);
-  const todayMatches = getMatchesForDate(matches, now);
+  const yesterdayMatches = getBriefingYesterdayMatches(matches, profile, now, timeZone);
+  const todayMatches = getBriefingTodayMatches(matches, now, timeZone);
   const journey = getFanJourney(matches, profile, now);
 
   const content = await generateBriefing({

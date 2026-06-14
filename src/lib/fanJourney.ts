@@ -1,5 +1,4 @@
 import { getCountdownParts } from "@/lib/countdown";
-import { getLocalTodayIso } from "@/lib/matchDate";
 import type { Match } from "@/types";
 import type { Profile } from "@/types/database";
 
@@ -162,37 +161,6 @@ export function getFanJourney(
     lastMatchLabel,
     opponent,
   };
-}
-
-export function getMatchesForDate(matches: Match[], targetDate: Date): Match[] {
-  const targetIso = getLocalTodayIso(targetDate);
-  return matches.filter((m) => toIsoDate(m.date) === targetIso);
-}
-
-export function getYesterdayFinishedMatches(
-  matches: Match[],
-  now = new Date()
-): Match[] {
-  const yesterday = new Date(now);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayIso = getLocalTodayIso(yesterday);
-
-  return matches.filter(
-    (m) => m.status === "finished" && toIsoDate(m.date) === yesterdayIso
-  );
-}
-
-export function getRelevantYesterdayMatches(
-  matches: Match[],
-  profile: Profile | null,
-  now = new Date()
-): Match[] {
-  const yesterday = getYesterdayFinishedMatches(matches, now);
-  if (!profile?.favorite_country && !profile?.secondary_country) {
-    return yesterday;
-  }
-  const relevant = yesterday.filter((m) => teamMatchesProfile(m, profile));
-  return relevant.length > 0 ? relevant : yesterday.slice(0, 5);
 }
 
 export function formatCountdownLabel(
