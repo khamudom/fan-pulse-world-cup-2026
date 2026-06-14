@@ -12,9 +12,10 @@ function isUpcomingStatus(status: Match["status"]): boolean {
 export function getUpcomingProgrammeMatches(
   matches: Match[],
   limit = 12,
+  referenceDate: Date = new Date(),
 ): Match[] {
-  const todayIso = getLocalTodayIso();
-  const endDate = new Date();
+  const todayIso = getLocalTodayIso(referenceDate);
+  const endDate = new Date(referenceDate);
   endDate.setDate(endDate.getDate() + 1);
   const endIso = getLocalTodayIso(endDate);
 

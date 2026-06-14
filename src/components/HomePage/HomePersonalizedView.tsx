@@ -1,19 +1,15 @@
 import { AiCompanionCard } from "@/components/AiCompanionCard";
 import { BriefingSection } from "@/components/BriefingContent";
 import { LocalTodayDate } from "@/components/LocalTodayDate";
-import { DataSourceBadge } from "@/components/DataSourceBadge";
 import { EmptyState } from "@/components/EmptyState";
 import { FanAccoladesBoard } from "@/components/FanAccoladesBoard";
 import { FanJourneyCard } from "@/components/FanJourneyCard";
-import { ProgrammeSchedule } from "@/components/ProgrammeSchedule";
-import { ViewAllLink } from "@/components/ViewAllLink";
 import { WelcomeBackHero } from "@/components/WelcomeBackHero";
 import { getFanJourney } from "@/lib/fanJourney";
-import { toDataSourceBadge } from "@/lib/dataSourceBadge";
 import type { ApiResult, Match } from "@/types";
 import type { Profile, UserStats } from "@/types/database";
 import styles from "@/app/page.module.css";
-import { getUpcomingProgrammeMatches } from "./utils";
+import { HomeFixturesSection } from "./HomeFixturesSection";
 
 type HomePersonalizedViewProps = {
   profile: Profile;
@@ -31,7 +27,6 @@ export function HomePersonalizedView({
   briefing,
 }: HomePersonalizedViewProps) {
   const journey = getFanJourney(matchesResult.data, profile);
-  const programmeMatches = getUpcomingProgrammeMatches(matchesResult.data);
 
   return (
     <>
@@ -77,45 +72,13 @@ export function HomePersonalizedView({
         </div>
       </section>
 
-      <section className={styles.fixturesSection}>
-        <div className="container">
-          <div className={styles.fixturesHeader}>
-            <div>
-              <h2 className={styles.fixturesTitle}>Fixtures</h2>
-              <p className={styles.fixturesSubtitle}>
-                Upcoming fixtures on your watchlist
-              </p>
-            </div>
-            <div className={styles.sectionActions}>
-              <DataSourceBadge
-                source={toDataSourceBadge(
-                  todaysResult.source,
-                  programmeMatches.length > 0,
-                )}
-              />
-              <ViewAllLink href="/matches" label="View all matches" />
-            </div>
-          </div>
-
-          {programmeMatches.length > 0 ? (
-            <ProgrammeSchedule
-              matches={programmeMatches}
-              favoriteCountry={profile.favorite_country}
-            />
-          ) : (
-            <EmptyState
-              title="No matches to show"
-              message="No upcoming fixtures from the API."
-              actionLabel="Browse all matches"
-              actionHref="/matches"
-            />
-          )}
-
-          <footer className={styles.fixturesSignoff}>
-            <p>Every day is a new chapter.</p>
-          </footer>
-        </div>
-      </section>
+      <HomeFixturesSection
+        matches={matchesResult.data}
+        source={todaysResult.source}
+        subtitle="Upcoming fixtures on your watchlist"
+        favoriteCountry={profile.favorite_country}
+        showSignoff
+      />
     </>
   );
 }
