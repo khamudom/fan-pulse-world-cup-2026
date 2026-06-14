@@ -1,4 +1,5 @@
 import { getCountdownParts } from "@/lib/countdown";
+import { getLocalTodayIso } from "@/lib/matchDate";
 import type { Match } from "@/types";
 import type { Profile } from "@/types/database";
 
@@ -164,7 +165,7 @@ export function getFanJourney(
 }
 
 export function getMatchesForDate(matches: Match[], targetDate: Date): Match[] {
-  const targetIso = targetDate.toISOString().slice(0, 10);
+  const targetIso = getLocalTodayIso(targetDate);
   return matches.filter((m) => toIsoDate(m.date) === targetIso);
 }
 
@@ -174,7 +175,7 @@ export function getYesterdayFinishedMatches(
 ): Match[] {
   const yesterday = new Date(now);
   yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayIso = yesterday.toISOString().slice(0, 10);
+  const yesterdayIso = getLocalTodayIso(yesterday);
 
   return matches.filter(
     (m) => m.status === "finished" && toIsoDate(m.date) === yesterdayIso

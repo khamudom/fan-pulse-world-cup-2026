@@ -8,11 +8,8 @@ import {
   getMatchesForDate,
   getRelevantYesterdayMatches,
 } from "@/lib/fanJourney";
+import { getLocalTodayIso } from "@/lib/matchDate";
 import { getMatches } from "@/services/worldCupApi";
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export async function getCachedBriefing(): Promise<{
   content: string | null;
@@ -28,7 +25,7 @@ export async function getCachedBriefing(): Promise<{
     .from("daily_briefings")
     .select("content")
     .eq("user_id", user.id)
-    .eq("briefing_date", todayIso())
+    .eq("briefing_date", getLocalTodayIso())
     .maybeSingle();
 
   return { content: data?.content ?? null };
@@ -44,7 +41,7 @@ export async function getOrCreateDailyBriefing(): Promise<{
     return { content: "", cached: false, error: "Sign in to read your briefing." };
   }
 
-  const today = todayIso();
+  const today = getLocalTodayIso();
   const supabase = await createClient();
 
   const { data: cached } = await supabase
@@ -67,6 +64,7 @@ export async function getOrCreateDailyBriefing(): Promise<{
   const content = await generateBriefing({
     userName: profile?.display_name ?? "Fan",
     profile,
+    briefingDate: today,
     yesterdayMatches,
     todayMatches,
     upcomingTeamMatch: journey.nextMatch,

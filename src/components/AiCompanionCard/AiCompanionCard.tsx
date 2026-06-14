@@ -105,11 +105,14 @@ export function AiCompanionCard({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="What's on your mind?"
+            autoComplete="off"
+            suppressHydrationWarning
           />
           <Button
             type="submit"
             variant="primary"
             disabled={loading || !message.trim()}
+            suppressHydrationWarning
           >
             {loading ? "Thinking…" : "Ask"}
           </Button>

@@ -1,10 +1,12 @@
 import OpenAI from "openai";
+import { formatSelectedDateLabel } from "@/lib/matchDate";
 import type { Match } from "@/types";
 import type { Profile } from "@/types/database";
 
 export interface BriefingInput {
   userName: string;
   profile: Profile | null;
+  briefingDate: string;
   yesterdayMatches: Match[];
   todayMatches: Match[];
   upcomingTeamMatch: Match | null;
@@ -33,11 +35,19 @@ function formatMatch(m: Match): string {
 }
 
 function buildTemplateBriefing(input: BriefingInput): string {
-  const { userName, profile, yesterdayMatches, todayMatches, upcomingTeamMatch, stats } =
-    input;
+  const {
+    userName,
+    profile,
+    briefingDate,
+    yesterdayMatches,
+    todayMatches,
+    upcomingTeamMatch,
+    stats,
+  } = input;
   const team = profile?.favorite_country ?? "your team";
   const lines: string[] = [];
 
+  lines.push(`Briefing date: ${formatSelectedDateLabel(briefingDate)} (today).`);
   lines.push(`Good morning, ${userName}.`);
   lines.push("");
 
@@ -125,7 +135,10 @@ export async function generateBriefing(input: BriefingInput): Promise<string> {
         },
         {
           role: "user",
-          content: `Write a personalized morning briefing (3-minute read, markdown). Use this context:\n\n${context}`,
+          content:
+            `Write a personalized morning briefing (3-minute read, markdown) for ${formatSelectedDateLabel(input.briefingDate)}. ` +
+            `Treat that date as "today". The **Yesterday** section is the previous calendar day; the **Today** section is ${formatSelectedDateLabel(input.briefingDate)}. ` +
+            `Use this context:\n\n${context}`,
         },
       ],
       max_tokens: 800,
