@@ -94,6 +94,7 @@ export function AiCompanionCard({
 
         <form
           className={styles.form}
+          suppressHydrationWarning
           onSubmit={(e) => {
             e.preventDefault();
             void ask(message);

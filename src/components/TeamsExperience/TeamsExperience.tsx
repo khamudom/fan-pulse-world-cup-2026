@@ -5,7 +5,6 @@ import {
   useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
 } from "react";
 import { Input } from "@khamudom/lumen-ui-react";
 import { Hero } from "@/components/Hero";
@@ -13,6 +12,7 @@ import { DataSourceBadge } from "@/components/DataSourceBadge";
 import { EmptyState } from "@/components/EmptyState";
 import { getTeamFifaNewsUrl } from "@/lib/fifa";
 import { toDataSourceBadge } from "@/lib/dataSourceBadge";
+import { useIsClient } from "@/lib/useClientOnly";
 import type { Team } from "@/types";
 import styles from "./TeamsExperience.module.css";
 
@@ -44,7 +44,7 @@ function ChevronIcon({ direction }: { direction: "left" | "right" }) {
 
 function getExploreIntro(group: string, count: number): string {
   if (!group) {
-    return `${count} nations from every corner of the earth — each carrying a dream to the same stage.`;
+    return "";
   }
   if (count === 1) {
     return `Group ${group} — one nation stands alone in this view. Explore every group to meet them all.`;
@@ -63,18 +63,6 @@ const teamsHeroProps = {
   backgroundImageFit: "fullWidth" as const,
 };
 
-function subscribeToMount() {
-  return () => {};
-}
-
-function getClientMounted() {
-  return true;
-}
-
-function getServerMounted() {
-  return false;
-}
-
 export function TeamsExperience({
   teams,
   groups,
@@ -82,11 +70,7 @@ export function TeamsExperience({
 }: TeamsExperienceProps) {
   const [search, setSearch] = useState("");
   const [group, setGroup] = useState("");
-  const mounted = useSyncExternalStore(
-    subscribeToMount,
-    getClientMounted,
-    getServerMounted,
-  );
+  const mounted = useIsClient();
   const scrollRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<HTMLButtonElement>(null);
 
@@ -130,6 +114,7 @@ export function TeamsExperience({
   };
 
   const sourceNote = teamsSource === "mock" ? " (fallback data)" : "";
+  const exploreIntro = getExploreIntro(group, filtered.length);
 
   if (teams.length === 0) {
     return (
@@ -198,10 +183,12 @@ export function TeamsExperience({
             />
           </div>
 
-          <p className={styles.groupIntro} role="status">
-            {getExploreIntro(group, filtered.length)}
-            {sourceNote}
-          </p>
+          {exploreIntro || sourceNote ? (
+            <p className={styles.groupIntro} role="status">
+              {exploreIntro}
+              {sourceNote}
+            </p>
+          ) : null}
 
           {groups.length > 0 ? (
             <div className={styles.groupPicker}>

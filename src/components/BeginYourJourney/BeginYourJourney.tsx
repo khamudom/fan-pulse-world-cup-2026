@@ -74,6 +74,7 @@ export function BeginYourJourney({
           <form
             className={styles.search}
             role="search"
+            suppressHydrationWarning
             onSubmit={(event) => event.preventDefault()}
           >
             <input
@@ -87,6 +88,7 @@ export function BeginYourJourney({
               aria-label="Find your nation"
               autoComplete="off"
               enterKeyHint="search"
+              suppressHydrationWarning
             />
           </form>
 

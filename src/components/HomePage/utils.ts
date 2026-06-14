@@ -1,22 +1,28 @@
-import { toIsoDate } from "@/lib/matchDate";
+import { getLocalTodayIso, toIsoDate } from "@/lib/matchDate";
 import type { Match } from "@/types";
+
+function isUpcomingStatus(status: Match["status"]): boolean {
+  return (
+    status === "scheduled" ||
+    status === "notstarted" ||
+    status === "live"
+  );
+}
 
 export function getUpcomingProgrammeMatches(
   matches: Match[],
   limit = 12,
 ): Match[] {
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const todayIso = getLocalTodayIso();
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + 1);
-  const endIso = endDate.toISOString().slice(0, 10);
+  const endIso = getLocalTodayIso(endDate);
 
   return [...matches]
-    .filter(
-      (match) =>
-        match.status === "scheduled" ||
-        match.status === "notstarted" ||
-        match.status === "live",
-    )
+    .filter((match) => {
+      const matchDate = toIsoDate(match.date);
+      return matchDate === todayIso || isUpcomingStatus(match.status);
+    })
     .sort((a, b) => {
       const dateCompare = toIsoDate(a.date).localeCompare(toIsoDate(b.date));
       if (dateCompare !== 0) return dateCompare;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Hero } from "@/components/Hero";
 import { MatchDateTimeline } from "@/components/MatchDateTimeline";
 import { MatchCard } from "@/components/MatchCard";
@@ -11,10 +11,10 @@ import { EmptyState } from "@/components/EmptyState";
 import { toDataSourceBadge } from "@/lib/dataSourceBadge";
 import {
   formatSelectedDateLabel,
-  getDefaultSelectedDate,
+  getMatchesOnDate,
   getUniqueMatchDates,
-  isMatchOnDate,
 } from "@/lib/matchDate";
+import { useSelectedMatchDate } from "@/lib/useSelectedMatchDate";
 import type { Group, Match } from "@/types";
 import styles from "./MatchesExperience.module.css";
 
@@ -47,12 +47,10 @@ export function MatchesExperience({
 }: MatchesExperienceProps) {
   const groupStandingsRef = useRef<HTMLElement>(null);
   const dates = useMemo(() => getUniqueMatchDates(matches), [matches]);
-  const [selectedDate, setSelectedDate] = useState(() =>
-    getDefaultSelectedDate(dates)
-  );
+  const [selectedDate, setSelectedDate, isDateReady] = useSelectedMatchDate(dates);
 
   const matchesOnDate = useMemo(
-    () => matches.filter((match) => isMatchOnDate(match.date, selectedDate)),
+    () => getMatchesOnDate(matches, selectedDate),
     [matches, selectedDate]
   );
 
@@ -104,19 +102,25 @@ export function MatchesExperience({
             />
 
             <SectionHeader
-              title={dateLabel || "Matches"}
-              subtitle={`${matchesOnDate.length} match${matchesOnDate.length === 1 ? "" : "es"}${sourceNote}`}
+              title={isDateReady && dateLabel ? dateLabel : "Matches"}
+              subtitle={
+                isDateReady
+                  ? `${matchesOnDate.length} match${matchesOnDate.length === 1 ? "" : "es"}${sourceNote}`
+                  : "Loading today's matches…"
+              }
               action={
                 <DataSourceBadge
                   source={toDataSourceBadge(matchesSource, matches.length > 0)}
                 />
               }
             />
-            <p className={styles.dateIntro}>
-              {getMatchesDayIntro(matchesOnDate.length, dateLabel)}
-            </p>
+            {isDateReady ? (
+              <p className={styles.dateIntro}>
+                {getMatchesDayIntro(matchesOnDate.length, dateLabel)}
+              </p>
+            ) : null}
 
-            {matchesOnDate.length === 0 ? (
+            {!isDateReady ? null : matchesOnDate.length === 0 ? (
               <EmptyState
                 title="No matches on this day"
                 message="Try selecting another date on the timeline above."

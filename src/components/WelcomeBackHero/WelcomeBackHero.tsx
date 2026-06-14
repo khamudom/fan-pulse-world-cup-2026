@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useClientClock } from "@/lib/client-clock";
+import { useNow } from "@/lib/useClientOnly";
 import { getCountdownParts, type CountdownParts } from "@/lib/countdown";
 import type { FanJourneyResult } from "@/lib/fanJourney";
 import { getLevelTitle } from "@/lib/points";
@@ -97,7 +97,7 @@ export function WelcomeBackHero({
   const predictionRecord =
     stats && accuracy > 0 ? `${Math.round(accuracy)}% accuracy` : "0 for 0";
 
-  const { now, isHydrated } = useClientClock();
+  const { now, isReady: isHydrated } = useNow();
   const emptyCountdown: CountdownParts = {
     days: 0,
     hours: 0,

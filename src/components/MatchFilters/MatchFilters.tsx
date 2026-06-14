@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Select } from "@khamudom/lumen-ui-react";
 import { MatchCard } from "@/components/MatchCard";
 import { EmptyState } from "@/components/EmptyState";
-import { isMatchOnDate } from "@/lib/matchDate";
+import { isMatchOnDate, sortMatchesByKickoff } from "@/lib/matchDate";
 import type { Match } from "@/types";
 import styles from "./MatchFilters.module.css";
 
@@ -28,18 +28,20 @@ export function MatchFilters({
   const [stadium, setStadium] = useState("");
 
   const filtered = useMemo(() => {
-    return matches.filter((m) => {
-      const matchesGroup = !group || m.group === group;
-      const matchesTeam =
-        !team ||
-        m.homeTeam.name === team ||
-        m.awayTeam.name === team;
-      const matchesStadium = !stadium || m.stadiumName === stadium;
-      const matchesDate =
-        !selectedDate || isMatchOnDate(m.date, selectedDate);
+    return sortMatchesByKickoff(
+      matches.filter((m) => {
+        const matchesGroup = !group || m.group === group;
+        const matchesTeam =
+          !team ||
+          m.homeTeam.name === team ||
+          m.awayTeam.name === team;
+        const matchesStadium = !stadium || m.stadiumName === stadium;
+        const matchesDate =
+          !selectedDate || isMatchOnDate(m.date, selectedDate);
 
-      return matchesGroup && matchesTeam && matchesStadium && matchesDate;
-    });
+        return matchesGroup && matchesTeam && matchesStadium && matchesDate;
+      }),
+    );
   }, [matches, group, team, stadium, selectedDate]);
 
   return (

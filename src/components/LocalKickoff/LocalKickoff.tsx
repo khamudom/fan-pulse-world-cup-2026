@@ -1,39 +1,11 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useIsClient } from "@/lib/useClientOnly";
 import {
   formatKickoffInTimeZone,
   formatKickoffInUserTz,
 } from "@/lib/timezone";
 import styles from "./LocalKickoff.module.css";
-
-function subscribeNoop() {
-  return () => {};
-}
-
-function getClientHydrated() {
-  return true;
-}
-
-function getServerHydrated() {
-  return false;
-}
-
-function useIsHydrated(): boolean {
-  return useSyncExternalStore(subscribeNoop, getClientHydrated, getServerHydrated);
-}
-
-function getUserTimeZone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-
-function getServerTimeZone(): string {
-  return "";
-}
-
-function useUserTimeZone(): string {
-  return useSyncExternalStore(subscribeNoop, getUserTimeZone, getServerTimeZone);
-}
 
 export interface LocalKickoffProps {
   kickoffUtc?: string;
@@ -54,8 +26,10 @@ export function LocalKickoff({
   className,
   showVenueTime = true,
 }: LocalKickoffProps) {
-  const hydrated = useIsHydrated();
-  const userTimeZone = useUserTimeZone();
+  const hydrated = useIsClient();
+  const userTimeZone = hydrated
+    ? Intl.DateTimeFormat().resolvedOptions().timeZone
+    : "";
 
   if (!kickoffUtc || !hydrated) {
     const fallback =

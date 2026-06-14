@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@khamudom/lumen-ui-react";
 import { LocalKickoff } from "@/components/LocalKickoff";
-import { toIsoDate } from "@/lib/matchDate";
+import { sortMatchesByKickoff } from "@/lib/matchDate";
 import type { Match, Stadium } from "@/types";
 import styles from "./StadiumCard.module.css";
 
@@ -20,14 +20,6 @@ interface StadiumCardProps {
   stadium: Stadium;
   matches?: Match[];
   featured?: boolean;
-}
-
-function sortMatchesByKickoff(matches: Match[]): Match[] {
-  return [...matches].sort((a, b) => {
-    const aKey = a.kickoffUtc ?? `${toIsoDate(a.date)}T${a.time ?? ""}`;
-    const bKey = b.kickoffUtc ?? `${toIsoDate(b.date)}T${b.time ?? ""}`;
-    return aKey.localeCompare(bKey);
-  });
 }
 
 function MatchesChevron() {

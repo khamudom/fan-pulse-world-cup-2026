@@ -16,6 +16,46 @@ export function isMatchOnDate(date: string, targetIsoDate: string): boolean {
   return toIsoDate(date) === targetIsoDate;
 }
 
+function getMatchKickoffTimestamp(match: Match): number {
+  if (match.kickoffUtc) {
+    const kickoff = new Date(match.kickoffUtc).getTime();
+    if (!Number.isNaN(kickoff)) return kickoff;
+  }
+
+  const iso = toIsoDate(match.date);
+  const timeMatch = match.time.match(/(\d+):(\d+)\s*(AM|PM)?/i);
+  if (!timeMatch) {
+    const fallback = new Date(`${iso}T12:00:00`).getTime();
+    return Number.isNaN(fallback) ? 0 : fallback;
+  }
+
+  let hour = parseInt(timeMatch[1], 10);
+  const minute = parseInt(timeMatch[2], 10);
+  const period = timeMatch[3]?.toUpperCase();
+
+  if (period === "PM" && hour < 12) hour += 12;
+  if (period === "AM" && hour === 12) hour = 0;
+
+  const kickoff = new Date(
+    `${iso}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00`,
+  ).getTime();
+  return Number.isNaN(kickoff) ? 0 : kickoff;
+}
+
+export function compareMatchesByKickoff(a: Match, b: Match): number {
+  return getMatchKickoffTimestamp(a) - getMatchKickoffTimestamp(b);
+}
+
+export function sortMatchesByKickoff(matches: Match[]): Match[] {
+  return [...matches].sort(compareMatchesByKickoff);
+}
+
+export function getMatchesOnDate(matches: Match[], targetIsoDate: string): Match[] {
+  return sortMatchesByKickoff(
+    matches.filter((match) => isMatchOnDate(match.date, targetIsoDate)),
+  );
+}
+
 export function getUniqueMatchDates(matches: Match[]): string[] {
   const dates = new Set<string>();
   for (const match of matches) {
@@ -24,10 +64,20 @@ export function getUniqueMatchDates(matches: Match[]): string[] {
   return [...dates].sort();
 }
 
-export function getDefaultSelectedDate(dates: string[]): string {
+export function getLocalTodayIso(date: Date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function getDefaultSelectedDate(
+  dates: string[],
+  referenceDate: Date = new Date(),
+): string {
   if (dates.length === 0) return "";
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getLocalTodayIso(referenceDate);
   if (dates.includes(today)) return today;
 
   const upcoming = dates.find((date) => date >= today);

@@ -1,16 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
 import { MatchDateTimeline } from "@/components/MatchDateTimeline";
 import { MatchFilters } from "@/components/MatchFilters";
 import { DataSourceBadge } from "@/components/DataSourceBadge";
 import {
   formatSelectedDateLabel,
-  getDefaultSelectedDate,
+  getMatchesOnDate,
   getUniqueMatchDates,
-  isMatchOnDate,
 } from "@/lib/matchDate";
+import { useSelectedMatchDate } from "@/lib/useSelectedMatchDate";
 import type { Match } from "@/types";
 
 interface MatchesSectionProps {
@@ -29,18 +29,18 @@ export function MatchesSection({
   source,
 }: MatchesSectionProps) {
   const dates = useMemo(() => getUniqueMatchDates(matches), [matches]);
-  const [selectedDate, setSelectedDate] = useState(() =>
-    getDefaultSelectedDate(dates)
-  );
+  const [selectedDate, setSelectedDate, isDateReady] = useSelectedMatchDate(dates);
 
   const matchesOnDate = useMemo(
-    () => matches.filter((match) => isMatchOnDate(match.date, selectedDate)),
+    () => getMatchesOnDate(matches, selectedDate),
     [matches, selectedDate]
   );
 
-  const subtitle = selectedDate
-    ? `${matchesOnDate.length} match${matchesOnDate.length === 1 ? "" : "es"} · ${formatSelectedDateLabel(selectedDate)}${source === "mock" ? " (fallback data)" : ""}`
-    : `${matches.length} matches${source === "mock" ? " (fallback data)" : ""}`;
+  const subtitle = !isDateReady
+    ? `${matches.length} matches${source === "mock" ? " (fallback data)" : ""}`
+    : selectedDate
+      ? `${matchesOnDate.length} match${matchesOnDate.length === 1 ? "" : "es"} · ${formatSelectedDateLabel(selectedDate)}${source === "mock" ? " (fallback data)" : ""}`
+      : `${matches.length} matches${source === "mock" ? " (fallback data)" : ""}`;
 
   return (
     <>

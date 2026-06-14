@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@khamudom/lumen-ui-react";
 import { WORLD_CUP_2026 } from "@/config/tournament";
-import { useClientClock } from "@/lib/client-clock";
+import { useNow } from "@/lib/useClientOnly";
 import { getCountdownParts, type CountdownParts } from "@/lib/countdown";
 import styles from "./WorldCupCountdown.module.css";
 
@@ -23,7 +23,7 @@ const countdownUnits: { key: keyof CountdownParts; label: string }[] = [
 ];
 
 export function WorldCupCountdown() {
-  const { now: currentDate, isHydrated } = useClientClock();
+  const { now: currentDate, isReady: isHydrated } = useNow();
   const phase = isHydrated ? getCountdownPhase(currentDate) : "countdown";
   const countdown = isHydrated
     ? getCountdownParts(WORLD_CUP_2026.kickoff, currentDate)

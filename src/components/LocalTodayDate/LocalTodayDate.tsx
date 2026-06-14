@@ -1,6 +1,6 @@
 "use client";
 
-import { useClientClock } from "@/lib/client-clock";
+import { useIsClient, useNow } from "@/lib/useClientOnly";
 
 export type LocalTodayDateProps = {
   locale?: string;
@@ -21,7 +21,7 @@ export function LocalTodayDate({
   fallback = "today",
   className,
 }: LocalTodayDateProps) {
-  const { now, isHydrated } = useClientClock();
+  const { now, isReady: isHydrated } = useNow(0);
 
   return (
     <span className={className} suppressHydrationWarning>
