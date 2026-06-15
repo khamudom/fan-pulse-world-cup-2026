@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { MatchDetailView } from "@/components/MatchDetailView";
+import { MatchDetailView } from "@/features/matches";
 import { USE_PROTOTYPE_DATA } from "@/config/dataSource";
 import { getSessionUser } from "@/lib/auth";
 import { getMyMatchPrediction } from "@/actions/points";

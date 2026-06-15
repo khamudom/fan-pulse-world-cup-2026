@@ -8,7 +8,7 @@ import {
   getBracketProgress,
   getNextPickableMatchId,
 } from "@/lib/bracket";
-import { LocalKickoff } from "@/components/LocalKickoff";
+import { LocalKickoff } from "@/components/display/LocalKickoff";
 import type {
   BracketMatchState,
   BracketParticipant,

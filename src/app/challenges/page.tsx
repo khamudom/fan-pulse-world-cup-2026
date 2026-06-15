@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import { Hero } from "@/components/Hero";
+import { Hero } from "@/components/display/Hero";
 import { DailyChallengeCard } from "@/components/DailyChallengeCard";
 import { FanAccoladesBoard } from "@/components/FanAccoladesBoard";
-import { SectionHeader } from "@/components/SectionHeader";
+import { SectionHeader } from "@/components/display/SectionHeader";
 import { getAuthContext } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import styles from "./page.module.css";

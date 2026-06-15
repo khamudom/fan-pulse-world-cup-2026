@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DataSourceBadge } from "@/components/DataSourceBadge";
+import { DataSourceBadge } from "@/components/display/DataSourceBadge";
 import styles from "./DataSourceLegend.module.css";
 
 const items = [

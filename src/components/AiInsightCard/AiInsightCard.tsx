@@ -1,1 +1,1 @@
-export { AiCompanionCard as AiInsightCard } from "@/components/AiCompanionCard";
+export { AiCompanionCard as AiInsightCard } from "@/features/home/components/AiCompanionCard";

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Hero } from "@/components/Hero";
+import { Hero } from "@/components/display/Hero";
 import { MyWorldCupForm } from "@/components/MyWorldCupForm";
 import { MyWorldCupExperience } from "@/components/MyWorldCupExperience";
 import { getAuthContext } from "@/lib/auth";

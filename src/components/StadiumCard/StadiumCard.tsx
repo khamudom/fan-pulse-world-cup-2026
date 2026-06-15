@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@khamudom/lumen-ui-react";
-import { LocalKickoff } from "@/components/LocalKickoff";
+import { LocalKickoff } from "@/components/display/LocalKickoff";
 import { sortMatchesByKickoff } from "@/lib/matchDate";
 import type { Match, Stadium } from "@/types";
 import styles from "./StadiumCard.module.css";

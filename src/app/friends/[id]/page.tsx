@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
-import { Hero } from "@/components/Hero";
-import { FriendDetail } from "@/components/FriendDetail";
+import { Hero } from "@/components/display/Hero";
+import { FriendDetail } from "@/features/friends";
 import { getFriendProfile } from "@/actions/social";
 import { getSessionUser } from "@/lib/auth";
 

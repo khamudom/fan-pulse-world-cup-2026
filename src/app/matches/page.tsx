@@ -1,5 +1,5 @@
-import { MatchesExperience } from "@/components/MatchesExperience";
-import { EmptyState } from "@/components/EmptyState";
+import { MatchesExperience } from "@/features/matches";
+import { EmptyState } from "@/components/feedback/EmptyState";
 import { getMatches, getGroups } from "@/services/worldCupApi";
 
 export const metadata = {

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { Badge, Button } from "@khamudom/lumen-ui-react";
-import { DataSourceBadge } from "@/components/DataSourceBadge";
-import { LocalKickoff } from "@/components/LocalKickoff";
+import { DataSourceBadge } from "@/components/display/DataSourceBadge";
+import { LocalKickoff } from "@/components/display/LocalKickoff";
 import { toDataSourceBadge, type ApiDataSource } from "@/lib/dataSourceBadge";
 import type { MyWorldCupData } from "@/lib/myWorldCup";
 import type {

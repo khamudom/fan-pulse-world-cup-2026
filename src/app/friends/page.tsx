@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { Hero } from "@/components/Hero";
-import { FriendsExperience } from "@/components/FriendsExperience";
+import { Hero } from "@/components/display/Hero";
+import { FriendsExperience } from "@/features/friends";
 import {
   getFriendFeed,
   getFriendLeaderboard,

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DataSourceBadge } from "@/components/DataSourceBadge";
+import { DataSourceBadge } from "@/components/display/DataSourceBadge";
 import { getTodaysStory, formatStoryDate } from "@/lib/todaysStory";
 import styles from "./page.module.css";
 

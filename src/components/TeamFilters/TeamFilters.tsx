@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Input, Select } from "@khamudom/lumen-ui-react";
 import { TeamCard } from "@/components/TeamCard";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState } from "@/components/feedback/EmptyState";
 import type { Team } from "@/types";
 import styles from "./TeamFilters.module.css";
 

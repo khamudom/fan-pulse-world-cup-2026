@@ -1,16 +1,16 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { homeHeroBackground } from "@/assets/homeHero";
-import { Hero } from "@/components/Hero";
-import { WorldCupCountdown } from "@/components/WorldCupCountdown";
-import { SectionHeader } from "@/components/SectionHeader";
-import { HomeFeatures } from "@/components/HomeFeatures";
+import { Hero } from "@/components/display/Hero";
+import { WorldCupCountdown } from "@/components/display/WorldCupCountdown";
+import { SectionHeader } from "@/components/display/SectionHeader";
 import {
+  HomeFeatures,
   HomeGuestDataSections,
   HomeGuestSkeleton,
   HomePageSkeleton,
   HomePersonalizedAsyncView,
-} from "@/components/HomePage";
+} from "@/features/home";
 import { getProfile, getSessionUser } from "@/lib/auth";
 import styles from "./page.module.css";
 

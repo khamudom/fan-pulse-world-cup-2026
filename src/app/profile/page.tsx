@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Hero } from "@/components/Hero";
+import { Hero } from "@/components/display/Hero";
 import { EditableDisplayName } from "@/components/EditableDisplayName";
 import { ProfileDashboard } from "@/components/ProfileDashboard";
 import { getAuthContext } from "@/lib/auth";

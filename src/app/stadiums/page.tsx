@@ -1,8 +1,8 @@
-import { Hero } from "@/components/Hero";
-import { SectionHeader } from "@/components/SectionHeader";
+import { Hero } from "@/components/display/Hero";
+import { SectionHeader } from "@/components/display/SectionHeader";
 import { StadiumCard } from "@/components/StadiumCard";
-import { DataSourceBadge } from "@/components/DataSourceBadge";
-import { EmptyState } from "@/components/EmptyState";
+import { DataSourceBadge } from "@/components/display/DataSourceBadge";
+import { EmptyState } from "@/components/feedback/EmptyState";
 import { getMatches, getStadiums } from "@/services/worldCupApi";
 import type { Match } from "@/types";
 import styles from "./page.module.css";

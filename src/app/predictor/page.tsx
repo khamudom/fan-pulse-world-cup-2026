@@ -1,5 +1,5 @@
-import { Hero } from "@/components/Hero";
-import { EmptyState } from "@/components/EmptyState";
+import { Hero } from "@/components/display/Hero";
+import { EmptyState } from "@/components/feedback/EmptyState";
 import { PredictorExperience } from "@/components/PredictorExperience";
 import { getMyBracketPrediction } from "@/actions/bracketPredictions";
 import { getAuthContext } from "@/lib/auth";

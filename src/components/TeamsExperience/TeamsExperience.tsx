@@ -7,9 +7,9 @@ import {
   useState,
 } from "react";
 import { Input } from "@khamudom/lumen-ui-react";
-import { Hero } from "@/components/Hero";
-import { DataSourceBadge } from "@/components/DataSourceBadge";
-import { EmptyState } from "@/components/EmptyState";
+import { Hero } from "@/components/display/Hero";
+import { DataSourceBadge } from "@/components/display/DataSourceBadge";
+import { EmptyState } from "@/components/feedback/EmptyState";
 import { getTeamFifaNewsUrl } from "@/lib/fifa";
 import { toDataSourceBadge } from "@/lib/dataSourceBadge";
 import { useIsClient } from "@/lib/useClientOnly";

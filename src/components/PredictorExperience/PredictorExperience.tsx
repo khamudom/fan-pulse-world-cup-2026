@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { Button, Alert, Card, CardContent } from "@khamudom/lumen-ui-react";
 import { saveMyBracketPrediction } from "@/actions/bracketPredictions";
-import { DataSourceBadge } from "@/components/DataSourceBadge";
+import { DataSourceBadge } from "@/components/display/DataSourceBadge";
 import {
   BracketModeToggle,
   WorldCupBracket,

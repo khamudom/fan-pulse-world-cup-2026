@@ -11,7 +11,7 @@ import {
   Select,
 } from "@khamudom/lumen-ui-react";
 import { saveMyWorldCup, type ProfileActionState } from "@/actions/profile";
-import { DataSourceBadge } from "@/components/DataSourceBadge";
+import { DataSourceBadge } from "@/components/display/DataSourceBadge";
 import { toDataSourceBadge, type ApiDataSource } from "@/lib/dataSourceBadge";
 import type { Team } from "@/types";
 import type { Profile } from "@/types/database";
