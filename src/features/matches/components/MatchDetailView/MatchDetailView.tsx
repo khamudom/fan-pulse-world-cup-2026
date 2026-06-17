@@ -203,7 +203,9 @@ export function MatchDetailView({
           <Badge variant={getStatusBadgeVariant(match.status)}>
             {getStatusLabel(match.status)}
           </Badge>
-          {match.group && <Badge variant="outline">Group {match.group}</Badge>}
+          {match.group && (
+            <Badge appearance="outline">Group {match.group}</Badge>
+          )}
         </div>
 
         {isLive && (

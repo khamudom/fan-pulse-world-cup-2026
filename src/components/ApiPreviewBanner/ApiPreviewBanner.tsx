@@ -8,7 +8,6 @@ import {
 } from "@khamudom/lumen-ui-react";
 import {
   isApiPreviewMode,
-  USE_MOCK_FALLBACKS,
   USE_PROTOTYPE_DATA,
 } from "@/config/dataSource";
 
@@ -20,7 +19,6 @@ export function ApiPreviewBanner() {
   }
 
   const notes = [
-    !USE_MOCK_FALLBACKS && "API mock fallbacks disabled",
     !USE_PROTOTYPE_DATA && "prototype sections hidden",
   ].filter(Boolean);
 

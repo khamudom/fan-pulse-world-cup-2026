@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import { MatchDetailView } from "@/features/matches";
+import { EmptyState } from "@/components/feedback/EmptyState";
 import { USE_PROTOTYPE_DATA } from "@/config/dataSource";
 import { getSessionUser } from "@/lib/auth";
 import { getMyMatchPrediction } from "@/actions/points";
-import { getMatchById } from "@/services/worldCupApi";
+import { getMatchById, getMatches } from "@/services/worldCupApi";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -20,10 +21,23 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function MatchDetailPage({ params }: PageProps) {
   const { id } = await params;
-  // Fetch fresh so an in-progress match shows the current score on load.
-  const { data: match, source } = await getMatchById(id, "fresh");
+  const { data: match, source } = await getMatchById(id);
 
-  if (!match) notFound();
+  if (!match) {
+    const { data: matches } = await getMatches();
+    if (matches.length === 0) notFound();
+
+    return (
+      <div className="page">
+        <EmptyState
+          title="Match not found"
+          message="We couldn't find this match in the schedule. It may have been rescheduled or removed."
+          actionLabel="Browse matches"
+          actionHref="/matches"
+        />
+      </div>
+    );
+  }
 
   const user = await getSessionUser();
   const userPrediction = user ? await getMyMatchPrediction(id) : null;

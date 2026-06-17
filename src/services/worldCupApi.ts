@@ -1,12 +1,4 @@
 import { cache } from "react";
-import { USE_MOCK_FALLBACKS } from "@/config/dataSource";
-import { mockGamesApiResponse } from "@/data/api/worldcup/games";
-import { mockGroupsApiResponse } from "@/data/api/worldcup/groups";
-import { mockStadiumsApiResponse } from "@/data/api/worldcup/stadiums";
-import {
-  mockTeamsApiResponse,
-  type WorldCupApiTeam,
-} from "@/data/api/worldcup/teams";
 import {
   parseLocalDateTimeString,
   zonedLocalToUtcIso,
@@ -23,6 +15,12 @@ import type {
 
 const API_BASE = "https://worldcup26.ir/get";
 const REVALIDATE_SECONDS = 300;
+const FETCH_RETRIES = 3;
+const RETRY_DELAY_MS = 500;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 /**
  * "cached" uses the 5-minute ISR cache (good for static-ish data).
@@ -88,18 +86,25 @@ async function fetchJson<T>(
   path: string,
   mode: FetchMode = "cached",
 ): Promise<T | null> {
-  try {
-    const res = await fetch(
-      `${API_BASE}/${path}`,
-      mode === "fresh"
-        ? { cache: "no-store" }
-        : { next: { revalidate: REVALIDATE_SECONDS } },
-    );
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
+  for (let attempt = 0; attempt < FETCH_RETRIES; attempt++) {
+    try {
+      const res = await fetch(
+        `${API_BASE}/${path}`,
+        mode === "fresh"
+          ? { cache: "no-store" }
+          : { next: { revalidate: REVALIDATE_SECONDS } },
+      );
+      if (res.ok) return (await res.json()) as T;
+    } catch {
+      // Retry on network errors.
+    }
+
+    if (attempt < FETCH_RETRIES - 1) {
+      await delay(RETRY_DELAY_MS * (attempt + 1));
+    }
   }
+
+  return null;
 }
 
 const fetchTeamsJson = cache(async () =>
@@ -159,73 +164,6 @@ function mapApiTeam(
   return { id, name, flag, group, fifaCode };
 }
 
-export function mapMockTeams(): Team[] {
-  return mockTeamsApiResponse.teams.map((t: WorldCupApiTeam) => ({
-    id: t.id,
-    name: t.name_en,
-    nameFa: t.name_fa,
-    flag: t.flag,
-    fifaCode: t.fifa_code,
-    iso2: t.iso2,
-    group: t.groups,
-  }));
-}
-
-export function mapMockMatches(): Match[] {
-  const teamMap = new Map(
-    mockTeamsApiResponse.teams.map((t) => [t.id, t as ApiTeam]),
-  );
-  const stadiumMap = new Map(
-    mockStadiumsApiResponse.stadiums.map((s) => [s.id, s as ApiStadium]),
-  );
-  return mockGamesApiResponse.games.map((g) =>
-    mapGameToMatch(g as ApiGame, teamMap, stadiumMap),
-  );
-}
-
-export function mapMockGroups(): Group[] {
-  const teamMap = new Map(
-    mockTeamsApiResponse.teams.map((t) => [t.id, t as ApiTeam]),
-  );
-  return mockGroupsApiResponse.groups.map((g) => ({
-    name: g.name,
-    standings: g.teams.map((s) => {
-      const team = teamMap.get(s.team_id);
-      return {
-        teamId: s.team_id,
-        teamName: team?.name_en ?? `Team ${s.team_id}`,
-        flag: team?.flag,
-        played: parseInt(s.mp, 10) || 0,
-        won: parseInt(s.w, 10) || 0,
-        drawn: parseInt(s.d, 10) || 0,
-        lost: parseInt(s.l, 10) || 0,
-        goalsFor: parseInt(s.gf, 10) || 0,
-        goalsAgainst: parseInt(s.ga, 10) || 0,
-        goalDifference: parseInt(s.gd, 10) || 0,
-        points: parseInt(s.pts, 10) || 0,
-      };
-    }),
-  }));
-}
-
-export function mapMockStadiums(): Stadium[] {
-  const matchCountByStadium = new Map<string, number>();
-  for (const game of mockGamesApiResponse.games) {
-    const count = matchCountByStadium.get(game.stadium_id) ?? 0;
-    matchCountByStadium.set(game.stadium_id, count + 1);
-  }
-  return mockStadiumsApiResponse.stadiums.map((s) => ({
-    id: s.id,
-    name: s.name_en,
-    fifaName: s.fifa_name,
-    city: s.city_en,
-    country: s.country_en,
-    capacity: s.capacity,
-    region: s.region,
-    matchCount: matchCountByStadium.get(s.id) ?? 0,
-  }));
-}
-
 function mapGameToMatch(game: ApiGame, teamMap: Map<string, ApiTeam>, stadiumMap: Map<string, ApiStadium>): Match {
   const homeApi = teamMap.get(game.home_team_id);
   const awayApi = teamMap.get(game.away_team_id);
@@ -272,9 +210,6 @@ function mapGameToMatch(game: ApiGame, teamMap: Map<string, ApiTeam>, stadiumMap
 async function getTeamsUncached(): Promise<ApiResult<Team[]>> {
   const response = await fetchTeamsJson();
   if (!response?.teams?.length) {
-    if (USE_MOCK_FALLBACKS) {
-      return { data: mapMockTeams(), source: "mock", error: "Using fallback team data" };
-    }
     return { data: [], source: "api", error: "World Cup API unavailable" };
   }
   const teams = response.teams.map((t) => ({
@@ -301,9 +236,6 @@ async function getMatchesUncached(
   ]);
 
   if (!gamesRes?.games?.length) {
-    if (USE_MOCK_FALLBACKS) {
-      return { data: mapMockMatches(), source: "mock", error: "Using fallback match data" };
-    }
     return { data: [], source: "api", error: "World Cup API unavailable" };
   }
 
@@ -327,25 +259,28 @@ export async function getMatchById(
   id: string,
   mode: FetchMode = "cached",
 ): Promise<ApiResult<Match | null>> {
-  const { data: matches, source, error } = await getMatches(mode);
-  const match = matches.find((m) => m.id === id) ?? null;
-  if (!match) {
-    if (USE_MOCK_FALLBACKS) {
-      const mockMatches = mapMockMatches();
-      const fallback = mockMatches.find((m) => m.id === id) ?? mockMatches[0];
-      return {
-        data: fallback ?? null,
-        source: "mock",
-        error: error ?? "Match not found; showing featured match",
-      };
+  const modes: FetchMode[] =
+    mode === "fresh" ? ["fresh", "cached"] : ["cached", "fresh"];
+
+  let lastResult: ApiResult<Match[]> | null = null;
+
+  for (const fetchMode of modes) {
+    const result = await getMatches(fetchMode);
+    lastResult = result;
+    const match = result.data.find((m) => m.id === id) ?? null;
+    if (match) {
+      return { data: match, source: result.source, error: result.error };
     }
-    return {
-      data: null,
-      source: "api",
-      error: error ?? "Match not found",
-    };
   }
-  return { data: match, source, error };
+
+  return {
+    data: null,
+    source: "api",
+    error:
+      lastResult?.data.length === 0
+        ? (lastResult.error ?? "World Cup API unavailable")
+        : (lastResult?.error ?? "Match not found"),
+  };
 }
 
 async function getGroupsUncached(): Promise<ApiResult<Group[]>> {
@@ -355,9 +290,6 @@ async function getGroupsUncached(): Promise<ApiResult<Group[]>> {
   ]);
 
   if (!groupsRes?.groups?.length) {
-    if (USE_MOCK_FALLBACKS) {
-      return { data: mapMockGroups(), source: "mock", error: "Using fallback group data" };
-    }
     return { data: [], source: "api", error: "World Cup API unavailable" };
   }
 
@@ -395,9 +327,6 @@ async function getStadiumsUncached(): Promise<ApiResult<Stadium[]>> {
   ]);
 
   if (!stadiumsRes?.stadiums?.length) {
-    if (USE_MOCK_FALLBACKS) {
-      return { data: mapMockStadiums(), source: "mock", error: "Using fallback stadium data" };
-    }
     return { data: [], source: "api", error: "World Cup API unavailable" };
   }
 
@@ -443,11 +372,7 @@ export async function getTodaysMatches(): Promise<ApiResult<Match[]>> {
     const upcoming = [...matches]
       .filter((m) => m.status === "scheduled" || m.status === "notstarted")
       .slice(0, 6);
-    return {
-      data: upcoming.length ? upcoming : USE_MOCK_FALLBACKS ? mapMockMatches() : [],
-      source,
-      error,
-    };
+    return { data: upcoming, source, error };
   }
 
   return { data: todays.slice(0, 8), source, error };
@@ -462,9 +387,6 @@ export async function getFeaturedMatch(): Promise<ApiResult<Match | null>> {
   );
   if (scheduled) return { data: scheduled, source, error };
   if (matches[0]) return { data: matches[0], source, error };
-  if (USE_MOCK_FALLBACKS) {
-    return { data: mapMockMatches()[0], source: "mock", error };
-  }
   return { data: null, source, error };
 }
 
@@ -482,15 +404,15 @@ export function getStatusLabel(status: MatchStatus): string {
 
 export function getStatusBadgeVariant(
   status: MatchStatus
-): "default" | "success" | "warning" | "danger" | "secondary" {
+): "default" | "success" | "warning" | "danger" {
   switch (status) {
     case "live":
       return "danger";
     case "finished":
-      return "secondary";
+      return "default";
     case "halftime":
       return "warning";
     default:
-      return "secondary";
+      return "default";
   }
 }

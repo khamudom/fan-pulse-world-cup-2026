@@ -1,0 +1,63 @@
+.wrapper {
+  padding: var(--space-10) var(--space-4);
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.matchup {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.flag,
+.teamName,
+.vs,
+.meta,
+.section {
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-border) 30%, transparent);
+}
+
+.flag {
+  width: 100%;
+  max-width: 7.5rem;
+  aspect-ratio: 200 / 134;
+}
+
+.teamName {
+  width: 5rem;
+  height: 1.25rem;
+  border-radius: var(--radius-md);
+}
+
+.vs {
+  width: 2rem;
+  height: 1.5rem;
+  border-radius: var(--radius-md);
+}
+
+.meta {
+  width: 14rem;
+  height: 1rem;
+  margin: 0 auto var(--space-10);
+  border-radius: var(--radius-md);
+}
+
+.sections {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.section {
+  height: 10rem;
+}
