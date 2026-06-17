@@ -53,7 +53,7 @@ export function HomeFeatures() {
         >
           <Card className={styles.featureCard} interactive>
             <CardHeader>
-              <Badge variant="secondary" className={styles.featureBadge}>
+              <Badge variant="default" className={styles.featureBadge}>
                 Feature
               </Badge>
               <CardTitle as="h3">{feature.title}</CardTitle>

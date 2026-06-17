@@ -56,7 +56,7 @@ export function ProfileDashboard({
             {profile?.favorite_country ? (
               <div>
                 <span className={styles.label}>My team</span>
-                <Badge variant="secondary">{profile.favorite_country}</Badge>
+                <Badge variant="default">{profile.favorite_country}</Badge>
               </div>
             ) : null}
             <div>

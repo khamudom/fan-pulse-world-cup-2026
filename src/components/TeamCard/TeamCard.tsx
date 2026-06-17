@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   Badge,
   Button,
@@ -22,13 +23,13 @@ export function TeamCard({ team }: TeamCardProps) {
   return (
     <Card className={styles.card}>
       {team.group && (
-        <Badge variant="outline" className={styles.groupBadge}>
+        <Badge appearance="outline" className={styles.groupBadge}>
           Group {team.group}
         </Badge>
       )}
       <CardHeader className={styles.header}>
         {team.flag ? (
-          <img
+          <Image
             src={team.flag}
             alt=""
             className={styles.flag}

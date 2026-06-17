@@ -21,15 +21,15 @@ const defaults: Record<DataSourceBadgeSource, string> = {
   unavailable: "No data",
 };
 
-const variants: Record<
-  DataSourceBadgeSource,
-  "success" | "warning" | "secondary" | "outline"
-> = {
-  api: "success",
-  mock: "warning",
-  local: "secondary",
-  unavailable: "outline",
-};
+const variants: Record<DataSourceBadgeSource, "success" | "warning" | "default"> =
+  {
+    api: "success",
+    mock: "warning",
+    local: "default",
+    unavailable: "default",
+  };
+
+const outlineSources: DataSourceBadgeSource[] = ["unavailable"];
 
 export function DataSourceBadge({ source, label }: DataSourceBadgeProps) {
   if (process.env.NODE_ENV === "production") {
@@ -39,6 +39,7 @@ export function DataSourceBadge({ source, label }: DataSourceBadgeProps) {
   return (
     <Badge
       variant={variants[source]}
+      appearance={outlineSources.includes(source) ? "outline" : undefined}
       className={`${styles.badge} ${styles[source]}`}
     >
       {label ?? defaults[source]}

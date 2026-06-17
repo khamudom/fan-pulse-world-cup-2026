@@ -14,7 +14,7 @@ export function SponsorBadge({
 }: SponsorBadgeProps) {
   return (
     <div className={styles.wrapper} role="note" aria-label={`${label} ${sponsor}`}>
-      <Badge variant="secondary" className={styles.badge}>
+      <Badge variant="default" className={styles.badge}>
         {label}
       </Badge>
       <span className={styles.sponsor}>{sponsor}</span>

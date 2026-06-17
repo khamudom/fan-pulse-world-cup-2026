@@ -12,7 +12,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
   return (
     <Card className={styles.card}>
       <CardHeader>
-        <Badge variant="outline">{article.category}</Badge>
+        <Badge appearance="outline">{article.category}</Badge>
         <CardTitle as="h3" className={styles.title}>
           {article.title}
         </CardTitle>

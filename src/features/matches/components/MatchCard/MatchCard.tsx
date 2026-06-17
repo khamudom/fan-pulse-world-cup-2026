@@ -64,7 +64,7 @@ export function MatchCard({ match, featured = false }: MatchCardProps) {
     <Card className={featured ? styles.featured : undefined}>
       <CardHeader className={styles.header}>
         <div className={styles.meta}>
-          {match.group && <Badge variant="outline">Group {match.group}</Badge>}
+          {match.group && <Badge appearance="outline">Group {match.group}</Badge>}
           <Badge variant={getStatusBadgeVariant(match.status)}>
             {match.status === "live" && (
               <span className={styles.liveDot} aria-hidden="true" />
