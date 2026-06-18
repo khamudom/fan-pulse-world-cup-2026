@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, type FormEvent } from "react";
 import {
   Card,
   CardContent,
@@ -9,12 +9,8 @@ import {
   Button,
   Input,
 } from "@khamudom/lumen-ui-react";
-import {
-  requestPasswordReset,
-  signIn,
-  signUp,
-  type AuthActionState,
-} from "@/actions/auth";
+import { signIn, signUp, type AuthActionState } from "@/actions/auth";
+import { createClient } from "@/lib/supabase/client";
 import styles from "./LoginForm.module.css";
 
 const initialState: AuthActionState = {};
@@ -41,10 +37,39 @@ export function LoginForm({
     signUp,
     initialState,
   );
-  const [resetState, resetAction, resetPending] = useActionState(
-    requestPasswordReset,
-    initialState,
-  );
+  const [resetState, setResetState] = useState<AuthActionState>({});
+  const [resetPending, setResetPending] = useState(false);
+
+  async function handleForgotSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setResetPending(true);
+    setResetState({});
+
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
+
+    if (!email) {
+      setResetState({ error: "Email is required." });
+      setResetPending(false);
+      return;
+    }
+
+    const supabase = createClient();
+    const redirectTo = `${window.location.origin}/login/reset-password`;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo,
+    });
+
+    setResetPending(false);
+    if (error) {
+      setResetState({ error: error.message });
+      return;
+    }
+
+    setResetState({
+      success: "Check your email for a link to reset your password.",
+    });
+  }
 
   const state =
     mode === "signin"
@@ -100,14 +125,14 @@ export function LoginForm({
     );
 
   const formAction =
-    mode === "signin"
-      ? signInAction
-      : mode === "signup"
-        ? signUpAction
-        : resetAction;
+    mode === "signin" ? signInAction : mode === "signup" ? signUpAction : undefined;
 
   const form = (
-    <form action={formAction} className={styles.form}>
+    <form
+      action={formAction}
+      onSubmit={mode === "forgot" ? handleForgotSubmit : undefined}
+      className={styles.form}
+    >
       {pendingCountry && mode !== "forgot" ? (
         <input type="hidden" name="pendingCountry" value={pendingCountry} />
       ) : null}
