@@ -1,16 +1,12 @@
-import { redirect } from "next/navigation";
-import { ResetPasswordPageOpener } from "@/components/AuthModal";
-import { getSessionUser, isSupabaseConfigured } from "@/lib/auth";
+import { ResetPasswordPageClient } from "@/components/ResetPasswordForm/ResetPasswordPageClient";
+import { isSupabaseConfigured } from "@/lib/auth";
 import styles from "../page.module.css";
 
 export const metadata = {
   title: "Reset password",
 };
 
-export default async function ResetPasswordPage() {
-  const user = await getSessionUser();
-  if (!user) redirect("/login");
-
+export default function ResetPasswordPage() {
   return (
     <div className={`page ${styles.page}`}>
       <div className="container">
@@ -23,7 +19,7 @@ export default async function ResetPasswordPage() {
             </p>
           </div>
         ) : (
-          <ResetPasswordPageOpener />
+          <ResetPasswordPageClient />
         )}
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { PasswordRecoveryListener } from "./PasswordRecoveryListener";
 import {
   createContext,
   useCallback,
@@ -90,6 +91,7 @@ export function AuthModalProvider({ children }: AuthModalProviderProps) {
 
   return (
     <AuthModalContext.Provider value={value}>
+      <PasswordRecoveryListener />
       {children}
       {open ? (
         <AuthModal
