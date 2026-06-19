@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { LocalKickoff } from "@/components/display/LocalKickoff";
 import { toIsoDate } from "@/lib/matchDate";
-import { getStatusLabel } from "@/services/worldCupApi";
+import { getStatusLabel } from "@/lib/worldcup/display";
 import type { Match } from "@/types";
 import styles from "./ProgrammeSchedule.module.css";
 

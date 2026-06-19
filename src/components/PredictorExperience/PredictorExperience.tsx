@@ -30,7 +30,7 @@ interface PredictorExperienceProps {
   matches: Match[];
   groups: Group[];
   teams: Team[];
-  matchSource: "api" | "mock";
+  matchSource: "api";
   isSignedIn: boolean;
   savedBracket?: BracketPredictionPayload | null;
 }

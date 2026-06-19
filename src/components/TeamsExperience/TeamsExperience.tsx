@@ -19,7 +19,7 @@ import styles from "./TeamsExperience.module.css";
 interface TeamsExperienceProps {
   teams: Team[];
   groups: string[];
-  teamsSource: "api" | "mock";
+  teamsSource: "api";
 }
 
 function ChevronIcon({ direction }: { direction: "left" | "right" }) {
@@ -113,7 +113,6 @@ export function TeamsExperience({
     });
   };
 
-  const sourceNote = teamsSource === "mock" ? " (fallback data)" : "";
   const exploreIntro = getExploreIntro(group, filtered.length);
 
   if (teams.length === 0) {
@@ -183,10 +182,9 @@ export function TeamsExperience({
             />
           </div>
 
-          {exploreIntro || sourceNote ? (
+          {exploreIntro ? (
             <p className={styles.groupIntro} role="status">
               {exploreIntro}
-              {sourceNote}
             </p>
           ) : null}
 

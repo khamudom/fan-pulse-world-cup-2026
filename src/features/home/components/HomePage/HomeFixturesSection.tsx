@@ -14,7 +14,7 @@ import { getUpcomingProgrammeMatches } from "./utils";
 
 type HomeFixturesSectionProps = {
   matches: Match[];
-  source: "api" | "mock";
+  source: "api";
   sourceError?: string;
   subtitle: string;
   favoriteCountry?: string | null;

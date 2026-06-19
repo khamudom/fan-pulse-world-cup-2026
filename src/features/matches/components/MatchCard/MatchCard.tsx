@@ -11,7 +11,7 @@ import {
   CardHeader,
 } from "@khamudom/lumen-ui-react";
 import type { Match } from "@/types";
-import { getStatusLabel, getStatusBadgeVariant } from "@/services/worldCupApi";
+import { getStatusLabel, getStatusBadgeStyle } from "@/lib/worldcup/display";
 import {
   LocalKickoff,
 } from "@/components/display/LocalKickoff";
@@ -64,8 +64,12 @@ export function MatchCard({ match, featured = false }: MatchCardProps) {
     <Card className={featured ? styles.featured : undefined}>
       <CardHeader className={styles.header}>
         <div className={styles.meta}>
-          {match.group && <Badge variant="outline">Group {match.group}</Badge>}
-          <Badge variant={getStatusBadgeVariant(match.status)}>
+          {match.group && (
+            <Badge variant="default" appearance="outline">
+              Group {match.group}
+            </Badge>
+          )}
+          <Badge {...getStatusBadgeStyle(match.status)}>
             {match.status === "live" && (
               <span className={styles.liveDot} aria-hidden="true" />
             )}

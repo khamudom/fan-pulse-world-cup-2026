@@ -1,13 +1,12 @@
 "use client";
 
 import { Badge } from "@khamudom/lumen-ui-react";
+import type { ComponentProps } from "react";
 import styles from "./DataSourceBadge.module.css";
 
-export type DataSourceBadgeSource =
-  | "api"
-  | "mock"
-  | "local"
-  | "unavailable";
+type BadgeProps = ComponentProps<typeof Badge>;
+
+export type DataSourceBadgeSource = "api" | "local" | "unavailable";
 
 type DataSourceBadgeProps = {
   source: DataSourceBadgeSource;
@@ -16,19 +15,17 @@ type DataSourceBadgeProps = {
 
 const defaults: Record<DataSourceBadgeSource, string> = {
   api: "Live API",
-  mock: "Mock API",
   local: "Local API",
   unavailable: "No data",
 };
 
-const variants: Record<
+const badgeStyles: Record<
   DataSourceBadgeSource,
-  "success" | "warning" | "secondary" | "outline"
+  Pick<BadgeProps, "variant" | "appearance">
 > = {
-  api: "success",
-  mock: "warning",
-  local: "secondary",
-  unavailable: "outline",
+  api: { variant: "success", appearance: "outline" },
+  local: { variant: "default", appearance: "tint" },
+  unavailable: { variant: "default", appearance: "outline" },
 };
 
 export function DataSourceBadge({ source, label }: DataSourceBadgeProps) {
@@ -38,7 +35,7 @@ export function DataSourceBadge({ source, label }: DataSourceBadgeProps) {
 
   return (
     <Badge
-      variant={variants[source]}
+      {...badgeStyles[source]}
       className={`${styles.badge} ${styles[source]}`}
     >
       {label ?? defaults[source]}

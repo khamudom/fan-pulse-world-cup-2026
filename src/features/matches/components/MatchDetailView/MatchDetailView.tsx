@@ -12,7 +12,7 @@ import { AiInsightCard } from "@/components/AiInsightCard";
 // import { ArticleCard } from "@/components/ArticleCard"; // hidden: Related Stories (mock data)
 import { getLiveMatch } from "@/actions/liveMatch";
 import { contentData } from "@/services/contentApi";
-import { getStatusLabel, getStatusBadgeVariant } from "@/services/worldCupApi";
+import { getStatusLabel, getStatusBadgeStyle } from "@/lib/worldcup/display";
 import type { Match } from "@/types";
 import styles from "./MatchDetailView.module.css";
 
@@ -62,7 +62,7 @@ const mockMatchInsights = contentData.matchInsights;
 
 interface MatchDetailViewProps {
   match: Match;
-  matchSource?: "api" | "mock";
+  matchSource?: "api";
   showPrototypeData?: boolean;
   isSignedIn?: boolean;
   userPrediction?: { home: number; away: number } | null;
@@ -199,11 +199,15 @@ export function MatchDetailView({
         centered
       >
         <div className={styles.heroMeta}>
-          <DataSourceBadge source={matchSource === "mock" ? "mock" : "api"} />
-          <Badge variant={getStatusBadgeVariant(match.status)}>
+          <DataSourceBadge source="api" />
+          <Badge {...getStatusBadgeStyle(match.status)}>
             {getStatusLabel(match.status)}
           </Badge>
-          {match.group && <Badge variant="outline">Group {match.group}</Badge>}
+          {match.group && (
+            <Badge variant="default" appearance="outline">
+              Group {match.group}
+            </Badge>
+          )}
         </div>
 
         {isLive && (

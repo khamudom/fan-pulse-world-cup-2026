@@ -1,6 +1,11 @@
-import { MatchesExperience } from "@/features/matches";
-import { EmptyState } from "@/components/feedback/EmptyState";
-import { getMatches, getGroups } from "@/services/worldCupApi";
+import { Suspense } from "react";
+import { Hero } from "@/components/display/Hero";
+import { MatchesGroupStandingsAsync } from "@/features/matches/components/MatchesGroupStandingsAsync/MatchesGroupStandingsAsync";
+import { MatchesScheduleAsync } from "@/features/matches/components/MatchesScheduleAsync/MatchesScheduleAsync";
+import {
+  MatchesGroupStandingsSkeleton,
+  MatchesScheduleSkeleton,
+} from "@/features/matches/components/MatchesPageSkeletons/MatchesPageSkeletons";
 
 export const metadata = {
   title: "Matches",
@@ -13,39 +18,23 @@ export default async function MatchesPage({
   searchParams: Promise<{ section?: string }>;
 }) {
   const { section } = await searchParams;
-  const [matchesResult, groupsResult] = await Promise.all([
-    getMatches(),
-    getGroups(),
-  ]);
-
-  const { data: matches, source: matchesSource } = matchesResult;
-  const { data: groups, source: groupsSource } = groupsResult;
-
-  const groupCount = [
-    ...new Set(matches.map((m) => m.group).filter(Boolean)),
-  ].length;
-
-  if (matches.length === 0 && groups.length === 0) {
-    return (
-      <div className="page">
-        <EmptyState
-          title="No matches available"
-          message="No match or group data is available yet."
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="page">
-      <MatchesExperience
-        matches={matches}
-        groups={groups}
-        groupCount={groupCount || groups.length}
-        matchesSource={matchesSource}
-        groupsSource={groupsSource}
-        initialSection={section}
+      <Hero
+        title="Match Schedule"
+        tagline="World Cup 2026"
+        subtitle="Follow the tournament day by day — pick a date and see what unfolds."
+        compact
       />
+
+      <Suspense fallback={<MatchesScheduleSkeleton />}>
+        <MatchesScheduleAsync />
+      </Suspense>
+
+      <Suspense fallback={<MatchesGroupStandingsSkeleton />}>
+        <MatchesGroupStandingsAsync initialSection={section} />
+      </Suspense>
     </div>
   );
 }

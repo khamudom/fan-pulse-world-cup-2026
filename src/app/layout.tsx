@@ -68,7 +68,9 @@ export default async function RootLayout({
             </Suspense>
             <DeferredApiPreviewBanner />
             {/* <DataSourceLegend /> */}
-            <AdminDrawer />
+            <Suspense fallback={null}>
+              <AdminDrawer />
+            </Suspense>
             <HeaderContainer resolvedTheme={resolvedTheme} />
             <CheckInCelebrationContainer />
             <main id="main-content">{children}</main>
