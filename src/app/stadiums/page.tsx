@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Hero } from "@/components/display/Hero";
-import { StadiumsSection, StadiumsSectionSkeleton } from "@/features/stadiums";
+import { StadiumsSection } from "@/features/stadiums/components/StadiumsSection/StadiumsSection";
+import { StadiumsSectionSkeleton } from "@/features/stadiums/components/StadiumsSectionSkeleton/StadiumsSectionSkeleton";
 
 export const metadata = {
   title: "Stadiums",

@@ -1,4 +1,4 @@
-import { TeamsPageSkeleton } from "@/features/teams";
+import { TeamsPageSkeleton } from "@/features/teams/components/TeamsPageSkeleton/TeamsPageSkeleton";
 
 export default function Loading() {
   return (

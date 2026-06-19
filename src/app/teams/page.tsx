@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { TeamsPageContent, TeamsPageSkeleton } from "@/features/teams";
+import { TeamsPageContent } from "@/features/teams/components/TeamsPageContent/TeamsPageContent";
+import { TeamsPageSkeleton } from "@/features/teams/components/TeamsPageSkeleton/TeamsPageSkeleton";
 
 export const metadata = {
   title: "Teams",

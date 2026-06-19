@@ -1,3 +1,5 @@
+"use client";
+
 import { Skeleton } from "@khamudom/lumen-ui-react";
 import styles from "./StadiumsSectionSkeleton.module.css";
 
