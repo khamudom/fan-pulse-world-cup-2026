@@ -20,10 +20,8 @@ function groupMatchesByStadium(matches: Match[]): Map<string, Match[]> {
 }
 
 export async function StadiumsSection() {
-  const [{ data: stadiums }, { data: matches }] = await Promise.all([
-    getStadiums(),
-    getMatches(),
-  ]);
+  const [{ data: stadiums, error: stadiumsError }, { data: matches }] =
+    await Promise.all([getStadiums(), getMatches()]);
   const matchesByStadium = groupMatchesByStadium(matches);
 
   if (stadiums.length === 0) {
@@ -36,7 +34,10 @@ export async function StadiumsSection() {
           />
           <EmptyState
             title="No stadiums available"
-            message="The World Cup API returned no stadium data."
+            message={
+              stadiumsError ??
+              "The World Cup API returned no stadium data."
+            }
           />
         </div>
       </section>

@@ -35,15 +35,28 @@ function parseMatchDateTime(match: Match): Date | null {
 }
 
 function teamMatchesFavorite(match: Match, favorite: string): boolean {
-  return match.homeTeam.name === favorite || match.awayTeam.name === favorite;
+  const aliases = getFavoriteTeamNames(favorite);
+  return aliases.some(
+    (name) => match.homeTeam.name === name || match.awayTeam.name === name,
+  );
+}
+
+const FAVORITE_TEAM_ALIASES: Record<string, string[]> = {
+  "United States": ["United States", "USA"],
+  USA: ["United States", "USA"],
+  "South Korea": ["South Korea", "Korea Republic"],
+};
+
+function getFavoriteTeamNames(favorite: string): string[] {
+  return FAVORITE_TEAM_ALIASES[favorite] ?? [favorite];
 }
 
 function teamMatchesProfile(match: Match, profile: Profile): boolean {
-  const teams = [profile.favorite_country, profile.secondary_country].filter(Boolean);
-  if (teams.length === 0) return false;
-  return teams.some(
-    (t) => match.homeTeam.name === t || match.awayTeam.name === t
+  const teams = [profile.favorite_country, profile.secondary_country].filter(
+    (team): team is string => Boolean(team),
   );
+  if (teams.length === 0) return false;
+  return teams.some((favorite) => teamMatchesFavorite(match, favorite));
 }
 
 function isLiveMatchStatus(status: Match["status"]): boolean {

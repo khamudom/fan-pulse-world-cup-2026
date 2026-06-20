@@ -1,13 +1,7 @@
-import { Suspense } from "react";
 import { Hero } from "@/components/display/Hero";
 import { LoadingState } from "@/components/feedback/LoadingState";
-import { PredictorExperienceAsync } from "@/components/PredictorExperience/PredictorExperienceAsync";
 
-export const metadata = {
-  title: "World Cup Predictor",
-};
-
-export default function PredictorPage() {
+export default function Loading() {
   return (
     <div className="page">
       <Hero
@@ -17,11 +11,7 @@ export default function PredictorPage() {
       />
       <section className="section">
         <div className="container">
-          <Suspense
-            fallback={<LoadingState label="Loading predictor…" rows={5} />}
-          >
-            <PredictorExperienceAsync />
-          </Suspense>
+          <LoadingState label="Loading predictor…" rows={5} />
         </div>
       </section>
     </div>

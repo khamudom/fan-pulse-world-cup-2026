@@ -6,7 +6,7 @@ import { MatchCard } from "../MatchCard";
 import { SectionHeader } from "@/components/display/SectionHeader";
 import { DataSourceBadge } from "@/components/display/DataSourceBadge";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { toDataSourceBadge } from "@/lib/dataSourceBadge";
+import { toDataSourceBadge, type ApiDataSource } from "@/lib/dataSourceBadge";
 import {
   formatSelectedDateLabel,
   getMatchesOnDate,
@@ -18,7 +18,8 @@ import styles from "../MatchesExperience/MatchesExperience.module.css";
 
 interface MatchesScheduleSectionProps {
   matches: Match[];
-  matchesSource: "api";
+  matchesSource: ApiDataSource;
+  error?: string;
 }
 
 function getMatchesDayIntro(matchCount: number, dateLabel: string): string {
@@ -34,6 +35,7 @@ function getMatchesDayIntro(matchCount: number, dateLabel: string): string {
 export function MatchesScheduleSection({
   matches,
   matchesSource,
+  error,
 }: MatchesScheduleSectionProps) {
   const dates = useMemo(() => getUniqueMatchDates(matches), [matches]);
   const [selectedDate, setSelectedDate, isDateReady] = useSelectedMatchDate(dates);
@@ -49,7 +51,10 @@ export function MatchesScheduleSection({
         <div className="container">
           <EmptyState
             title="No matches available"
-            message="Match data isn't available yet. Check back closer to the tournament."
+            message={
+              error ??
+              "Match data isn't available yet. Check back closer to the tournament."
+            }
           />
         </div>
       </section>

@@ -29,6 +29,7 @@ interface FanJourneyCardProps {
   journey: FanJourneyResult;
   favoriteCountry?: string | null;
   matchesSource?: ApiDataSource;
+  dataError?: string;
 }
 
 function LastResultBlock({
@@ -68,6 +69,7 @@ export function FanJourneyCard({
   journey,
   favoriteCountry,
   matchesSource = "api",
+  dataError,
 }: FanJourneyCardProps) {
   const [match, setMatch] = useState(journey.nextMatch);
   const isLive = match ? isLiveMatchStatus(match.status) : false;
@@ -154,7 +156,9 @@ export function FanJourneyCard({
               lastMatchLabel={journey.lastMatchLabel}
             />
           ) : null}
-          <p className={styles.message}>{journey.label}</p>
+          <p className={styles.message}>
+            {dataError ?? journey.label}
+          </p>
         </CardContent>
       </Card>
     );

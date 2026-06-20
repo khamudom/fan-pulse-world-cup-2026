@@ -13,6 +13,7 @@ import { AiInsightCard } from "@/components/AiInsightCard";
 import { getLiveMatch } from "@/actions/liveMatch";
 import { contentData } from "@/services/contentApi";
 import { getStatusLabel, getStatusBadgeStyle } from "@/lib/worldcup/display";
+import type { ApiDataSource } from "@/lib/dataSourceBadge";
 import type { Match } from "@/types";
 import styles from "./MatchDetailView.module.css";
 
@@ -62,7 +63,7 @@ const mockMatchInsights = contentData.matchInsights;
 
 interface MatchDetailViewProps {
   match: Match;
-  matchSource?: "api";
+  matchSource?: ApiDataSource;
   showPrototypeData?: boolean;
   isSignedIn?: boolean;
   userPrediction?: { home: number; away: number } | null;

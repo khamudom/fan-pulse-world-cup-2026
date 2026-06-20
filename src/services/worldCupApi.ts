@@ -5,6 +5,7 @@ import {
   fetchWorldCupResource,
   type WorldCupFetchMode,
 } from "@/lib/worldcup/client";
+import { WORLD_CUP_API_AUTH_REQUIRED, WORLD_CUP_API_UNAVAILABLE } from "@/lib/worldcup/config";
 import {
   parseLocalDateTimeString,
   zonedLocalToUtcIso,
@@ -20,6 +21,13 @@ import type {
 } from "@/types";
 
 export type FetchMode = WorldCupFetchMode;
+
+function worldCupFetchErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message === WORLD_CUP_API_AUTH_REQUIRED) {
+    return WORLD_CUP_API_AUTH_REQUIRED;
+  }
+  return WORLD_CUP_API_UNAVAILABLE;
+}
 
 interface ApiGame {
   id: string;
@@ -80,6 +88,63 @@ async function fetchTeamsJson(mode: FetchMode = "cached") {
 }
 
 const fetchTeamsCached = cache(async () => fetchTeamsJson("cached"));
+
+async function getTeamsUncached(): Promise<ApiResult<Team[]>> {
+  try {
+    const response = await fetchTeamsCached();
+    if (!response.teams.length) {
+      return { data: [], source: "api", error: "World Cup API returned no teams" };
+    }
+
+    const teams = response.teams.map((team) => ({
+      id: team.id,
+      name: team.name_en,
+      nameFa: team.name_fa,
+      flag: team.flag,
+      fifaCode: team.fifa_code,
+      iso2: team.iso2,
+      group: team.groups,
+    }));
+
+    return { data: teams, source: "api" };
+  } catch (error) {
+    return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
+  }
+}
+
+async function getMatchesUncached(
+  mode: FetchMode = "cached",
+): Promise<ApiResult<Match[]>> {
+  try {
+    const gamesRes = await fetchWorldCupResource<{ games: ApiGame[] }>("games", {
+      mode,
+    });
+
+    if (!gamesRes.games.length) {
+      return { data: [], source: "api", error: "World Cup API returned no matches" };
+    }
+
+    const [teamsRes, stadiumsRes] = await Promise.all([
+      fetchTeamsCached().catch(() => ({ teams: [] as ApiTeam[] })),
+      fetchWorldCupResource<{ stadiums: ApiStadium[] }>("stadiums", {
+        mode: "cached",
+      }).catch(() => ({ stadiums: [] as ApiStadium[] })),
+    ]);
+
+    const teamMap = new Map(teamsRes.teams.map((team) => [team.id, team]));
+    const stadiumMap = new Map(
+      stadiumsRes.stadiums.map((stadium) => [stadium.id, stadium]),
+    );
+
+    const matches = gamesRes.games.map((game) =>
+      mapGameToMatch(game, teamMap, stadiumMap),
+    );
+
+    return { data: matches, source: "api" };
+  } catch (error) {
+    return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
+  }
+}
 
 function parseStatus(finished: string, timeElapsed: string): MatchStatus {
   const finishedUpper = finished?.toUpperCase();
@@ -181,63 +246,6 @@ function mapGameToMatch(
   };
 }
 
-async function getTeamsUncached(): Promise<ApiResult<Team[]>> {
-  try {
-    const response = await fetchTeamsCached();
-    if (!response.teams.length) {
-      return { data: [], source: "api", error: "World Cup API returned no teams" };
-    }
-
-    const teams = response.teams.map((team) => ({
-      id: team.id,
-      name: team.name_en,
-      nameFa: team.name_fa,
-      flag: team.flag,
-      fifaCode: team.fifa_code,
-      iso2: team.iso2,
-      group: team.groups,
-    }));
-
-    return { data: teams, source: "api" };
-  } catch {
-    return { data: [], source: "api", error: "World Cup API unavailable" };
-  }
-}
-
-async function getMatchesUncached(
-  mode: FetchMode = "cached",
-): Promise<ApiResult<Match[]>> {
-  try {
-    const gamesRes = await fetchWorldCupResource<{ games: ApiGame[] }>("games", {
-      mode,
-    });
-
-    if (!gamesRes.games.length) {
-      return { data: [], source: "api", error: "World Cup API returned no matches" };
-    }
-
-    const [teamsRes, stadiumsRes] = await Promise.all([
-      fetchTeamsCached().catch(() => ({ teams: [] as ApiTeam[] })),
-      fetchWorldCupResource<{ stadiums: ApiStadium[] }>("stadiums", {
-        mode: "cached",
-      }).catch(() => ({ stadiums: [] as ApiStadium[] })),
-    ]);
-
-    const teamMap = new Map(teamsRes.teams.map((team) => [team.id, team]));
-    const stadiumMap = new Map(
-      stadiumsRes.stadiums.map((stadium) => [stadium.id, stadium]),
-    );
-
-    const matches = gamesRes.games.map((game) =>
-      mapGameToMatch(game, teamMap, stadiumMap),
-    );
-
-    return { data: matches, source: "api" };
-  } catch {
-    return { data: [], source: "api", error: "World Cup API unavailable" };
-  }
-}
-
 export const getTeams = cache(getTeamsUncached);
 export const getMatches = cache(getMatchesUncached);
 
@@ -251,7 +259,7 @@ export async function getMatchById(
   if (!match) {
     return {
       data: null,
-      source: "api",
+      source,
       error: error ?? "Match not found",
     };
   }
@@ -296,8 +304,8 @@ async function getGroupsUncached(): Promise<ApiResult<Group[]>> {
       data: groups.sort((a, b) => a.name.localeCompare(b.name)),
       source: "api",
     };
-  } catch {
-    return { data: [], source: "api", error: "World Cup API unavailable" };
+  } catch (error) {
+    return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
   }
 }
 
@@ -337,8 +345,8 @@ async function getStadiumsUncached(): Promise<ApiResult<Stadium[]>> {
     }));
 
     return { data: stadiums, source: "api" };
-  } catch {
-    return { data: [], source: "api", error: "World Cup API unavailable" };
+  } catch (error) {
+    return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
   }
 }
 

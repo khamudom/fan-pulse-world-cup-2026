@@ -11,7 +11,7 @@ import { Hero } from "@/components/display/Hero";
 import { DataSourceBadge } from "@/components/display/DataSourceBadge";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { getTeamFifaNewsUrl } from "@/lib/fifa";
-import { toDataSourceBadge } from "@/lib/dataSourceBadge";
+import { toDataSourceBadge, type ApiDataSource } from "@/lib/dataSourceBadge";
 import { useIsClient } from "@/lib/useClientOnly";
 import type { Team } from "@/types";
 import styles from "./TeamsExperience.module.css";
@@ -19,7 +19,8 @@ import styles from "./TeamsExperience.module.css";
 interface TeamsExperienceProps {
   teams: Team[];
   groups: string[];
-  teamsSource: "api";
+  teamsSource: ApiDataSource;
+  error?: string;
 }
 
 function ChevronIcon({ direction }: { direction: "left" | "right" }) {
@@ -67,6 +68,7 @@ export function TeamsExperience({
   teams,
   groups,
   teamsSource,
+  error,
 }: TeamsExperienceProps) {
   const [search, setSearch] = useState("");
   const [group, setGroup] = useState("");
@@ -126,7 +128,7 @@ export function TeamsExperience({
           <div className="container">
             <EmptyState
               title="No teams available"
-              message="The World Cup API returned no team data."
+              message={error ?? "The World Cup API returned no team data."}
             />
           </div>
         </section>

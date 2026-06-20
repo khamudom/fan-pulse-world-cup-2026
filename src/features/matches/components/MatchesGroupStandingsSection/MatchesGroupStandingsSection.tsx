@@ -5,19 +5,21 @@ import { GroupStandings } from "../GroupStandings";
 import { SectionHeader } from "@/components/display/SectionHeader";
 import { DataSourceBadge } from "@/components/display/DataSourceBadge";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { toDataSourceBadge } from "@/lib/dataSourceBadge";
+import { toDataSourceBadge, type ApiDataSource } from "@/lib/dataSourceBadge";
 import type { Group } from "@/types";
 import styles from "../MatchesExperience/MatchesExperience.module.css";
 
 interface MatchesGroupStandingsSectionProps {
   groups: Group[];
-  groupsSource: "api";
+  groupsSource: ApiDataSource;
+  error?: string;
   initialSection?: string;
 }
 
 export function MatchesGroupStandingsSection({
   groups,
   groupsSource,
+  error,
   initialSection,
 }: MatchesGroupStandingsSectionProps) {
   const groupStandingsRef = useRef<HTMLElement>(null);
@@ -61,7 +63,10 @@ export function MatchesGroupStandingsSection({
         ) : (
           <EmptyState
             title="No group standings available"
-            message="Standings will appear here once the group stage begins."
+            message={
+              error ??
+              "Standings will appear here once the group stage begins."
+            }
           />
         )}
       </div>

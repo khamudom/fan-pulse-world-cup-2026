@@ -5,11 +5,17 @@ import { Hero } from "@/components/display/Hero";
 import { WorldCupCountdown } from "@/components/display/WorldCupCountdown";
 import { SectionHeader } from "@/components/display/SectionHeader";
 import {
+  BeginJourneySkeleton,
+  BriefingSkeleton,
+  FixturesSkeleton,
+  HomeBeginJourneyAsync,
+  HomeBriefingAsync,
   HomeFeatures,
-  HomeGuestDataSections,
-  HomeGuestSkeleton,
-  HomePageSkeleton,
-  HomePersonalizedAsyncView,
+  HomeFixturesAsync,
+  HomePersonalGridAsync,
+  HomeWelcomeHeroAsync,
+  PersonalGridSkeleton,
+  PersonalizedHeaderSkeleton,
 } from "@/features/home";
 import { getProfile, getSessionUser } from "@/lib/auth";
 import styles from "./page.module.css";
@@ -21,12 +27,30 @@ export default async function HomePage() {
   if (user && profile?.onboarding_complete) {
     return (
       <div className={`page ${styles.homePage}`}>
-        <Suspense fallback={<HomePageSkeleton />}>
-          <HomePersonalizedAsyncView />
+        <Suspense fallback={<PersonalizedHeaderSkeleton />}>
+          <HomeWelcomeHeroAsync />
+        </Suspense>
+
+        <Suspense fallback={<BriefingSkeleton />}>
+          <HomeBriefingAsync />
+        </Suspense>
+
+        <Suspense fallback={<PersonalGridSkeleton />}>
+          <HomePersonalGridAsync />
+        </Suspense>
+
+        <Suspense fallback={<FixturesSkeleton />}>
+          <HomeFixturesAsync
+            subtitle="Upcoming fixtures on your watchlist"
+            showSignoff
+            personalized
+          />
         </Suspense>
       </div>
     );
   }
+
+  const showBeginJourney = Boolean(user && !profile?.onboarding_complete);
 
   return (
     <div className={`page ${styles.homePage}`}>
@@ -55,10 +79,14 @@ export default async function HomePage() {
         aside={<WorldCupCountdown />}
       />
 
-      <Suspense fallback={<HomeGuestSkeleton />}>
-        <HomeGuestDataSections
-          showBeginJourney={!profile?.onboarding_complete}
-        />
+      {showBeginJourney ? (
+        <Suspense fallback={<BeginJourneySkeleton />}>
+          <HomeBeginJourneyAsync />
+        </Suspense>
+      ) : null}
+
+      <Suspense fallback={<FixturesSkeleton />}>
+        <HomeFixturesAsync subtitle="Upcoming fixtures from the tournament" />
       </Suspense>
 
       <section className="section">

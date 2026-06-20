@@ -1,7 +1,13 @@
 export { HomeFeatures } from "./components/HomeFeatures";
 export {
-  HomeGuestDataSections,
-  HomeGuestSkeleton,
-  HomePageSkeleton,
-  HomePersonalizedAsyncView,
+  BeginJourneySkeleton,
+  BriefingSkeleton,
+  FixturesSkeleton,
+  HomeBeginJourneyAsync,
+  HomeBriefingAsync,
+  HomeFixturesAsync,
+  HomePersonalGridAsync,
+  HomeWelcomeHeroAsync,
+  PersonalGridSkeleton,
+  PersonalizedHeaderSkeleton,
 } from "./components/HomePage";

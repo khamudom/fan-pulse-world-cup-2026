@@ -8,12 +8,13 @@ interface MatchesGroupStandingsAsyncProps {
 export async function MatchesGroupStandingsAsync({
   initialSection,
 }: MatchesGroupStandingsAsyncProps) {
-  const { data: groups, source } = await getGroups();
+  const { data: groups, source, error } = await getGroups();
 
   return (
     <MatchesGroupStandingsSection
       groups={groups}
       groupsSource={source}
+      error={error}
       initialSection={initialSection}
     />
   );

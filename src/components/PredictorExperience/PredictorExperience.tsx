@@ -5,6 +5,7 @@ import { useMemo, useState, useTransition } from "react";
 import { Button, Alert, Card, CardContent } from "@khamudom/lumen-ui-react";
 import { saveMyBracketPrediction } from "@/actions/bracketPredictions";
 import { DataSourceBadge } from "@/components/display/DataSourceBadge";
+import type { ApiDataSource } from "@/lib/dataSourceBadge";
 import {
   BracketModeToggle,
   WorldCupBracket,
@@ -30,7 +31,7 @@ interface PredictorExperienceProps {
   matches: Match[];
   groups: Group[];
   teams: Team[];
-  matchSource: "api";
+  matchSource: ApiDataSource;
   isSignedIn: boolean;
   savedBracket?: BracketPredictionPayload | null;
 }
