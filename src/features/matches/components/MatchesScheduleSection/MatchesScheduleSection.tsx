@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/feedback/EmptyState";
 import { toDataSourceBadge, type ApiDataSource } from "@/lib/dataSourceBadge";
 import {
   formatSelectedDateLabel,
+  getDefaultSelectedDate,
   getMatchesOnDate,
   getUniqueMatchDates,
 } from "@/lib/matchDate";
@@ -20,6 +21,7 @@ interface MatchesScheduleSectionProps {
   matches: Match[];
   matchesSource: ApiDataSource;
   error?: string;
+  initialSelectedDate?: string;
 }
 
 function getMatchesDayIntro(matchCount: number, dateLabel: string): string {
@@ -36,9 +38,13 @@ export function MatchesScheduleSection({
   matches,
   matchesSource,
   error,
+  initialSelectedDate = "",
 }: MatchesScheduleSectionProps) {
   const dates = useMemo(() => getUniqueMatchDates(matches), [matches]);
-  const [selectedDate, setSelectedDate, isDateReady] = useSelectedMatchDate(dates);
+  const [selectedDate, setSelectedDate, isDateReady] = useSelectedMatchDate(
+    dates,
+    initialSelectedDate,
+  );
   const matchesOnDate = useMemo(
     () => getMatchesOnDate(matches, selectedDate),
     [matches, selectedDate],
@@ -75,11 +81,11 @@ export function MatchesScheduleSection({
         />
 
         <SectionHeader
-          title={isDateReady && dateLabel ? dateLabel : "Matches"}
+          title={dateLabel || "Matches"}
           subtitle={
             isDateReady
               ? `${matchesOnDate.length} match${matchesOnDate.length === 1 ? "" : "es"}`
-              : "Loading today's matches…"
+              : `${matches.length} match${matches.length === 1 ? "" : "es"}`
           }
           action={
             <DataSourceBadge

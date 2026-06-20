@@ -5,7 +5,7 @@ import { useMemo, useState, useTransition } from "react";
 import { Button, Alert, Card, CardContent } from "@khamudom/lumen-ui-react";
 import { saveMyBracketPrediction } from "@/actions/bracketPredictions";
 import { DataSourceBadge } from "@/components/display/DataSourceBadge";
-import type { ApiDataSource } from "@/lib/dataSourceBadge";
+import { toDataSourceBadge, type ApiDataSource } from "@/lib/dataSourceBadge";
 import {
   BracketModeToggle,
   WorldCupBracket,
@@ -157,7 +157,9 @@ export function PredictorExperience({
           <h2 id="group-predictions" className={styles.sectionTitle}>
             Group Stage Predictions
           </h2>
-          <DataSourceBadge source={matchSource} />
+          <DataSourceBadge
+            source={toDataSourceBadge(matchSource, matches.length > 0)}
+          />
         </div>
         <p className={styles.sectionDesc}>
           Group advancement is decided by final standings, not knockout games.
@@ -192,7 +194,9 @@ export function PredictorExperience({
             </p>
           </div>
           <div className={styles.bracketActions}>
-            <DataSourceBadge source={matchSource} />
+            <DataSourceBadge
+            source={toDataSourceBadge(matchSource, matches.length > 0)}
+          />
             <BracketModeToggle mode={bracketMode} onChange={setBracketMode} />
           </div>
         </div>
