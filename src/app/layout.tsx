@@ -38,6 +38,12 @@ export const metadata: Metadata = {
     "Your companion experience for the FIFA World Cup 2026 — matches, predictions, insights, and fan engagement.",
 };
 
+/** worldcup26.ir is hosted in/near the Middle East; run server fetches closer to it. */
+export const preferredRegion = ["dub1", "bom1", "sin1", "cdg1", "iad1"];
+
+/** /get/games can take 12s+ from US regions; allow headroom on Vercel. */
+export const maxDuration = 60;
+
 export default async function RootLayout({
   children,
 }: Readonly<{

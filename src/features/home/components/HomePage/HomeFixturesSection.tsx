@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import { DataSourceBadge } from "@/components/display/DataSourceBadge";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { LoadingState } from "@/components/feedback/LoadingState";
 import { ProgrammeSchedule } from "../ProgrammeSchedule";
 import { ViewAllLink } from "@/components/display/ViewAllLink";
 import { toDataSourceBadge, type ApiDataSource } from "@/lib/dataSourceBadge";
@@ -15,6 +14,7 @@ import { getUpcomingProgrammeMatches } from "./utils";
 
 type HomeFixturesSectionProps = {
   matches: Match[];
+  initialProgrammeMatches: Match[];
   source: ApiDataSource;
   sourceError?: string;
   subtitle: string;
@@ -24,6 +24,7 @@ type HomeFixturesSectionProps = {
 
 export function HomeFixturesSection({
   matches,
+  initialProgrammeMatches,
   source,
   sourceError,
   subtitle,
@@ -33,9 +34,11 @@ export function HomeFixturesSection({
   const { now, isReady } = useClientTime();
 
   const programmeMatches = useMemo(() => {
-    if (!isReady) return [];
+    if (!isReady) return initialProgrammeMatches;
     return getUpcomingProgrammeMatches(matches, 12, now);
-  }, [isReady, matches, now]);
+  }, [initialProgrammeMatches, isReady, matches, now]);
+
+  const hasProgrammeMatches = programmeMatches.length > 0;
 
   return (
     <section className={styles.fixturesSection}>
@@ -47,18 +50,13 @@ export function HomeFixturesSection({
           </div>
           <div className={styles.sectionActions}>
             <DataSourceBadge
-              source={toDataSourceBadge(
-                source,
-                isReady && programmeMatches.length > 0,
-              )}
+              source={toDataSourceBadge(source, hasProgrammeMatches)}
             />
             <ViewAllLink href="/matches" label="View all matches" />
           </div>
         </div>
 
-        {!isReady ? (
-          <LoadingState label="Loading fixtures…" rows={3} />
-        ) : programmeMatches.length > 0 ? (
+        {hasProgrammeMatches ? (
           <ProgrammeSchedule
             matches={programmeMatches}
             favoriteCountry={favoriteCountry}

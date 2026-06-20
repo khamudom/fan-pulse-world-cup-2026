@@ -29,6 +29,12 @@ function worldCupFetchErrorMessage(error: unknown): string {
   return WORLD_CUP_API_UNAVAILABLE;
 }
 
+function logWorldCupFetchFailure(scope: string, error: unknown): void {
+  const message =
+    error instanceof Error ? error.message : "World Cup API request failed";
+  console.error(`[worldCupApi] ${scope}: ${message}`);
+}
+
 interface ApiGame {
   id: string;
   home_team_id: string;
@@ -108,6 +114,7 @@ async function getTeamsUncached(): Promise<ApiResult<Team[]>> {
 
     return { data: teams, source: "api" };
   } catch (error) {
+    logWorldCupFetchFailure("getTeams", error);
     return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
   }
 }
@@ -142,6 +149,7 @@ async function getMatchesUncached(
 
     return { data: matches, source: "api" };
   } catch (error) {
+    logWorldCupFetchFailure("getMatches", error);
     return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
   }
 }
@@ -305,6 +313,7 @@ async function getGroupsUncached(): Promise<ApiResult<Group[]>> {
       source: "api",
     };
   } catch (error) {
+    logWorldCupFetchFailure("getGroups", error);
     return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
   }
 }
@@ -346,6 +355,7 @@ async function getStadiumsUncached(): Promise<ApiResult<Stadium[]>> {
 
     return { data: stadiums, source: "api" };
   } catch (error) {
+    logWorldCupFetchFailure("getStadiums", error);
     return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
   }
 }

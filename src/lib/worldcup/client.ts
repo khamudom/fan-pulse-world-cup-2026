@@ -3,8 +3,10 @@ import { getWorldCupApiToken, clearWorldCupApiToken } from "./auth";
 import {
   WORLD_CUP_API_AUTH_REQUIRED,
   WORLD_CUP_API_BASE,
+  WORLD_CUP_GAMES_TIMEOUT_MS,
   WORLD_CUP_LIVE_REVALIDATE_SECONDS,
   WORLD_CUP_MAX_RETRIES,
+  WORLD_CUP_PUBLIC_GET_API,
   WORLD_CUP_REQUEST_TIMEOUT_MS,
   WORLD_CUP_RETRY_DELAY_MS,
   WORLD_CUP_STABLE_REVALIDATE_SECONDS,
@@ -38,6 +40,12 @@ const resourceTags: Record<WorldCupResource, WorldCupCacheTag> = {
   stadiums: worldCupCacheTags.stadiums,
 };
 
+function getRequestTimeoutMs(resource: WorldCupResource): number {
+  return resource === "games"
+    ? WORLD_CUP_GAMES_TIMEOUT_MS
+    : WORLD_CUP_REQUEST_TIMEOUT_MS;
+}
+
 function isRetryable(error: unknown): boolean {
   if (!(error instanceof Error)) return true;
   const code = (error as NodeJS.ErrnoException).code;
@@ -51,7 +59,7 @@ function isRetryable(error: unknown): boolean {
   ) {
     return true;
   }
-  return /ssl|fetch failed/i.test(error.message);
+  return /ssl|fetch failed|socket hang up|network/i.test(error.message);
 }
 
 function sleep(ms: number): Promise<void> {
@@ -76,6 +84,13 @@ function getCacheConfig(resource: WorldCupResource, mode: WorldCupFetchMode) {
   };
 }
 
+async function resolveAuthToken(): Promise<string | null> {
+  if (WORLD_CUP_PUBLIC_GET_API) {
+    return null;
+  }
+  return getWorldCupApiToken();
+}
+
 async function fetchWorldCupOnce<T>(
   resource: WorldCupResource,
   mode: WorldCupFetchMode,
@@ -83,6 +98,7 @@ async function fetchWorldCupOnce<T>(
 ): Promise<T> {
   const headers: Record<string, string> = {
     Accept: "application/json",
+    "User-Agent": "FanPulse/1.0 (+https://github.com/khamudom/fan-pulse-world-cup-2026)",
   };
   if (token) {
     headers.Authorization = `Bearer ${token}`;
@@ -91,7 +107,7 @@ async function fetchWorldCupOnce<T>(
   const response = await fetch(`${WORLD_CUP_API_BASE}/${resource}`, {
     ...getCacheConfig(resource, mode),
     headers,
-    signal: AbortSignal.timeout(WORLD_CUP_REQUEST_TIMEOUT_MS),
+    signal: AbortSignal.timeout(getRequestTimeoutMs(resource)),
   });
 
   if (response.status === 401) {
@@ -116,7 +132,7 @@ export async function fetchWorldCupResource<T>(
   options: WorldCupFetchOptions = {},
 ): Promise<T> {
   const mode = options.mode ?? "cached";
-  let token = await getWorldCupApiToken();
+  let token = await resolveAuthToken();
   let refreshedAuth = false;
   let lastError: unknown;
 
@@ -127,13 +143,30 @@ export async function fetchWorldCupResource<T>(
       lastError = error;
 
       if (
+        !WORLD_CUP_PUBLIC_GET_API &&
         error instanceof WorldCupFetchError &&
         error.message === WORLD_CUP_API_AUTH_REQUIRED &&
         !refreshedAuth
       ) {
         clearWorldCupApiToken();
         refreshedAuth = true;
-        token = await getWorldCupApiToken(true);
+        try {
+          token = await getWorldCupApiToken(true);
+        } catch (authError) {
+          lastError = authError;
+          break;
+        }
+        continue;
+      }
+
+      if (
+        !WORLD_CUP_PUBLIC_GET_API &&
+        error instanceof WorldCupFetchError &&
+        error.message === WORLD_CUP_API_AUTH_REQUIRED &&
+        refreshedAuth &&
+        token
+      ) {
+        token = null;
         continue;
       }
 

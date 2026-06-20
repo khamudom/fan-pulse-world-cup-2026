@@ -4,15 +4,20 @@ import { useMemo, useState } from "react";
 import { getDefaultSelectedDate } from "@/lib/matchDate";
 import { useClientTime } from "@/lib/useClientOnly";
 
-export function useSelectedMatchDate(dates: string[]) {
+export function useSelectedMatchDate(
+  dates: string[],
+  serverDefaultDate = "",
+) {
   const [userPickedDate, setUserPickedDate] = useState<string | null>(null);
   const { now: clientDate, isReady } = useClientTime();
 
   const selectedDate = useMemo(() => {
     if (userPickedDate) return userPickedDate;
-    if (!isReady) return "";
-    return getDefaultSelectedDate(dates, clientDate);
-  }, [userPickedDate, isReady, clientDate, dates]);
+    if (isReady) return getDefaultSelectedDate(dates, clientDate);
+    return serverDefaultDate || dates[0] || "";
+  }, [userPickedDate, isReady, clientDate, dates, serverDefaultDate]);
 
-  return [selectedDate, setUserPickedDate, isReady] as const;
+  const isDateReady = Boolean(selectedDate);
+
+  return [selectedDate, setUserPickedDate, isDateReady] as const;
 }

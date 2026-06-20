@@ -13,6 +13,10 @@ export const WORLD_CUP_STABLE_REVALIDATE_SECONDS = 300;
 /** Live scores and match status. */
 export const WORLD_CUP_LIVE_REVALIDATE_SECONDS = 60;
 
-export const WORLD_CUP_REQUEST_TIMEOUT_MS = 10_000;
-export const WORLD_CUP_MAX_RETRIES = 2;
-export const WORLD_CUP_RETRY_DELAY_MS = 250;
+/** The /get/* endpoints are public; do not attach auth headers. */
+export const WORLD_CUP_PUBLIC_GET_API = true;
+
+export const WORLD_CUP_REQUEST_TIMEOUT_MS = 20_000;
+export const WORLD_CUP_GAMES_TIMEOUT_MS = 35_000;
+export const WORLD_CUP_MAX_RETRIES = 3;
+export const WORLD_CUP_RETRY_DELAY_MS = 500;
