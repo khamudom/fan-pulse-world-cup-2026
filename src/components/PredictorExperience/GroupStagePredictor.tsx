@@ -100,7 +100,7 @@ export function GroupStagePredictor({
                         <TeamFlag flag={standing.flag} name={standing.teamName} />
                         <span className={styles.teamName}>{standing.teamName}</span>
                         {advances && (
-                          <Badge variant="secondary" className={styles.advanceBadge}>
+                          <Badge variant="default" appearance="tint" className={styles.advanceBadge}>
                             {POSITION_LABELS[position]}
                           </Badge>
                         )}

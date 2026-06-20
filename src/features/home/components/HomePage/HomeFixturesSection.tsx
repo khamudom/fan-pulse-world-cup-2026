@@ -6,7 +6,8 @@ import { EmptyState } from "@/components/feedback/EmptyState";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ProgrammeSchedule } from "../ProgrammeSchedule";
 import { ViewAllLink } from "@/components/display/ViewAllLink";
-import { toDataSourceBadge } from "@/lib/dataSourceBadge";
+import { toDataSourceBadge, type ApiDataSource } from "@/lib/dataSourceBadge";
+import { WORLD_CUP_API_UNAVAILABLE } from "@/lib/worldcup/config";
 import { useClientTime } from "@/lib/useClientOnly";
 import type { Match } from "@/types";
 import styles from "@/app/page.module.css";
@@ -14,7 +15,7 @@ import { getUpcomingProgrammeMatches } from "./utils";
 
 type HomeFixturesSectionProps = {
   matches: Match[];
-  source: "api" | "mock";
+  source: ApiDataSource;
   sourceError?: string;
   subtitle: string;
   favoriteCountry?: string | null;
@@ -65,7 +66,7 @@ export function HomeFixturesSection({
         ) : (
           <EmptyState
             title="No matches to show"
-            message={sourceError ?? "No upcoming fixtures from the API."}
+            message={sourceError ?? WORLD_CUP_API_UNAVAILABLE}
             actionLabel="Browse all matches"
             actionHref="/matches"
           />

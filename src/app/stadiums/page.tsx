@@ -1,34 +1,13 @@
+import { Suspense } from "react";
 import { Hero } from "@/components/display/Hero";
-import { SectionHeader } from "@/components/display/SectionHeader";
-import { StadiumCard } from "@/components/StadiumCard";
-import { DataSourceBadge } from "@/components/display/DataSourceBadge";
-import { EmptyState } from "@/components/feedback/EmptyState";
-import { getMatches, getStadiums } from "@/services/worldCupApi";
-import type { Match } from "@/types";
-import styles from "./page.module.css";
-
-function groupMatchesByStadium(matches: Match[]): Map<string, Match[]> {
-  const byStadium = new Map<string, Match[]>();
-  for (const match of matches) {
-    if (!match.stadiumId) continue;
-    const list = byStadium.get(match.stadiumId) ?? [];
-    list.push(match);
-    byStadium.set(match.stadiumId, list);
-  }
-  return byStadium;
-}
+import { StadiumsSection } from "@/features/stadiums/components/StadiumsSection/StadiumsSection";
+import { StadiumsSectionSkeleton } from "@/features/stadiums/components/StadiumsSectionSkeleton/StadiumsSectionSkeleton";
 
 export const metadata = {
   title: "Stadiums",
 };
 
-export default async function StadiumsPage() {
-  const [{ data: stadiums, source }, { data: matches }] = await Promise.all([
-    getStadiums(),
-    getMatches(),
-  ]);
-  const matchesByStadium = groupMatchesByStadium(matches);
-
+export default function StadiumsPage() {
   return (
     <div className="page">
       <Hero
@@ -37,39 +16,9 @@ export default async function StadiumsPage() {
         compact
       />
 
-      {stadiums.length > 0 ? (
-        <section className="section">
-          <div className="container">
-            <SectionHeader
-              title="All Stadiums"
-              subtitle={`${stadiums.length} venues${source === "mock" ? " (fallback data)" : ""}`}
-              action={<DataSourceBadge source={source === "mock" ? "mock" : "api"} />}
-            />
-            <div className={styles.grid}>
-              {stadiums.map((stadium) => (
-                <StadiumCard
-                  key={stadium.id}
-                  stadium={stadium}
-                  matches={matchesByStadium.get(stadium.id) ?? []}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : (
-        <section className="section">
-          <div className="container">
-            <SectionHeader
-              title="All Stadiums"
-              action={<DataSourceBadge source="unavailable" />}
-            />
-            <EmptyState
-              title="No stadiums available"
-              message="The World Cup API returned no stadium data."
-            />
-          </div>
-        </section>
-      )}
+      <Suspense fallback={<StadiumsSectionSkeleton />}>
+        <StadiumsSection />
+      </Suspense>
     </div>
   );
 }

@@ -10,10 +10,6 @@ const items = [
     description: "Teams, matches, standings, and stadiums from worldcup26.ir",
   },
   {
-    source: "mock" as const,
-    description: "Fallback tournament data when the World Cup API is unavailable",
-  },
-  {
     source: "local" as const,
     description:
       "Demo content from src/data/api/ — stories, players, polls, comparisons, and AI routes",

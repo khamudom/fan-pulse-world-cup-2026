@@ -1,12 +1,11 @@
+import "server-only";
+
 import { cache } from "react";
-import { USE_MOCK_FALLBACKS } from "@/config/dataSource";
-import { mockGamesApiResponse } from "@/data/api/worldcup/games";
-import { mockGroupsApiResponse } from "@/data/api/worldcup/groups";
-import { mockStadiumsApiResponse } from "@/data/api/worldcup/stadiums";
 import {
-  mockTeamsApiResponse,
-  type WorldCupApiTeam,
-} from "@/data/api/worldcup/teams";
+  fetchWorldCupResource,
+  type WorldCupFetchMode,
+} from "@/lib/worldcup/client";
+import { WORLD_CUP_API_AUTH_REQUIRED, WORLD_CUP_API_UNAVAILABLE } from "@/lib/worldcup/config";
 import {
   parseLocalDateTimeString,
   zonedLocalToUtcIso,
@@ -21,14 +20,14 @@ import type {
   Team,
 } from "@/types";
 
-const API_BASE = "https://worldcup26.ir/get";
-const REVALIDATE_SECONDS = 300;
+export type FetchMode = WorldCupFetchMode;
 
-/**
- * "cached" uses the 5-minute ISR cache (good for static-ish data).
- * "fresh" bypasses the cache entirely for live data like in-progress scores.
- */
-export type FetchMode = "cached" | "fresh";
+function worldCupFetchErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message === WORLD_CUP_API_AUTH_REQUIRED) {
+    return WORLD_CUP_API_AUTH_REQUIRED;
+  }
+  return WORLD_CUP_API_UNAVAILABLE;
+}
 
 interface ApiGame {
   id: string;
@@ -84,27 +83,68 @@ interface ApiGroup {
   teams: ApiGroupTeam[];
 }
 
-async function fetchJson<T>(
-  path: string,
-  mode: FetchMode = "cached",
-): Promise<T | null> {
+async function fetchTeamsJson(mode: FetchMode = "cached") {
+  return fetchWorldCupResource<{ teams: ApiTeam[] }>("teams", { mode });
+}
+
+const fetchTeamsCached = cache(async () => fetchTeamsJson("cached"));
+
+async function getTeamsUncached(): Promise<ApiResult<Team[]>> {
   try {
-    const res = await fetch(
-      `${API_BASE}/${path}`,
-      mode === "fresh"
-        ? { cache: "no-store" }
-        : { next: { revalidate: REVALIDATE_SECONDS } },
-    );
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
+    const response = await fetchTeamsCached();
+    if (!response.teams.length) {
+      return { data: [], source: "api", error: "World Cup API returned no teams" };
+    }
+
+    const teams = response.teams.map((team) => ({
+      id: team.id,
+      name: team.name_en,
+      nameFa: team.name_fa,
+      flag: team.flag,
+      fifaCode: team.fifa_code,
+      iso2: team.iso2,
+      group: team.groups,
+    }));
+
+    return { data: teams, source: "api" };
+  } catch (error) {
+    return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
   }
 }
 
-const fetchTeamsJson = cache(async () =>
-  fetchJson<{ teams: ApiTeam[] }>("teams"),
-);
+async function getMatchesUncached(
+  mode: FetchMode = "cached",
+): Promise<ApiResult<Match[]>> {
+  try {
+    const gamesRes = await fetchWorldCupResource<{ games: ApiGame[] }>("games", {
+      mode,
+    });
+
+    if (!gamesRes.games.length) {
+      return { data: [], source: "api", error: "World Cup API returned no matches" };
+    }
+
+    const [teamsRes, stadiumsRes] = await Promise.all([
+      fetchTeamsCached().catch(() => ({ teams: [] as ApiTeam[] })),
+      fetchWorldCupResource<{ stadiums: ApiStadium[] }>("stadiums", {
+        mode: "cached",
+      }).catch(() => ({ stadiums: [] as ApiStadium[] })),
+    ]);
+
+    const teamMap = new Map(teamsRes.teams.map((team) => [team.id, team]));
+    const stadiumMap = new Map(
+      stadiumsRes.stadiums.map((stadium) => [stadium.id, stadium]),
+    );
+
+    const matches = gamesRes.games.map((game) =>
+      mapGameToMatch(game, teamMap, stadiumMap),
+    );
+
+    return { data: matches, source: "api" };
+  } catch (error) {
+    return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
+  }
+}
 
 function parseStatus(finished: string, timeElapsed: string): MatchStatus {
   const finishedUpper = finished?.toUpperCase();
@@ -154,79 +194,16 @@ function mapApiTeam(
   name: string,
   flag?: string,
   group?: string,
-  fifaCode?: string
+  fifaCode?: string,
 ): Team {
   return { id, name, flag, group, fifaCode };
 }
 
-export function mapMockTeams(): Team[] {
-  return mockTeamsApiResponse.teams.map((t: WorldCupApiTeam) => ({
-    id: t.id,
-    name: t.name_en,
-    nameFa: t.name_fa,
-    flag: t.flag,
-    fifaCode: t.fifa_code,
-    iso2: t.iso2,
-    group: t.groups,
-  }));
-}
-
-export function mapMockMatches(): Match[] {
-  const teamMap = new Map(
-    mockTeamsApiResponse.teams.map((t) => [t.id, t as ApiTeam]),
-  );
-  const stadiumMap = new Map(
-    mockStadiumsApiResponse.stadiums.map((s) => [s.id, s as ApiStadium]),
-  );
-  return mockGamesApiResponse.games.map((g) =>
-    mapGameToMatch(g as ApiGame, teamMap, stadiumMap),
-  );
-}
-
-export function mapMockGroups(): Group[] {
-  const teamMap = new Map(
-    mockTeamsApiResponse.teams.map((t) => [t.id, t as ApiTeam]),
-  );
-  return mockGroupsApiResponse.groups.map((g) => ({
-    name: g.name,
-    standings: g.teams.map((s) => {
-      const team = teamMap.get(s.team_id);
-      return {
-        teamId: s.team_id,
-        teamName: team?.name_en ?? `Team ${s.team_id}`,
-        flag: team?.flag,
-        played: parseInt(s.mp, 10) || 0,
-        won: parseInt(s.w, 10) || 0,
-        drawn: parseInt(s.d, 10) || 0,
-        lost: parseInt(s.l, 10) || 0,
-        goalsFor: parseInt(s.gf, 10) || 0,
-        goalsAgainst: parseInt(s.ga, 10) || 0,
-        goalDifference: parseInt(s.gd, 10) || 0,
-        points: parseInt(s.pts, 10) || 0,
-      };
-    }),
-  }));
-}
-
-export function mapMockStadiums(): Stadium[] {
-  const matchCountByStadium = new Map<string, number>();
-  for (const game of mockGamesApiResponse.games) {
-    const count = matchCountByStadium.get(game.stadium_id) ?? 0;
-    matchCountByStadium.set(game.stadium_id, count + 1);
-  }
-  return mockStadiumsApiResponse.stadiums.map((s) => ({
-    id: s.id,
-    name: s.name_en,
-    fifaName: s.fifa_name,
-    city: s.city_en,
-    country: s.country_en,
-    capacity: s.capacity,
-    region: s.region,
-    matchCount: matchCountByStadium.get(s.id) ?? 0,
-  }));
-}
-
-function mapGameToMatch(game: ApiGame, teamMap: Map<string, ApiTeam>, stadiumMap: Map<string, ApiStadium>): Match {
+function mapGameToMatch(
+  game: ApiGame,
+  teamMap: Map<string, ApiTeam>,
+  stadiumMap: Map<string, ApiStadium>,
+): Match {
   const homeApi = teamMap.get(game.home_team_id);
   const awayApi = teamMap.get(game.away_team_id);
   const stadium = stadiumMap.get(game.stadium_id);
@@ -244,14 +221,14 @@ function mapGameToMatch(game: ApiGame, teamMap: Map<string, ApiTeam>, stadiumMap
       game.home_team_name_en || homeApi?.name_en || "TBD",
       homeApi?.flag,
       game.group,
-      homeApi?.fifa_code
+      homeApi?.fifa_code,
     ),
     awayTeam: mapApiTeam(
       game.away_team_id,
       game.away_team_name_en || awayApi?.name_en || "TBD",
       awayApi?.flag,
       game.group,
-      awayApi?.fifa_code
+      awayApi?.fifa_code,
     ),
     homeScore: parseInt(game.home_score, 10) || 0,
     awayScore: parseInt(game.away_score, 10) || 0,
@@ -269,57 +246,6 @@ function mapGameToMatch(game: ApiGame, teamMap: Map<string, ApiTeam>, stadiumMap
   };
 }
 
-async function getTeamsUncached(): Promise<ApiResult<Team[]>> {
-  const response = await fetchTeamsJson();
-  if (!response?.teams?.length) {
-    if (USE_MOCK_FALLBACKS) {
-      return { data: mapMockTeams(), source: "mock", error: "Using fallback team data" };
-    }
-    return { data: [], source: "api", error: "World Cup API unavailable" };
-  }
-  const teams = response.teams.map((t) => ({
-    id: t.id,
-    name: t.name_en,
-    nameFa: t.name_fa,
-    flag: t.flag,
-    fifaCode: t.fifa_code,
-    iso2: t.iso2,
-    group: t.groups,
-  }));
-  return { data: teams, source: "api" };
-}
-
-async function getMatchesUncached(
-  mode: FetchMode = "cached",
-): Promise<ApiResult<Match[]>> {
-  // Only the games feed carries volatile data (scores, status, minute),
-  // so teams/stadiums always stay on the standard cache.
-  const [gamesRes, teamsRes, stadiumsRes] = await Promise.all([
-    fetchJson<{ games: ApiGame[] }>("games", mode),
-    fetchTeamsJson(),
-    fetchJson<{ stadiums: ApiStadium[] }>("stadiums"),
-  ]);
-
-  if (!gamesRes?.games?.length) {
-    if (USE_MOCK_FALLBACKS) {
-      return { data: mapMockMatches(), source: "mock", error: "Using fallback match data" };
-    }
-    return { data: [], source: "api", error: "World Cup API unavailable" };
-  }
-
-  const teamMap = new Map(
-    (teamsRes?.teams ?? []).map((t) => [t.id, t])
-  );
-  const stadiumMap = new Map(
-    (stadiumsRes?.stadiums ?? []).map((s) => [s.id, s])
-  );
-
-  const matches = gamesRes.games.map((g) =>
-    mapGameToMatch(g, teamMap, stadiumMap)
-  );
-  return { data: matches, source: "api" };
-}
-
 export const getTeams = cache(getTeamsUncached);
 export const getMatches = cache(getMatchesUncached);
 
@@ -328,97 +254,100 @@ export async function getMatchById(
   mode: FetchMode = "cached",
 ): Promise<ApiResult<Match | null>> {
   const { data: matches, source, error } = await getMatches(mode);
-  const match = matches.find((m) => m.id === id) ?? null;
+  const match = matches.find((item) => item.id === id) ?? null;
+
   if (!match) {
-    if (USE_MOCK_FALLBACKS) {
-      const mockMatches = mapMockMatches();
-      const fallback = mockMatches.find((m) => m.id === id) ?? mockMatches[0];
-      return {
-        data: fallback ?? null,
-        source: "mock",
-        error: error ?? "Match not found; showing featured match",
-      };
-    }
     return {
       data: null,
-      source: "api",
+      source,
       error: error ?? "Match not found",
     };
   }
+
   return { data: match, source, error };
 }
 
 async function getGroupsUncached(): Promise<ApiResult<Group[]>> {
-  const [groupsRes, teamsRes] = await Promise.all([
-    fetchJson<{ groups: ApiGroup[] }>("groups"),
-    fetchJson<{ teams: ApiTeam[] }>("teams"),
-  ]);
+  try {
+    const [groupsRes, teamsRes] = await Promise.all([
+      fetchWorldCupResource<{ groups: ApiGroup[] }>("groups"),
+      fetchTeamsCached(),
+    ]);
 
-  if (!groupsRes?.groups?.length) {
-    if (USE_MOCK_FALLBACKS) {
-      return { data: mapMockGroups(), source: "mock", error: "Using fallback group data" };
+    if (!groupsRes.groups.length) {
+      return { data: [], source: "api", error: "World Cup API returned no groups" };
     }
-    return { data: [], source: "api", error: "World Cup API unavailable" };
+
+    const teamMap = new Map(teamsRes.teams.map((team) => [team.id, team]));
+
+    const groups: Group[] = groupsRes.groups.map((group) => ({
+      name: group.name,
+      standings: group.teams.map((standing) => {
+        const team = teamMap.get(standing.team_id);
+        return {
+          teamId: standing.team_id,
+          teamName: team?.name_en ?? `Team ${standing.team_id}`,
+          flag: team?.flag,
+          played: parseInt(standing.mp, 10) || 0,
+          won: parseInt(standing.w, 10) || 0,
+          drawn: parseInt(standing.d, 10) || 0,
+          lost: parseInt(standing.l, 10) || 0,
+          goalsFor: parseInt(standing.gf, 10) || 0,
+          goalsAgainst: parseInt(standing.ga, 10) || 0,
+          goalDifference: parseInt(standing.gd, 10) || 0,
+          points: parseInt(standing.pts, 10) || 0,
+        };
+      }),
+    }));
+
+    return {
+      data: groups.sort((a, b) => a.name.localeCompare(b.name)),
+      source: "api",
+    };
+  } catch (error) {
+    return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
   }
-
-  const teamMap = new Map(
-    (teamsRes?.teams ?? []).map((t) => [t.id, t])
-  );
-
-  const groups: Group[] = groupsRes.groups.map((g) => ({
-    name: g.name,
-    standings: g.teams.map((s) => {
-      const team = teamMap.get(s.team_id);
-      return {
-        teamId: s.team_id,
-        teamName: team?.name_en ?? `Team ${s.team_id}`,
-        flag: team?.flag,
-        played: parseInt(s.mp, 10) || 0,
-        won: parseInt(s.w, 10) || 0,
-        drawn: parseInt(s.d, 10) || 0,
-        lost: parseInt(s.l, 10) || 0,
-        goalsFor: parseInt(s.gf, 10) || 0,
-        goalsAgainst: parseInt(s.ga, 10) || 0,
-        goalDifference: parseInt(s.gd, 10) || 0,
-        points: parseInt(s.pts, 10) || 0,
-      };
-    }),
-  }));
-
-  return { data: groups.sort((a, b) => a.name.localeCompare(b.name)), source: "api" };
 }
 
 async function getStadiumsUncached(): Promise<ApiResult<Stadium[]>> {
-  const [stadiumsRes, gamesRes] = await Promise.all([
-    fetchJson<{ stadiums: ApiStadium[] }>("stadiums"),
-    fetchJson<{ games: ApiGame[] }>("games"),
-  ]);
+  try {
+    const stadiumsRes = await fetchWorldCupResource<{ stadiums: ApiStadium[] }>(
+      "stadiums",
+    );
 
-  if (!stadiumsRes?.stadiums?.length) {
-    if (USE_MOCK_FALLBACKS) {
-      return { data: mapMockStadiums(), source: "mock", error: "Using fallback stadium data" };
+    if (!stadiumsRes.stadiums.length) {
+      return {
+        data: [],
+        source: "api",
+        error: "World Cup API returned no stadiums",
+      };
     }
-    return { data: [], source: "api", error: "World Cup API unavailable" };
+
+    const gamesRes = await fetchWorldCupResource<{ games: ApiGame[] }>("games", {
+      mode: "cached",
+    }).catch(() => ({ games: [] as ApiGame[] }));
+
+    const matchCountByStadium = new Map<string, number>();
+    for (const game of gamesRes.games) {
+      const count = matchCountByStadium.get(game.stadium_id) ?? 0;
+      matchCountByStadium.set(game.stadium_id, count + 1);
+    }
+
+    const stadiums: Stadium[] = stadiumsRes.stadiums.map((stadium) => ({
+      id: stadium.id,
+      name: stadium.name_en,
+      fifaName: stadium.fifa_name,
+      city: stadium.city_en,
+      country: stadium.country_en,
+      capacity: stadium.capacity,
+      region: stadium.region,
+      matchCount: matchCountByStadium.get(stadium.id) ?? 0,
+    }));
+
+    return { data: stadiums, source: "api" };
+  } catch (error) {
+    return { data: [], source: "api", error: worldCupFetchErrorMessage(error) };
   }
-
-  const matchCountByStadium = new Map<string, number>();
-  for (const game of gamesRes?.games ?? []) {
-    const count = matchCountByStadium.get(game.stadium_id) ?? 0;
-    matchCountByStadium.set(game.stadium_id, count + 1);
-  }
-
-  const stadiums: Stadium[] = stadiumsRes.stadiums.map((s) => ({
-    id: s.id,
-    name: s.name_en,
-    fifaName: s.fifa_name,
-    city: s.city_en,
-    country: s.country_en,
-    capacity: s.capacity,
-    region: s.region,
-    matchCount: matchCountByStadium.get(s.id) ?? 0,
-  }));
-
-  return { data: stadiums, source: "api" };
 }
 
 export const getGroups = cache(getGroupsUncached);
@@ -429,8 +358,8 @@ export async function getTodaysMatches(): Promise<ApiResult<Match[]>> {
   const today = new Date();
   const todayStr = today.toISOString().slice(0, 10);
 
-  const todays = matches.filter((m) => {
-    const isoDate = toIsoDate(m.date);
+  const todays = matches.filter((match) => {
+    const isoDate = toIsoDate(match.date);
     if (isoDate === todayStr) return true;
     const matchDate = new Date(isoDate);
     return (
@@ -441,10 +370,11 @@ export async function getTodaysMatches(): Promise<ApiResult<Match[]>> {
 
   if (todays.length === 0) {
     const upcoming = [...matches]
-      .filter((m) => m.status === "scheduled" || m.status === "notstarted")
+      .filter((match) => match.status === "scheduled" || match.status === "notstarted")
       .slice(0, 6);
+
     return {
-      data: upcoming.length ? upcoming : USE_MOCK_FALLBACKS ? mapMockMatches() : [],
+      data: upcoming,
       source,
       error,
     };
@@ -455,42 +385,14 @@ export async function getTodaysMatches(): Promise<ApiResult<Match[]>> {
 
 export async function getFeaturedMatch(): Promise<ApiResult<Match | null>> {
   const { data: matches, source, error } = await getMatches();
-  const live = matches.find((m) => m.status === "live");
+  const live = matches.find((match) => match.status === "live");
   if (live) return { data: live, source, error };
+
   const scheduled = matches.find(
-    (m) => m.status === "scheduled" || m.status === "notstarted"
+    (match) => match.status === "scheduled" || match.status === "notstarted",
   );
   if (scheduled) return { data: scheduled, source, error };
   if (matches[0]) return { data: matches[0], source, error };
-  if (USE_MOCK_FALLBACKS) {
-    return { data: mapMockMatches()[0], source: "mock", error };
-  }
+
   return { data: null, source, error };
-}
-
-export function getStatusLabel(status: MatchStatus): string {
-  const labels: Record<MatchStatus, string> = {
-    scheduled: "Scheduled",
-    notstarted: "Not Started",
-    live: "Live",
-    finished: "Full Time",
-    halftime: "Half Time",
-    postponed: "Postponed",
-  };
-  return labels[status] ?? status;
-}
-
-export function getStatusBadgeVariant(
-  status: MatchStatus
-): "default" | "success" | "warning" | "danger" | "secondary" {
-  switch (status) {
-    case "live":
-      return "danger";
-    case "finished":
-      return "secondary";
-    case "halftime":
-      return "warning";
-    default:
-      return "secondary";
-  }
 }

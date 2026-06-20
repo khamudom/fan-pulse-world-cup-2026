@@ -6,7 +6,7 @@ import { AdminDrawer } from "@/components/AdminDrawer";
 import { AuthModalProvider } from "@/components/AuthModal";
 // import { DataSourceLegend } from "@/components/DataSourceLegend";
 import { CheckInCelebrationContainer } from "@/components/CheckInCelebration";
-import { HeaderContainer } from "@/components/layout/Header/HeaderContainer";
+import { HeaderContainer, HeaderSkeleton } from "@/components/layout/Header";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { ThemeProvider } from "@/components/Theme";
 import { getThemeState } from "@/lib/theme-request";
@@ -68,8 +68,12 @@ export default async function RootLayout({
             </Suspense>
             <DeferredApiPreviewBanner />
             {/* <DataSourceLegend /> */}
-            <AdminDrawer />
-            <HeaderContainer resolvedTheme={resolvedTheme} />
+            <Suspense fallback={null}>
+              <AdminDrawer />
+            </Suspense>
+            <Suspense fallback={<HeaderSkeleton />}>
+              <HeaderContainer resolvedTheme={resolvedTheme} />
+            </Suspense>
             <CheckInCelebrationContainer />
             <main id="main-content">{children}</main>
           </AuthModalProvider>

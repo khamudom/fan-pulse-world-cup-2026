@@ -51,7 +51,7 @@ export function DailyChallengeCard({
         <div className={styles.headerRow}>
           <CardTitle as="h3">{challenge.title}</CardTitle>
           {challenge.points > 0 ? (
-            <Badge variant="outline">+{challenge.points} pts</Badge>
+            <Badge variant="default" appearance="outline">+{challenge.points} pts</Badge>
           ) : null}
         </div>
       </CardHeader>

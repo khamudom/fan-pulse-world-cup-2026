@@ -143,6 +143,6 @@ export interface TimelineEvent {
 
 export interface ApiResult<T> {
   data: T;
-  source: "api" | "mock";
+  source: "api";
   error?: string;
 }

@@ -22,7 +22,7 @@ export function TeamCard({ team }: TeamCardProps) {
   return (
     <Card className={styles.card}>
       {team.group && (
-        <Badge variant="outline" className={styles.groupBadge}>
+        <Badge variant="default" appearance="outline" className={styles.groupBadge}>
           Group {team.group}
         </Badge>
       )}

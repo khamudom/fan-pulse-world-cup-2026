@@ -8,10 +8,6 @@
   color: var(--color-success);
 }
 
-.mock {
-  color: #f59e0b;
-}
-
 .local {
   color: var(--color-accent);
 }

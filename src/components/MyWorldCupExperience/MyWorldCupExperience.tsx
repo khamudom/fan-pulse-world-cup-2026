@@ -171,7 +171,7 @@ function HeroChapter({
         </p>
         {favoriteTeam?.group ? (
           <p className={styles.heroMeta}>
-            <Badge variant="secondary">Group {favoriteTeam.group}</Badge>
+            <Badge variant="default" appearance="tint">Group {favoriteTeam.group}</Badge>
             <span>The road to the Final begins here.</span>
           </p>
         ) : null}
@@ -310,7 +310,7 @@ function FixtureTimeline({
             <div className={styles.timelineCard}>
               <div className={styles.timelineTop}>
                 {match.group ? (
-                  <Badge variant="outline">Group {match.group}</Badge>
+                  <Badge variant="default" appearance="outline">Group {match.group}</Badge>
                 ) : null}
                 <span className={styles.timelineDate}>
                   <LocalKickoff
@@ -490,7 +490,7 @@ function SecondStoryChapter({
           <div>
             <p className={styles.secondName}>{secondaryTeam.name}</p>
             {secondaryTeam.group ? (
-              <Badge variant="outline">Group {secondaryTeam.group}</Badge>
+              <Badge variant="default" appearance="outline">Group {secondaryTeam.group}</Badge>
             ) : null}
           </div>
         </div>

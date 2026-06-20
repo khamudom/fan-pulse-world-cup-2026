@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useState } from "react";
 import {
   Card,
@@ -7,41 +8,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@khamudom/lumen-ui-react";
-import { FriendFeed } from "../FriendFeed";
-import { FriendLeaderboard } from "../FriendLeaderboard";
 import { FriendRequests } from "../FriendRequests";
 import { FriendSearch } from "../FriendSearch";
 import { FriendsList } from "../FriendsList";
 import { InvitePanel } from "../InvitePanel";
-import { UsernamePrompt } from "../UsernamePrompt";
-import type { FeedItem, FriendRequestSummary, FriendSummary, LeaderboardEntry } from "@/lib/social";
+import type { FriendRequestSummary, FriendSummary } from "@/lib/social";
 import styles from "./FriendsExperience.module.css";
 
 type Tab = "feed" | "friends" | "requests" | "find";
 
 interface FriendsExperienceProps {
-  feed: FeedItem[];
   friends: FriendSummary[];
   incoming: FriendRequestSummary[];
   outgoing: FriendRequestSummary[];
-  leaderboard: LeaderboardEntry[];
-  needsUsername: boolean;
+  activityPanel: ReactNode;
 }
 
 export function FriendsExperience({
-  feed,
   friends,
   incoming,
   outgoing,
-  leaderboard,
-  needsUsername,
+  activityPanel,
 }: FriendsExperienceProps) {
   const [tab, setTab] = useState<Tab>("feed");
   const pendingCount = incoming.length;
-
-  if (needsUsername) {
-    return <UsernamePrompt />;
-  }
 
   const tabs: { key: Tab; label: string; badge?: number }[] = [
     { key: "feed", label: "Feed" },
@@ -71,30 +61,7 @@ export function FriendsExperience({
       </div>
 
       <div className={styles.grid}>
-        {tab === "feed" ? (
-          <>
-            <Card className={`${styles.card} ${styles.gridFull}`}>
-              <CardHeader>
-                <CardTitle as="h2" className={styles.cardTitle}>
-                  Standings
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <FriendLeaderboard entries={leaderboard} />
-              </CardContent>
-            </Card>
-            <Card className={`${styles.card} ${styles.gridFull}`}>
-              <CardHeader>
-                <CardTitle as="h2" className={styles.cardTitle}>
-                  Friends activity
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <FriendFeed items={feed} />
-              </CardContent>
-            </Card>
-          </>
-        ) : null}
+        {tab === "feed" ? activityPanel : null}
 
         {tab === "friends" ? (
           <Card className={`${styles.card} ${styles.gridFull}`}>
